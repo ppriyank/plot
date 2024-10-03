@@ -2,15 +2,8 @@ import matplotlib.colors as mc
 import colorsys
 from matplotlib.colors import LinearSegmentedColormap
 
-def lighten_color(color, amount=0.5):
-    try:
-        c = mc.cnames[color]
-    except:
-        c = color
-    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
-
-def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, formatter = lambda x: f"{x:.1f}"):
+def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, decimal_places=1):
+    formatter = lambda x: f"{x:.{decimal_places}f}"
     MAX_Y = max(y_vals) + y_up_off
     MIN_Y = min(y_vals) - y_down_off
     offset = (MAX_Y - MIN_Y)/ no
