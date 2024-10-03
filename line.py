@@ -15,6 +15,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
 
     fig, ax = plt.subplots(figsize=figsize)
     COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+    assert len(COLORS) >= len(Lines), "COLORS < LINES (not all lines will be plotted"
 
     X_pos = [] 
     Y_pose = []
@@ -25,8 +26,8 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line)
         if use_scatter:ax.scatter(X, Y, fc=color, s=scatter_size, lw=1.5, ec="white", zorder=12)
 
-    Y_pose += h_lines
     if h_lines:
+        Y_pose += h_lines
         for h_line in h_lines:            
             ax.plot([min(X_pos), max(X_pos)], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
 
@@ -51,7 +52,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
 
 
 def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK], 
-    figsize=(8, 6), name="test", decimal_places=1, alpha_line=1, line_width=5, 
+    figsize=(8, 6), name="test_shade", decimal_places=1, alpha_line=1, line_width=5, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
     use_scatter=True, scatter_size=50, 
@@ -61,6 +62,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
 
     fig, ax = plt.subplots(figsize=figsize)
     COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+    assert len(COLORS) >= len(Lines), "COLORS < LINES (not all lines will be plotted"
 
     # average line dark color
     mid_path_effects = [withStroke(linewidth=6, foreground="white")]
@@ -85,6 +87,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         if use_scatter:ax.scatter(X, Y_min_mean, fc=color, s=scatter_size, lw=1.5, ec="white", zorder=12)
 
     if h_lines:
+        Y_pose += h_lines
         for h_line in h_lines:            
             ax.plot([min(X_pos), max(X_pos)], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
 
