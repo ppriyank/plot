@@ -4,6 +4,8 @@ import matplotlib.colors as mc
 import colorsys
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.pyplot as plt
+import numpy as np 
 
 BROWN = "#AD8C97"
 BROWN_DARKER = "#7d3a46"
@@ -33,6 +35,7 @@ ALONE_COLORS = sns.color_palette("pastel", as_cmap=True)
 HEAT_MAP_COLOR = LinearSegmentedColormap.from_list("custom_cmap", [ORANGE, RED, "black", BLUE, "white"][::-1])
 
 
+
 def lighten_color(color, amount=0.5):
     try:
         c = mc.cnames[color]
@@ -41,4 +44,9 @@ def lighten_color(color, amount=0.5):
     c = colorsys.rgb_to_hls(*mc.to_rgb(c))
     return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
 
+
+def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))):
+    # Generate a gradient of colors from blue to orange
+    colors = LinearSegmentedColormap.from_list("blue_to_orange", colors)
+    return colors
 

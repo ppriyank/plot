@@ -1,5 +1,5 @@
 from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot
-from colors import HEAT_MAP_COLOR
+from colors import HEAT_MAP_COLOR, generate_color_gradient
 import pandas as pd 
 import torch 
 import torch.nn.functional as F
@@ -22,7 +22,12 @@ dist = (dist ** 2).sum(-1)
 df = pd.DataFrame( dist.cpu(), columns=[f"Layer-{e+1}" for e in range(len(dist))])
 heatmap_plt(df, name="test_heatmap", X_label_fontsize=25, figsize=(10, 10), xticklabels= 5, vmin=0, vmax=2,  cmap=cmap,
     linewidths=.5 , annot=False, fmt=".2f")
-    
+
+cmap = generate_color_gradient(1000)
+heatmap_plt(df, name="test_heatmap2", X_label_fontsize=25, figsize=(10, 10), xticklabels= 5, vmin=0, vmax=2,  cmap=cmap,
+    linewidths=.5 , annot=False, fmt=".2f")
+
+
 
 ######### WORD CLOUD 
 
