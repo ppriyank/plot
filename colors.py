@@ -33,6 +33,7 @@ ALONE_COLORS = sns.color_palette("pastel", as_cmap=True)
 
 # Create the colormap
 HEAT_MAP_COLOR = LinearSegmentedColormap.from_list("custom_cmap", [ORANGE, RED, "black", BLUE, "white"][::-1])
+BAR_LABEL = "#009933"
 
 
 
