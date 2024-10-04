@@ -3,8 +3,7 @@
 Reference : https://python-graph-gallery.com/
 
 
-## Line Plots 
-`test_line.py`
+## Line Plots `test_line.py`
 
 <div style="display: flex; justify-content: space-around;">
   <div>
@@ -18,8 +17,7 @@ Reference : https://python-graph-gallery.com/
 </div>
 
 
-## Histogram Plots 
-`test_hist.py`
+## Histogram Plots `test_hist.py`
 
 <div style="display: flex; justify-content: space-around;">
   <div>
@@ -36,8 +34,7 @@ Reference : https://python-graph-gallery.com/
 
 
 
-## Scatter Plots 
-`test_scatter.py`
+## Scatter Plots `test_scatter.py`
 
 <div style="display: flex; justify-content: space-around;">
   <div>
@@ -49,8 +46,8 @@ Reference : https://python-graph-gallery.com/
 
 
 
-## Misc : Radar, Word Cloud, Heamtmp
-`test_misc.py`
+## Misc `test_misc.py` : Radar, Word Cloud, Heamtmp
+
 
 <div style="display: flex; justify-content: space-around;">
   <div>

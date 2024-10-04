@@ -48,25 +48,30 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
     
 
 def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
-    x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None):
+    x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
+    switch_off_x_axis=None):
     
     # Customize y-axis ticks
     ax.yaxis.set_ticks( Y_range )
     ax.yaxis.set_ticklabels( Y_range_label )
     ax.yaxis.set_tick_params(labelleft=False, length=0)
-    
+
     if x_ticks_allowed:
         ax.xaxis.set_ticks(X_range)
         ax.xaxis.set_ticklabels(X_range_label, fontsize=X_label_fontsize)
         ax.xaxis.set_tick_params(length=6, width=1.2)
+        # Add grid lines
+        
     else:
         ax.xaxis.set_tick_params(labelbottom=False, length=0)
-
+        
+        
     # Make gridlines be below most artists.
     ax.set_axisbelow(True)
-
     # Add grid lines
-    ax.grid(axis = "both", color="#A8BAC4", lw=1.2)
+    ax.grid(axis = "y", color="#A8BAC4", lw=1.2)
+    
+    
 
     # Remove all spines but the one in the bottom
     ax.spines["right"].set_visible(False)
