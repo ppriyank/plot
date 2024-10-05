@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import matplotlib as mpl
-from colors import LinearSegmentedColormap, sns
+from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE
 from math import pi
-from colors import ALONE_COLORS, lighten_color
 from utils import range_calc
 
 # vmin= hardlimit of start range
@@ -136,3 +135,50 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
     plt.tight_layout()
     plt.savefig(f"{name}.png")
     
+
+
+
+def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), cmap=None,
+    linewidths=.5 , decimal_places=1, COLOR= ALONE_COLORS,
+    y_points=3, y_up_offset=0, y_down_offset=0, y_font_size=20, use_mean=None,
+    x_padding_factor=0.5, ):
+    
+    plt.clf()
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    COLORS = {e:COLOR[i] for i,e in enumerate(df["X"].unique())}
+    
+    
+
+    if not use_mean:
+        boxplot = sns.boxplot(x="X", y="Y",  data=df, palette=COLORS, width=width)
+        boxplot.set_xticklabels(boxplot.get_xticklabels(), fontsize=X_label_fontsize)
+        boxplot.set(xlabel='', ylabel="")
+    else:
+        # Calculate mean and standard deviation
+        means = df.groupby('X')['Y'].mean()
+        stds = df.groupby('X')['Y'].std()
+        # Overlay mean and standard deviation
+        for i, day in enumerate(means.index):
+            plt.scatter(i, means[day], color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
+            plt.errorbar(i, means[day], yerr=stds[day], fmt='none', color="black", capsize=12, lw=2)
+        ax.xaxis.set_ticks(range(len(means.index)))
+        ax.xaxis.set_ticklabels(means.index, fontsize=X_label_fontsize)
+        ax.xaxis.set_zorder(12)
+        plt.xlim(0 - x_padding_factor,  len(means.index) -1 + x_padding_factor)
+
+    
+
+    Y_range, Y_range_label = range_calc(df["Y"].tolist(), y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+    plt.ylim(min(Y_range),  max(Y_range))
+    ax.yaxis.set_ticks(Y_range)
+    ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size)
+    ax.yaxis.set_zorder(12)
+
+    ax.set_axisbelow(True)
+    ax.grid(axis = "both", color="#A8BAC4", lw=1.2)
+
+    plt.tight_layout()
+    plt.savefig(f"{name}.png")
+    plt.clf()
+

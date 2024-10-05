@@ -66,5 +66,11 @@ Reference : https://python-graph-gallery.com/
     <img src="Pictures/test_radar1.png" alt="Multiple Lines" style="width: 50%;">
     <p style="text-align: center;">Radar Plot2</p>
   </div>
+  <div>
+    <img src="Pictures/test_box.png" alt="Multiple Lines" style="width: 50%;">
+    <p style="text-align: center;">Box Plot (median and qunatile)</p>
+    <img src="Pictures/test_box_mean.png" alt="Multiple Lines" style="width: 50%;">
+    <p style="text-align: center;">Box Plot (mean and std)</p>
+  </div>
 </div>
 
