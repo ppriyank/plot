@@ -1,5 +1,5 @@
 from hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_side
-
+from colors import RED, BAR_LABEL
 
 Hists = [
     [[0, 1, 2], [42.4, 41.4, 39.6]],
@@ -57,11 +57,23 @@ Hists = [
 custom_labels = [
     ["" for i in Hists[0]],
 ]
+custom_labels_colors = [
+    ["black" for i in Hists[0]],
+]
+
 diff_array = []
+new_colors = []
 for i in range(len(Hists[0])):
     diff = Hists[1][i] - Hists[0][i] 
-    diff_array.append(f"{diff:.1f}")
+    if diff > 0:
+        diff_array.append(f"+{diff:.1f}")
+        new_colors.append(BAR_LABEL)
+    else:
+        diff_array.append(f"{diff:.1f}")
+        new_colors.append(RED)
+
 custom_labels.append(diff_array)    
+custom_labels_colors.append(new_colors)
 
 X_labels = ["Dataset_A", "Dataset_B", "Dataset_C"]
 
@@ -69,8 +81,8 @@ bar_graph_side_by_side(Hists, name="test_hist_side_diff_labels", artificial_dark
     barWidth=0.4, gap_between_bars=0.5,  gap_between_groups=1,
     figsize=(6, 6),  x_ticks_allowed=False, bar_opacity=1,  
     y_points=2, Y_label_fontsize=25, y_up_offset=0.5, y_down_offset=0.5, y_padding_factor=-0.03, switch_off_yaxis=True, 
-    X_labels=X_labels, x_padding_factor=-0.1, x_padding=-0.09, X_label_fontsize=20,
-    bar_labels=custom_labels, bar_labels_y_offset=0.2, bar_labels_x_offset=0.18, bar_labels_font_size=20,
+    X_labels=X_labels, x_padding_factor=-0.1, x_padding=-0.09, X_label_fontsize=25, x_label_rotate=15, 
+    bar_labels=custom_labels, bar_labels_y_offset=0.1, bar_labels_x_offset=0.2, bar_labels_font_size=20, bar_color=custom_labels_colors,
     )
 
 

@@ -7,6 +7,22 @@ from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import numpy as np 
 
+def lighten_color(color, amount=0.5):
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
+
+
+def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))):
+    # Generate a gradient of colors from blue to orange
+    colors = LinearSegmentedColormap.from_list("blue_to_orange", colors)
+    return colors
+
+
+
 BROWN = "#AD8C97"
 BROWN_DARKER = "#7d3a46"
 GREEN = "#2FC1D3"
@@ -36,18 +52,10 @@ HEAT_MAP_COLOR = LinearSegmentedColormap.from_list("custom_cmap", [ORANGE, RED, 
 BAR_LABEL = "#009933"
 
 
-
-def lighten_color(color, amount=0.5):
-    try:
-        c = mc.cnames[color]
-    except:
-        c = color
-    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
-
-
-def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))):
-    # Generate a gradient of colors from blue to orange
-    colors = LinearSegmentedColormap.from_list("blue_to_orange", colors)
-    return colors
+FIVE_COLOR_SET = ["#FFD700", lighten_color("#FFD700", 0.6), 
+    "#FF4500", lighten_color("#FF4500", 0.6), 
+    "#D2691E", lighten_color("#D2691E", 0.6), 
+    "#4169E1", lighten_color("#4169E1", 0.6),
+    "purple", lighten_color("purple", 0.6),
+]
 

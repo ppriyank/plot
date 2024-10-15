@@ -49,7 +49,7 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
 
 def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
     x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
-    switch_off_x_axis=None):
+    switch_off_x_axis=None, x_label_rotate=0):
     
     # Customize y-axis ticks
     ax.yaxis.set_ticks( Y_range )
@@ -58,7 +58,7 @@ def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fo
 
     if x_ticks_allowed:
         ax.xaxis.set_ticks(X_range)
-        ax.xaxis.set_ticklabels(X_range_label, fontsize=X_label_fontsize)
+        ax.xaxis.set_ticklabels(X_range_label, fontsize=X_label_fontsize, rotation=x_label_rotate)
         ax.xaxis.set_tick_params(length=6, width=1.2)
         # Add grid lines
         
