@@ -13,19 +13,20 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     fig, ax = plt.subplots(figsize=figsize)
 
+    
     if Labels == None:
         Labels = [0 for i in range(len(Points))]
     if type(Labels) == torch.Tensor:
         Labels = Labels.tolist()
     
-
-    print(len(COLORS), len(set(Labels)))
+    print(len(COLORS), len(set(COLORS)), len(set(Labels)))
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_COLORS 
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_XKCD_COLORS 
     
-    COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+    if artificial_darkening:
+        COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
     if len(SIZE) == 1:
         SIZE = [SIZE for i in range(len(Points))]
         
@@ -36,11 +37,12 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
-    for y in set(Labels):
+    for i,y in enumerate(set(Labels)):
         selected_index  = Labels == y
         X, Y = Points[selected_index][:,0], Points[selected_index][:,1]
         size  = SIZE[selected_index]
-        ax.scatter(X, Y, fc=COLORS[y], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
+        y = int(y)
+        ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
 
     if hard_y:
         Y_pos = Y_pos[Y_pos >= min(hard_y) + y_down_offset]

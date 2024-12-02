@@ -47,6 +47,8 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
         ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )
     
 
+# x_padding_factor == position of y axis (& y axis labels) (hortizontal)
+# y_padding_factor == position of y axis labels  (veritical)
 def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
     x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
     switch_off_x_axis=None, x_label_rotate=0):
@@ -93,6 +95,8 @@ def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fo
 
     # # Add labels for vertical grid lines -----------------------
     # # The pad is equal to 1% of the vertical range (35 - 0)
+    
+    # plt.savefig(f"test_hx_hy.png")
     PAD = abs(y_max - y_min) * y_padding_factor
     for i, (label_pos, label) in enumerate(zip(Y_range, Y_range_label)):
         ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )

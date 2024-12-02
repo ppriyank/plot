@@ -2,7 +2,8 @@ from colors import *
 from plot_utils import range_calc
 from style import simplify_hist
 
-
+# x_padding_factor == position of y axis (& y axis labels) (hortizontal)
+# y_padding_factor == position of y axis labels  (veritical)
 def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], 
     figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=0, bar_opacity=1,
     barWidth = 0.3, lw=1.5, ec="white", 
