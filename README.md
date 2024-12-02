@@ -2,7 +2,14 @@
 
 Reference : https://python-graph-gallery.com/
 
-
+## Ussage 
+Download the folder in your directory 
+```
+from plot.colors import ALL_COLORS, lighten_color
+current_path = os.getcwd()
+sys.path.append(os.path.join(current_path, "plot"))
+from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_side
+```
 ## Line Plots `test_line.py`
 
 <div style="display: flex; justify-content: space-around;">

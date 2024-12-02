@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 from colors import * 
-from utils import range_calc
+from plot_utils import range_calc
 from style import simplify
 
 def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK], 

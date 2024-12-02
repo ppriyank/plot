@@ -3,7 +3,7 @@ from wordcloud import WordCloud
 import matplotlib as mpl
 from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE
 from math import pi
-from utils import range_calc
+from plot_utils import range_calc
 
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range

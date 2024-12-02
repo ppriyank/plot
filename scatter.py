@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from colors import * 
-from utils import range_calc
+from plot_utils import range_calc
 from style import simplify
 
 import torch 
