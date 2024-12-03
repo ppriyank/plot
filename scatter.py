@@ -27,9 +27,11 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     
     if artificial_darkening:
         COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
-    if len(SIZE) == 1:
+    if type(SIZE) == int or len(SIZE) == 1:
         SIZE = [SIZE for i in range(len(Points))]
-        
+        SIZE = torch.tensor(SIZE)
+    
+    
     indices = torch.argsort(SIZE, descending=True)
     SIZE = np.array(SIZE)[indices]
     Points = np.array(Points)[indices]

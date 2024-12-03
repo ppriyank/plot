@@ -43,6 +43,9 @@ ALL_COLORS = [c for c,hex in mc.CSS4_COLORS.items()]
 ALL_XKCD_COLORS = [c for c,hex in mc.XKCD_COLORS.items()]
 COLORS = [BLUE, RED]
 
+COLOR_SET_20=["#c9fd60" ,"#682385" ,"#e4cfd3" ,"#08ca46" ,"#6dae9c" ,"#89aa81" ,"#ac39b4" ,"#db6900" ,"#944116" ,"#c276b6" ,"#3d3f59" ,"#52fd7a" ,"#747a39" ,"#b861d7" ,"#83dd1f" ,"#c08202" ,"#93a0b6" ,"#b44f2d" ,"#34ba31" ,"#c6c0b3"]
+COLOR_SET_15=["#1a1816", "#c5e1f7", "#359032", "#acd1dd", "#f7ff89", "#82bb4d", "#b03010", "#b1b352", "#00c595", "#6455af", "#ce6694", "#ef0422", "#9b1167", "#2ff67a", "#36c28c"]
+
 PAIRED_COLORS = sns.color_palette("Paired", as_cmap=True)
 ALONE_COLORS = sns.color_palette("pastel", as_cmap=True)
 
