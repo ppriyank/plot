@@ -6,7 +6,7 @@ from style import simplify
 import torch 
 
 def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, BLUE, RED, GREEN], 
-    figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, 
+    figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, enable_relabeling=None, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, hard_y=None,
     x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_points=3, x_padding_factor=0, x_padding=0.04, hard_x=None,
     ):
@@ -20,6 +20,11 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         Labels = Labels.tolist()
     
     print(len(COLORS), len(set(COLORS)), len(set(Labels)))
+    if enable_relabeling:
+        unique = sorted(set(Labels))
+        unique = {e:i for i,e in enumerate(unique)}
+        Labels= [unique[e] for e in Labels]
+    
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_COLORS 
     if len(COLORS) < len(set(Labels)):
@@ -39,7 +44,9 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
-    for i,y in enumerate(set(Labels)):
+    
+    for i,y in enumerate(sorted(set(Labels))):
+        print(i,y, COLORS[i])
         selected_index  = Labels == y
         X, Y = Points[selected_index][:,0], Points[selected_index][:,1]
         size  = SIZE[selected_index]
@@ -47,14 +54,13 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
 
     if hard_y:
-        Y_pos = Y_pos[Y_pos >= min(hard_y) + y_down_offset]
-        Y_pos = Y_pos[Y_pos <= max(hard_y) - y_up_offset]
+        Y_pos = Y_pos[Y_pos >= (min(hard_y) - y_down_offset) ]
+        Y_pos = Y_pos[Y_pos <= (max(hard_y) + y_up_offset) ]
 
     if hard_x:
         X_pos = X_pos[X_pos >= min(hard_x) + x_down_offset]
         X_pos = X_pos[X_pos <= max(hard_x) - x_up_offset]
-
-
+    
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
 
