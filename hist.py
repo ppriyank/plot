@@ -4,7 +4,7 @@ from style import simplify_hist
 
 # x_padding_factor == position of y axis (& y axis labels) (hortizontal)
 # y_padding_factor == position of y axis labels  (veritical)
-def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], 
+def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None, 
     figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=0, bar_opacity=1,
     barWidth = 0.3, lw=1.5, ec="white", 
     x_ticks_allowed=None, X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0, 
@@ -23,8 +23,11 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE],
         X, Y = hist
         Y_pos += Y
         X_pos += X
-        ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
-
+        if OVERLAPING_COLORS:
+            ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+        else:
+            ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+    
     if bar_labels == True:
         for i,hist in enumerate(Hists):
             X, Y = hist
@@ -38,9 +41,9 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE],
     else:
         X_range = X_labels_pos
         X_range_label = X_labels 
-
+    
     simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
-        x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=True , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate)
+        x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=x_ticks_allowed , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate)
 
     plt.tight_layout()
     plt.savefig(f"{name}.png")

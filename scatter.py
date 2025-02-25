@@ -9,11 +9,11 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, enable_relabeling=None, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, hard_y=None,
     x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_points=3, x_padding_factor=0, x_padding=0.04, hard_x=None,
+    SHAPES = None,
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    
     if Labels == None:
         Labels = [0 for i in range(len(Points))]
     if type(Labels) == torch.Tensor:
@@ -23,6 +23,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     if enable_relabeling:
         unique = sorted(set(Labels))
         unique = {e:i for i,e in enumerate(unique)}
+        print("NEW LABELS : ", unique)
         Labels= [unique[e] for e in Labels]
     
     if len(COLORS) < len(set(Labels)):
@@ -35,24 +36,36 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     if type(SIZE) == int or len(SIZE) == 1:
         SIZE = [SIZE for i in range(len(Points))]
         SIZE = torch.tensor(SIZE)
-    
+    elif type(SIZE)== list:
+        SIZE = torch.tensor(SIZE)
     
     indices = torch.argsort(SIZE, descending=True)
     SIZE = np.array(SIZE)[indices]
     Points = np.array(Points)[indices]
     Labels = np.array(Labels)[indices]
+    if SHAPES is not None:
+        SHAPES = np.array(SHAPES)[indices]
 
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
     
     for i,y in enumerate(sorted(set(Labels))):
-        print(i,y, COLORS[i])
+        # print(i,y, COLORS[i])
         selected_index  = Labels == y
         X, Y = Points[selected_index][:,0], Points[selected_index][:,1]
         size  = SIZE[selected_index]
         y = int(y)
-        ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
+        if SHAPES is not None:
+            shape = SHAPES[selected_index]
+            assert len(set(shape)) == 1, "same label can't have multiple shape"
+            shape = shape[0]
+            ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
+        else:
+            ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
 
+    
+        
+    
     if hard_y:
         Y_pos = Y_pos[Y_pos >= (min(hard_y) - y_down_offset) ]
         Y_pos = Y_pos[Y_pos <= (max(hard_y) + y_up_offset) ]
