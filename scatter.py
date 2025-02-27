@@ -14,7 +14,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    if Labels == None:
+    if Labels is None:
         Labels = [0 for i in range(len(Points))]
     if type(Labels) == torch.Tensor:
         Labels = Labels.tolist()
