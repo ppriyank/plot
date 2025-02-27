@@ -36,6 +36,8 @@ from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_s
     <img src="Pictures/test_hist_side.png" alt="Hist X Y Z" style="width: 50%;">
     <p style="text-align: center;">Relative Comparison</p>
     <img src="Pictures/test_hist_side_diff_labels.png" alt="Hist X Y" style="width: 50%;">
+    <p style="text-align: center;">Horizontal Plots</p>
+    <img src="Pictures/test_hist_horizontal.png" alt="Hist Hist X Y" style="width: 50%;">
   </div>
 </div>
 

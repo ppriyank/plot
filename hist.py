@@ -5,7 +5,7 @@ from style import simplify_hist
 # x_padding_factor == position of y axis (& y axis labels) (hortizontal)
 # y_padding_factor == position of y axis labels  (veritical)
 def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None, 
-    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=0, bar_opacity=1,
+    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=0, bar_opacity=1, 
     barWidth = 0.3, lw=1.5, ec="white", 
     x_ticks_allowed=None, X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0, 
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
@@ -172,5 +172,67 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
 
 
 
+
+
+
+
+def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], 
+    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=1, grid_shape="x",
+    gap_between_bars = 1, barWidth = 0.3, bar_opacity=1,
+    lw=1.5, ec="white", 
+    y_ticks_allowed=None, Y_labels=None, Y_label_fontsize=25, 
+    bar_labels = None, bar_labels_x_offset=0.1, bar_labels_y_offset=0.1, bar_labels_font_size=5, bar_color=None, 
+    x_points=3, X_label_fontsize=20, x_left_offset=0.1, x_right_offset = 0.1, x_padding=0, x_ticks_allowed=True, switch_off_xaxis=True, x_label_rotate=0,
+    switch_off_yaxis=True, y_padding=0, x_padding_factor=0.1, y_padding_factor=0, y_label_rotate=0):
+    bar_label_formatter = lambda x: f"{x:.{decimal_places}f}"
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    
+    if artificial_darkening:
+        COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+
+    N_of_hist = len(Hists)
+    indices = []
+    index = 0
+    if bar_color:
+        bar_color = [bar_color for i in range(N_of_hist)]
+    elif bar_color is None:
+        bar_color = COLORS
+
+    for i in range(N_of_hist):
+        index = index + gap_between_bars
+        indices.append(index)
+    y_index = np.array(indices)
+    y_index = y_index[::-1]
+    
+    X_pos = Hists
+    Y_pos = y_index
+    for i, (X,Y) in enumerate(zip(Hists, y_index)):
+        ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+    
+
+    if bar_labels == True:
+        for i, (X,Y) in enumerate(zip(Hists, y_index)):
+            ax.text( X + bar_labels_x_offset, Y + bar_labels_y_offset, bar_label_formatter(X),  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color[i] )
+            print(X + bar_labels_x_offset, Y + bar_labels_y_offset)
+    elif bar_labels != None:
+        for i, (X,Y) in enumerate(zip(Hists, y_index)):
+            label = bar_labels[i]
+            ax.text( X + bar_labels_x_offset, Y + bar_labels_y_offset, label,  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color[i] )
+        
+        
+    X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_right_offset,  y_down_off=x_left_offset, decimal_places=decimal_places)
+
+    
+    # Y_range = Y_pos + 
+    simplify_hist(ax, Y_pos, Y_labels, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
+                  x_min=min(X_range), x_max= max(X_range), x_ticks_allowed=x_ticks_allowed , switch_off_yaxis=switch_off_yaxis, switch_off_xaxis=switch_off_xaxis,
+                  y_padding=y_padding + barWidth, grid_shape=grid_shape, 
+                  x_padding = x_padding, x_padding_factor=x_padding_factor, y_padding_factor=y_padding_factor,
+                  x_label_rotate=x_label_rotate, y_label_rotate=y_label_rotate)
+            
+    plt.tight_layout()
+    plt.savefig(f"{name}.png")
+    
 
 
