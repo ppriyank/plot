@@ -62,3 +62,9 @@ FIVE_COLOR_SET = ["#FFD700", lighten_color("#FFD700", 0.6),
     "purple", lighten_color("purple", 0.6),
 ]
 
+
+
+# COLOR PALLETS : 
+# https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0
+# https://coolors.co/palette/ef476f-f78c6b-ffd166-06d6a0-118ab2-073b4c
+# https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226
