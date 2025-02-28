@@ -68,6 +68,11 @@ GRADIENT_COLORS_6 = [
     "#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6", "#023E8A", "#03045E",
 ]
 
+#### LIGHT YELLOW TO DARK GREEN 
+GRADIENT_COLORS_6_GREEN = [
+    "#CCFF33", "#70E000", "#38B000", "#008000", "#006400", "#004B23"
+]
+
 # COLOR PALLETS : 
 # https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0
 # https://coolors.co/palette/ef476f-f78c6b-ffd166-06d6a0-118ab2-073b4c
