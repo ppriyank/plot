@@ -63,6 +63,10 @@ FIVE_COLOR_SET = ["#FFD700", lighten_color("#FFD700", 0.6),
 ]
 
 
+#### LIGHT BLUE TO DARK 
+GRADIENT_COLORS_6 = [
+    "#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6", "#023E8A", "#03045E",
+]
 
 # COLOR PALLETS : 
 # https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0

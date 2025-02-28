@@ -9,11 +9,11 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, enable_relabeling=None, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, hard_y=None,
     x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_points=3, x_padding_factor=0, x_padding=0.04, hard_x=None,
-    SHAPES = None,
+    SHAPES = None, strict_order = None, 
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
-
+    
     if Labels is None:
         Labels = [0 for i in range(len(Points))]
     if type(Labels) == torch.Tensor:
@@ -26,10 +26,12 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         print("NEW LABELS : ", unique)
         Labels= [unique[e] for e in Labels]
     
+    
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_COLORS 
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_XKCD_COLORS 
+    
     
     if artificial_darkening:
         COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
@@ -49,7 +51,10 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
     
-    for i,y in enumerate(sorted(set(Labels))):
+    curret_order_of_loop = sorted(set(Labels)) 
+    if strict_order is not None:
+        curret_order_of_loop = strict_order
+    for i,y in enumerate( curret_order_of_loop ):
         # print(i,y, COLORS[i])
         selected_index  = Labels == y
         X, Y = Points[selected_index][:,0], Points[selected_index][:,1]
