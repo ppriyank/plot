@@ -67,7 +67,10 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
             ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
         else:
             ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
-
+            # (0.4562745098039217, 0.2133333333333331, 1.000000000000000)
+            # COLORS[i] =[round(e, 15) for e in COLORS[i]]
+            # [0.4562745098039217, 0.2133333333333332, 1.0000000000000002]
+            # (0.2048179271708681, 0.5431932773109239, 0.9069467787114849)
     
         
     

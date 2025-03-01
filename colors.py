@@ -13,7 +13,9 @@ def lighten_color(color, amount=0.5):
     except:
         c = color
     c = colorsys.rgb_to_hls(*mc.to_rgb(c))
-    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
+    c= colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
+    c =[round(e, 15) for e in c]
+    return c
 
 
 def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))):

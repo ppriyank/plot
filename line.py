@@ -57,6 +57,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     use_scatter=True, scatter_size=50, 
     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
     border_line_width=None, SHADE_Colors=None, artificial_darkening=1, artificial_light=2, 
+    background_vline=None, vline_color="black", 
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -71,6 +72,16 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         border_line_width = line_width
     if SHADE_Colors == None:
         SHADE_Colors = [lighten_color(e, amount=artificial_light)  for e in COLORS]
+
+    if background_vline is not None:
+        Y_pose = []
+        for percentage in Lines:
+            _, Y_max, Y_min_mean, Y_min = percentage
+            Y_pose += Y_max + Y_min_mean + Y_min
+        
+        for v_line in background_vline:            
+            ax.plot([v_line, v_line], [min(Y_pose) - y_down_offset, max(Y_pose) + y_up_offset], color=vline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
+
 
     X_pos = [] 
     Y_pose = []
