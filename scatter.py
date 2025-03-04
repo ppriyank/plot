@@ -41,6 +41,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     elif type(SIZE)== list:
         SIZE = torch.tensor(SIZE)
     
+    
     indices = torch.argsort(SIZE, descending=True)
     SIZE = np.array(SIZE)[indices]
     Points = np.array(Points)[indices]
@@ -62,9 +63,12 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         y = int(y)
         if SHAPES is not None:
             shape = SHAPES[selected_index]
-            assert len(set(shape)) == 1, "same label can't have multiple shape"
-            shape = shape[0]
-            ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
+            if len(set(shape)) == 1:
+                shape = shape[0]
+                ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
+            else:
+                for s in set(shape):
+                    ax.scatter(X[shape == s], Y[shape == s], fc=COLORS[i], s=size[shape == s], zorder=12, ec=ec, lw=lw, alpha=alpha, marker=s)
         else:
             ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
             # (0.4562745098039217, 0.2133333333333331, 1.000000000000000)
