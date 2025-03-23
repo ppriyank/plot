@@ -23,7 +23,10 @@ def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))
     colors = LinearSegmentedColormap.from_list("blue_to_orange", colors)
     return colors
 
-
+def generate_color_gradients2(n, colors=["#4169E1", "#FF4500"]):
+    colors_template = LinearSegmentedColormap.from_list('custom_gradient', colors, N=n)
+    colors = [colors_template(i/n) for i in range(n)]
+    return colors
 
 BROWN = "#AD8C97"
 BROWN_DARKER = "#7d3a46"

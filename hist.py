@@ -10,6 +10,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     x_ticks_allowed=None, X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0, 
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
+    hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -19,6 +20,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
 
     X_pos = [] 
     Y_pos = []
+    
     for i,hist in enumerate(Hists):
         X, Y = hist
         Y_pos += Y
@@ -33,6 +35,13 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
             X, Y = hist
             for x,y in zip(X,Y):
                 ax.text( x + bar_labels_x_offset, y + bar_labels_y_offset, bar_label_formatter(y),  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color )
+    
+    if hline:
+        Y_pos += hline
+        for h_line in hline:
+            ax.plot([min(X_pos) - barWidth, max(X_pos) + barWidth], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, zorder=0)
+            
+    
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
         
     if X_labels is None:
@@ -55,6 +64,7 @@ def bar_graph_X_Y_Gradient(Hists, COLORS=['#89CFF0', '#000080', '#000000'],
     x_ticks_allowed=None, X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0,
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
+    hline=None, 
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -85,6 +95,7 @@ def bar_graph_X_Y_Gradient(Hists, COLORS=['#89CFF0', '#000080', '#000000'],
             X, Y, _ = hist
             for x,y in zip(X,Y):
                 ax.text( x + bar_labels_x_offset, y + bar_labels_y_offset, bar_label_formatter(y),  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color )
+    
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
         
     if X_labels is None:
@@ -176,7 +187,7 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
 
 
 
-def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], 
+def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None, 
     figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=1, grid_shape="x",
     gap_between_bars = 1, barWidth = 0.3, bar_opacity=1,
     lw=1.5, ec="white", 
@@ -191,7 +202,11 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN],
     if artificial_darkening:
         COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
 
-    N_of_hist = len(Hists)
+    if side_by_side:
+        assert False, "broken not yet verified"
+        N_of_hist = len(Hists[0])
+    else:
+        N_of_hist = len(Hists)
     indices = []
     index = 0
     if bar_color:
@@ -204,12 +219,20 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN],
         indices.append(index)
     y_index = np.array(indices)
     y_index = y_index[::-1]
-    
-    X_pos = Hists
+
+    if side_by_side:
+        X_pos = Hists[0]
+    else:
+        X_pos = Hists
     Y_pos = y_index
-    for i, (X,Y) in enumerate(zip(Hists, y_index)):
-        ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
-    
+    if side_by_side:
+        for hist in Hists:
+            for i, (X,Y) in enumerate(zip(hist, y_index)):
+                ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+    else:
+        for i, (X,Y) in enumerate(zip(Hists, y_index)):
+            ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+        
 
     if bar_labels == True:
         for i, (X,Y) in enumerate(zip(Hists, y_index)):
