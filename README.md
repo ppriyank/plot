@@ -64,6 +64,10 @@ from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_s
     <p style="text-align: center;">Heat Map</p>
   </div>
   <div>
+    <img src="Pictures/test_heatmap3.png" alt="Heat map" style="width: 50%;">
+    <p style="text-align: center;">Heat Map</p>
+  </div>
+  <div>
     <img src="Pictures/test_word_cloud.png" alt="Word Cloud" style="width: 50%;">
     <p style="text-align: center;">Word Cloud</p>
   </div>

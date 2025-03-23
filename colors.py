@@ -82,3 +82,12 @@ GRADIENT_COLORS_6_GREEN = [
 # https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0
 # https://coolors.co/palette/ef476f-f78c6b-ffd166-06d6a0-118ab2-073b4c
 # https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226
+
+
+
+if __name__ == 'main':
+    ### Range specific colors 
+    colors = [(0, "#FF4500"), (0.5, 'black'), (1, "#4169E1")]
+    cmap = generate_color_gradients2(1000, colors=colors)
+    cmap # is list of colors (RGB, val)
+    # val == 1 =end color, val == 0 start color

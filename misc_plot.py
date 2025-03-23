@@ -7,21 +7,47 @@ from plot_utils import range_calc
 
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range
-def heatmap_plt(df, name="test", X_label_fontsize=25, figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None,
-    linewidths=.5 , annot=False, fmt=".2f"):
+def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None,
+    linewidths=.5 , annot=False, fmt=".2f", yticklabels=False, center=None, 
+    x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, ann_size=20,
+    color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0,):
     fig, ax = plt.subplots(figsize=figsize)
-    default_size  = plt.rcParams['font.size']
-    plt.rcParams.update({'font.size': X_label_fontsize})
 
     plt.clf()
-    if vmin is None and vmax is None :
-        sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=False, cmap=cmap, linewidths=linewidths, fmt=fmt)
-    else:
-        sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=False, vmin=vmin, vmax=vmax, cmap=cmap, center = (vmin + vmax)/ 2, linewidths=linewidths, fmt=fmt)
+    if center is None:
+        center = (vmin + vmax)/ 2
 
+
+    if vmin is None and vmax is None :
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, cmap=cmap, linewidths=linewidths, fmt=fmt, annot_kws={"size": ann_size})
+    else:
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, linewidths=linewidths, fmt=fmt, annot_kws={"size": ann_size})
+
+    
+    if color_bar_labels is not None:
+        if color_bar_labels_range == None:
+            color_bar_labels_range = color_bar_labels
+        # Get the colorbar
+        colorbar = ax.collections[0].colorbar
+        # Set custom labels for the colorbar
+        colorbar.set_ticks(color_bar_labels_range)
+        colorbar.set_ticklabels(color_bar_labels, fontsize=color_label_fontsize, rotation=color_label_rotate)
+        # # Set the label for the colorbar
+        # colorbar.set_label('Custom Label')
+    
+    for x_ticks in ax.get_xticklabels():
+        x_ticks.set_size(X_label_fontsize)
+        x_ticks.set_rotation(x_label_rotate)
+    
+    for x_ticks in ax.get_yticklabels():
+        x_ticks.set_size(Y_label_fontsize)
+        x_ticks.set_rotation(y_label_rotate)
+    
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    
     plt.tight_layout()
     plt.savefig(f"{name}.png")
-    plt.rcParams.update({'font.size': default_size})
     plt.clf()
 
 
