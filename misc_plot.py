@@ -9,7 +9,7 @@ from plot_utils import range_calc
 # vmax= hardlimit of end range
 def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None,
     linewidths=.5 , annot=False, fmt=".2f", yticklabels=False, center=None, 
-    x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, ann_size=20,
+    x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, ann_size=20, x_label_dist=0, y_label_dist=5, 
     color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0,):
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -17,7 +17,12 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     if center is None:
         center = (vmin + vmax)/ 2
 
-
+    if type(x_label_dist) != list:
+        x_label_dist = [x_label_dist for _ in range(len(df.columns))]
+    if type(y_label_dist) != list:
+        y_label_dist = [y_label_dist for _ in range(len(df.columns))]
+    
+    
     if vmin is None and vmax is None :
         ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, cmap=cmap, linewidths=linewidths, fmt=fmt, annot_kws={"size": ann_size})
     else:
@@ -39,10 +44,20 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         x_ticks.set_size(X_label_fontsize)
         x_ticks.set_rotation(x_label_rotate)
     
-    for x_ticks in ax.get_yticklabels():
-        x_ticks.set_size(Y_label_fontsize)
-        x_ticks.set_rotation(y_label_rotate)
+    for i, label in enumerate(ax.get_xticklabels()):
+        label.set_position((label.get_position()[0], label.get_position()[1] - x_label_dist[i] ))
+
     
+    for y_ticks in ax.get_yticklabels():
+        y_ticks.set_size(Y_label_fontsize)
+        y_ticks.set_rotation(y_label_rotate)
+    
+    for i, label in enumerate(ax.get_yticklabels()):
+        label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))
+
+    
+    
+
     ax.set_xlabel('')
     ax.set_ylabel('')
     

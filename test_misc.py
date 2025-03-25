@@ -49,15 +49,17 @@ if heat_map2:
     df.set_index('LR-TK0', inplace=True)
     df = df.sub(df.iloc[0])
     df = df * 100 
+    df = df.iloc[1:]
     print(df)
 
     mini= df.min().min()
     maxi= df.max().max()
-    n_bins=  10 
+    ##### smoothness
+    n_bins=  20
 
     ## Min val ==> "#FF4500", 0 special case ==> 'black' , maxi ==> "#4169E1"
     zero_one_range = lambda x: (x - mini) / (maxi - mini)
-    colors = [(zero_one_range(mini), "#FF4500"), (zero_one_range(0), 'black'), (zero_one_range(maxi), "#4169E1")]
+    colors = [(zero_one_range(mini), "#FF4500"), (zero_one_range(0), 'white'), (zero_one_range(maxi), "#4169E1")]
     cmap = generate_color_gradients2(n_bins, colors)
 
     offset  =(maxi - mini) / n_bins
@@ -67,12 +69,30 @@ if heat_map2:
     yticklabels=True
     x_font_size=13
     y_font_size = 15
+    
+    #### Position of x labels 
+    x_padding = {'OG': -0.01, 'Pixel Drop ': -0.025, 
+        'ISO': -0.005, 'Salt': -0.01, 'Low Res': -0.025, 
+        'Focus Blur': -0.025, 'JPG': 0.005, 
+        'Chromatic': -0.025, 'Motion Blur ': -0.03, 
+        'Fog': 0.0, 'Rain': -0.025, 
+        'Snow': -0.02, 'Atmospheric': -0.04}
+    
+    #### Position of y labels 
+    y_padding = {'Pixel Drop ': 0.0, 
+        'ISO': 0.0, 'Rain': 0, 
+        'Snow': 0.0, 'Atmospheric': -0.0}
+
+    x_label_dist = [val for key,val in x_padding.items()]
+    y_label_dist = [val for key,val in y_padding.items()]
+
     heatmap_plt(df, name="test_heatmap3", 
-        X_label_fontsize=x_font_size, Y_label_fontsize=y_font_size, x_label_rotate=45,
-        figsize=(10, 10), xticklabels= 1, vmin=mini, vmax=maxi, cmap=cmap, linewidths=.1 , annot=True, fmt=".1f", yticklabels=yticklabels, 
-        color_bar_labels=color_bar_labels, color_bar_labels_range=color_bar_labels_range, color_label_fontsize=15, ann_size=14)
+        X_label_fontsize=x_font_size, Y_label_fontsize=y_font_size, x_label_rotate=25, x_label_dist=x_label_dist, y_label_rotate=0, y_label_dist=y_label_dist, 
+        figsize=(10, 6), xticklabels= 1, vmin=mini, vmax=maxi, cmap=cmap, linewidths=.1 , annot=True, fmt=".1f", yticklabels=yticklabels, 
+        color_bar_labels=color_bar_labels, color_bar_labels_range=color_bar_labels_range, color_label_fontsize=15, ann_size=15)
 
 
+     
 
 
 ######### WORD CLOUD 
