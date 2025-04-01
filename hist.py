@@ -120,6 +120,7 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
     x_ticks_allowed=None, X_labels=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0,
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
+    x_label_dist=None,
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -172,10 +173,10 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
         X_range = X_index.mean(-1)
         X_range_label = X_labels
         simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
-            x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=True , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate)
+            x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=True , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist)
     else:
         simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
-            x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=False , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate)
+            x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=False , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist)
 
     plt.tight_layout()
     plt.savefig(f"{name}.png")

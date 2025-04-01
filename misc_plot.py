@@ -7,10 +7,10 @@ from plot_utils import range_calc
 
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range
-def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None,
-    linewidths=.5 , annot=False, fmt=".2f", yticklabels=False, center=None, 
-    x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, ann_size=20, x_label_dist=0, y_label_dist=5, 
-    color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0,):
+def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
+    x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
+    color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0, 
+    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", ):
     fig, ax = plt.subplots(figsize=figsize)
 
     plt.clf()
@@ -24,11 +24,17 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     
     
     if vmin is None and vmax is None :
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, cmap=cmap, linewidths=linewidths, fmt=fmt, annot_kws={"size": ann_size})
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, cmap=cmap, fmt=fmt,  annot_kws={"size": ann_size})
     else:
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, linewidths=linewidths, fmt=fmt, annot_kws={"size": ann_size})
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size})
 
+    # # Turn off the axis spines
+    # ax.spines['top'].set_visible(False)
+    # ax.spines['bottom'].set_visible(False)
+    # ax.spines['left'].set_visible(False)
+    # ax.spines['right'].set_visible(False)
     
+
     if color_bar_labels is not None:
         if color_bar_labels_range == None:
             color_bar_labels_range = color_bar_labels
@@ -48,6 +54,16 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         label.set_position((label.get_position()[0], label.get_position()[1] - x_label_dist[i] ))
 
     
+    # # Add horizontal grid lines with custom opacity
+    for y in range(1, len(df.index) ):
+        ax.hlines(y, xmin=0, xmax=len(df.columns), color=grid_color, alpha=grid_alpha, linewidth=grid_width)
+    # x axis 
+    ax.hlines(len(df.index) , xmin=0, xmax=len(df.columns), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
+    for x in range(1, len(df.columns) ):
+        ax.vlines(x, ymin=0, ymax=len(df.index), color=grid_color, alpha=grid_alpha, linewidth=grid_width)
+    # y axis 
+    ax.vlines(0, ymin=0, ymax=len(df.index), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
+    
     for y_ticks in ax.get_yticklabels():
         y_ticks.set_size(Y_label_fontsize)
         y_ticks.set_rotation(y_label_rotate)
@@ -56,6 +72,9 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))
 
     
+    
+    
+
     
 
     ax.set_xlabel('')
