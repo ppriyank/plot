@@ -51,7 +51,7 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
 # y_padding_factor == position of y axis labels  (veritical)
 def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
     x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
-    switch_off_x_axis=None, x_label_rotate=0, switch_off_xaxis=None, y_padding=0, grid_shape="y", y_label_rotate=0, x_label_dist=None):
+    switch_off_x_axis=None, x_label_rotate=0, switch_off_xaxis=None, y_padding=0, grid_shape="y", y_label_rotate=0, x_label_dist=None, grid_opacity=1):
     
     # Customize y-axis ticks
     ax.yaxis.set_ticks( Y_range )
@@ -76,7 +76,7 @@ def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fo
     ax.set_axisbelow(True)
     
     # Add grid lines
-    ax.grid(axis = grid_shape, color="#A8BAC4", lw=1.2)
+    ax.grid(axis = grid_shape, color="#A8BAC4", lw=1.2, alpha=grid_opacity)
     # Remove all spines but the one in the bottom
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)

@@ -50,6 +50,30 @@ COLORS = [BLUE, RED]
 
 COLOR_SET_20=["#c9fd60" ,"#682385" ,"#e4cfd3" ,"#08ca46" ,"#6dae9c" ,"#89aa81" ,"#ac39b4" ,"#db6900" ,"#944116" ,"#c276b6" ,"#3d3f59" ,"#52fd7a" ,"#747a39" ,"#b861d7" ,"#83dd1f" ,"#c08202" ,"#93a0b6" ,"#b44f2d" ,"#34ba31" ,"#c6c0b3"]
 COLOR_SET_15=["#1a1816", "#c5e1f7", "#359032", "#acd1dd", "#f7ff89", "#82bb4d", "#b03010", "#b1b352", "#00c595", "#6455af", "#ce6694", "#ef0422", "#9b1167", "#2ff67a", "#36c28c"]
+COLOR_SET_15=["#FBE183FF", "#F4C40FFF", "#FE9B00FF", "#D8443CFF", "#9B3441FF", "#DE597CFF", "#E87B89FF", "#E6A2A6FF", "#AA7AA1FF", "#9F5691FF", "#633372FF", "#1F6E9CFF", "#2B9B81FF", "#92C051FF"]
+
+
+#### BLUE - RED 
+COLOR_SET_10=["#033270", "#1368AA", "#4091C9", "#9DCEE2", "#FEDFD4", "#F29479", "#F26A4F", "#EF3C2D", "#CB1B16", "#65010C"]
+#### DARK GREEN - ORANGE
+COLOR_SET_10_2=["#264653", "#287271", "#2A9D8F", "#8AB17D", "#BABB74", "#E9C46A", "#EFB366", "#F4A261", "#EE8959", "#E76F51"]
+#### DARK BLUE - ORANGE
+COLOR_SET_10_3=["#011A51", "#1957DB", "#487BEA", "#7EA3F1", "#C8D7F9", "#B83700", "#F06C00", "#FAB129", "#FBC55F", "#FDE9C3"]
+#### ORANGE - LIGHT BLUE
+COLOR_SET_10_4=["#CC4400", "#D66915", "#E08E29", "#F0C761", "#FFFF99", "#C2FCFF", "#7CC6DE", "#3890BC", "#1C489A", "#000077"]
+#### BLACK - LIGHT GREEN
+COLOR_SET_10_5=["#310906", "#633533", "#90605E", "#E9B6B4", "#F3EFE0", "#C1D3C8", "#8FB7B0", "#597380", "#3E5168", "#222E50"]
+
+
+#### BLUE - ORANGE
+COLOR_SET_5_1=["#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"]
+#### BLUE - ORANGE
+COLOR_SET_5_2=["#3D348B", "#7678ED", "#F7B801", "#F18701", "#F35B04"]
+
+
+
+
+
 
 PAIRED_COLORS = sns.color_palette("Paired", as_cmap=True)
 ALONE_COLORS = sns.color_palette("pastel", as_cmap=True)
@@ -86,8 +110,6 @@ DISTINCT_5 = [
 
 # COLOR PALLETS : 
 # https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0
-# https://coolors.co/palette/ef476f-f78c6b-ffd166-06d6a0-118ab2-073b4c
-# https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226
 
 
 

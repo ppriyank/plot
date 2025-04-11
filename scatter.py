@@ -51,7 +51,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
-    
+
     curret_order_of_loop = sorted(set(Labels)) 
     if strict_order is not None:
         curret_order_of_loop = strict_order
@@ -88,8 +88,6 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
-
-    
 
     simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
         Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
