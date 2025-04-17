@@ -50,6 +50,7 @@ COLORS = [BLUE, RED]
 
 COLOR_SET_20=["#c9fd60" ,"#682385" ,"#e4cfd3" ,"#08ca46" ,"#6dae9c" ,"#89aa81" ,"#ac39b4" ,"#db6900" ,"#944116" ,"#c276b6" ,"#3d3f59" ,"#52fd7a" ,"#747a39" ,"#b861d7" ,"#83dd1f" ,"#c08202" ,"#93a0b6" ,"#b44f2d" ,"#34ba31" ,"#c6c0b3"]
 COLOR_SET_15=["#1a1816", "#c5e1f7", "#359032", "#acd1dd", "#f7ff89", "#82bb4d", "#b03010", "#b1b352", "#00c595", "#6455af", "#ce6694", "#ef0422", "#9b1167", "#2ff67a", "#36c28c"]
+## Yellow - Blue 
 COLOR_SET_15=["#FBE183FF", "#F4C40FFF", "#FE9B00FF", "#D8443CFF", "#9B3441FF", "#DE597CFF", "#E87B89FF", "#E6A2A6FF", "#AA7AA1FF", "#9F5691FF", "#633372FF", "#1F6E9CFF", "#2B9B81FF", "#92C051FF"]
 
 
@@ -69,6 +70,15 @@ COLOR_SET_10_5=["#310906", "#633533", "#90605E", "#E9B6B4", "#F3EFE0", "#C1D3C8"
 COLOR_SET_5_1=["#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"]
 #### BLUE - ORANGE
 COLOR_SET_5_2=["#3D348B", "#7678ED", "#F7B801", "#F18701", "#F35B04"]
+
+
+# distinct 8 colors  --> 16 colors in paris 
+COLOR_SET_16_1 = ["#F00314", '#FF8019', '#FAE603', '#28E10A', '#3BB5FF', '#0500C7', '#5C03FA', '#DE00ED']
+COLOR_SET_16_1 = [x for e in COLOR_SET_16_1 for x in (lighten_color(e, 1.2), lighten_color(e, 0.8))]
+
+# distinct 8 colors  --> 16 colors in paris 
+COLOR_SET_14_1 = ["#588B8B", '#FFFFFF', '#FFD5C2', '#F28F3B', '#C8553D', '#2D3047', '#93B7BE']
+COLOR_SET_14_1 = [x for e in COLOR_SET_14_1 for x in (lighten_color(e, 1), lighten_color(e, 0.8))]
 
 
 
