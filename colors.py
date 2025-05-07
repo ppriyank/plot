@@ -28,6 +28,21 @@ def generate_color_gradients2(n, colors=["#4169E1", "#FF4500"]):
     colors = [colors_template(i/n) for i in range(n)]
     return colors
 
+
+def colors_heat_map(maxi,  mini, specific_values= [-2,0,2], n_bins=100 ):
+    zero_one_range = lambda x: (x - mini) / (maxi - mini)
+    colors = [
+        (zero_one_range(mini), lighten_color("#FF4500", 0.8) ), 
+        (zero_one_range( specific_values[0] ), lighten_color("#FF4500", 1.5)), 
+        (zero_one_range( specific_values[1] ), 'white'), 
+        (zero_one_range( specific_values[2] ), lighten_color("#4169E1", 1.5)), 
+        (zero_one_range(maxi), lighten_color("#4169E1", 0.8) )
+    ]
+    cmap = generate_color_gradients2(n_bins, colors)
+    return cmap
+
+
+
 BROWN = "#AD8C97"
 BROWN_DARKER = "#7d3a46"
 GREEN = "#2FC1D3"
@@ -80,6 +95,7 @@ COLOR_SET_16_1 = [x for e in COLOR_SET_16_1 for x in (lighten_color(e, 1.2), lig
 COLOR_SET_14_1 = ["#588B8B", '#FFFFFF', '#FFD5C2', '#F28F3B', '#C8553D', '#2D3047', '#93B7BE']
 COLOR_SET_14_1 = [x for e in COLOR_SET_14_1 for x in (lighten_color(e, 1), lighten_color(e, 0.8))]
 
+COLOR_SET_7_1 = ["#005F73", '#0A9396', '#94D2BD', '#E9D8A6', '#EE9B00', '#CA6702', '#BB3E03', '#AE2012', '#9B2226', ]
 
 
 
@@ -116,6 +132,12 @@ GRADIENT_COLORS_6_GREEN = [
 DISTINCT_5 = [
     "#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"
 ]
+
+DISTINCT_3 = ["#26547C", "#EF476F", "#FFD166"]
+DISTINCT_4 = ["#001524", "#15616D", "#FFECD1", '#FF7D00']
+
+DISTINCT_9 = ["#F4F1DE", '#EAB69F', '#E07A5F', '#8F5D5D', '#3D405B', '#5F797B', '#81B29A', '#BABF95', '#F2CC8F', ]
+
 
 
 # COLOR PALLETS : 
