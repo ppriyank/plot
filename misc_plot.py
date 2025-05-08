@@ -17,10 +17,15 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     if center is None:
         center = (vmin + vmax)/ 2
 
-    if type(x_label_dist) != list:
+    if x_label_dist is None:
+        x_label_dist = [0 for _ in range(len(df.columns))]
+    elif type(x_label_dist) != list:
         x_label_dist = [x_label_dist for _ in range(len(df.columns))]
-    if type(y_label_dist) != list:
-        y_label_dist = [y_label_dist for _ in range(len(df.columns))]
+        
+    if y_label_dist is None :
+        y_label_dist = [0 for _ in range(len(df.index))]
+    elif type(y_label_dist) != list:
+        y_label_dist = [y_label_dist for _ in range(len(df.index))]
     
     
     if vmin is None and vmax is None :
@@ -34,7 +39,6 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     # ax.spines['left'].set_visible(False)
     # ax.spines['right'].set_visible(False)
     
-
     if color_bar_labels is not None:
         if color_bar_labels_range == None:
             color_bar_labels_range = color_bar_labels
@@ -45,7 +49,8 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         colorbar.set_ticklabels(color_bar_labels, fontsize=color_label_fontsize, rotation=color_label_rotate)
         # # Set the label for the colorbar
         # colorbar.set_label('Custom Label')
-    
+        
+        
     for x_ticks in ax.get_xticklabels():
         x_ticks.set_size(X_label_fontsize)
         x_ticks.set_rotation(x_label_rotate)
@@ -54,13 +59,16 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         label.set_position((label.get_position()[0], label.get_position()[1] - x_label_dist[i] ))
 
     
+    
     # # Add horizontal grid lines with custom opacity
     for y in range(1, len(df.index) ):
         ax.hlines(y, xmin=0, xmax=len(df.columns), color=grid_color, alpha=grid_alpha, linewidth=grid_width)
     # x axis 
     ax.hlines(len(df.index) , xmin=0, xmax=len(df.columns), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
+    
     for x in range(1, len(df.columns) ):
         ax.vlines(x, ymin=0, ymax=len(df.index), color=grid_color, alpha=grid_alpha, linewidth=grid_width)
+    
     # y axis 
     ax.vlines(0, ymin=0, ymax=len(df.index), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
     
@@ -68,14 +76,10 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         y_ticks.set_size(Y_label_fontsize)
         y_ticks.set_rotation(y_label_rotate)
     
+    
     for i, label in enumerate(ax.get_yticklabels()):
         label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))
 
-    
-    
-    
-
-    
 
     ax.set_xlabel('')
     ax.set_ylabel('')

@@ -9,7 +9,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha_line=1, line_width=5, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
-    use_scatter=True, scatter_size=50, 
+    use_scatter=True, scatter_size=50, scatter_boder=1.5, scatter_color="white",
     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
     ):
 
@@ -24,7 +24,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         X_pos += X
         Y_pose += Y
         ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line)
-        if use_scatter:ax.scatter(X, Y, fc=color, s=scatter_size, lw=1.5, ec="white", zorder=12)
+        if use_scatter:ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=12)
 
     if h_lines:
         Y_pose += h_lines
