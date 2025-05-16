@@ -10,7 +10,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
     use_scatter=True, scatter_size=50, scatter_boder=1.5, scatter_color="white",
-    h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
+    h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, add_black_outline=None, 
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -23,8 +23,15 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         X, Y = percentage
         X_pos += X
         Y_pose += Y
-        ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line)
-        if use_scatter:ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=12)
+        if add_black_outline:
+            ax.plot(X, Y, color='black', lw=line_width+1, alpha=alpha_line, zorder=12)
+        
+        ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line, zorder=13)
+        if use_scatter:
+            if add_black_outline:
+                ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=12)
+            else:
+                ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=14)
 
     if h_lines:
         Y_pose += h_lines
@@ -46,7 +53,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor)
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
 
 
 
@@ -78,7 +85,8 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         for percentage in Lines:
             _, Y_max, Y_min_mean, Y_min = percentage
             Y_pose += Y_max + Y_min_mean + Y_min
-        
+            
+
         for v_line in background_vline:            
             ax.plot([v_line, v_line], [min(Y_pose) - y_down_offset, max(Y_pose) + y_up_offset], color=vline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
 
@@ -116,4 +124,4 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
 
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)

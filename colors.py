@@ -126,29 +126,44 @@ THREE_COLOR_SET = [
 
 
 #### LIGHT BLUE TO DARK 
-GRADIENT_COLORS_6_BLUE = [
-    "#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6", "#023E8A", "#03045E",
-]
-
+GRADIENT_COLORS_6_BLUE = ["#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6", "#023E8A", "#03045E",]
 #### LIGHT YELLOW TO DARK GREEN 
-GRADIENT_COLORS_6_GREEN = [
-    "#CCFF33", "#70E000", "#38B000", "#008000", "#006400", "#004B23"
-]
-
-GRADIENT_COLORS_6_ORANGE=[
-    "#FFBA08", "#FAA307", "#F48C06", "#E85D04", "#DC2F02", "#D00000"
-]
-
+GRADIENT_COLORS_6_GREEN = ["#CCFF33", "#70E000", "#38B000", "#008000", "#006400", "#004B23"]
+GRADIENT_COLORS_6_ORANGE=["#FFBA08", "#FAA307", "#F48C06", "#E85D04", "#DC2F02", "#D00000"]
+DISTINCT_6_1 = ["#ff9191", "#ffb75f", "#fff56a", "#64d380", "#5f8aee", "#a25fac"]
 
 DISTINCT_5 = [
     "#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"
 ]
 
-DISTINCT_3 = ["#26547C", "#EF476F", "#FFD166"]
+# Blue Red Yellow
+DISTINCT_3_1 = ["#26547C", "#EF476F", "#FFD166"]
+# Black Blue Red 
+DISTINCT_3_3 = ["#0B3954", "#BFD7EA", "#FF6663"]
+# orange yellow blue
+DISTINCT_3_2 = ["#dd6e42", "#e8dab2", "#4f6d7a"]
+# Black Blue orange 
+DISTINCT_3_4 = ["#0B3954", "#BFD7EA", "#FF7D00"]
+
+DISTINCT_3_5 = ["#191716", "#EE964B", "#8ECAE6", ]
+ 
+
+
+# black, green, white, orange
 DISTINCT_4_1 = ["#001524", "#15616D", "#FFECD1", '#FF7D00']
+# light blue, dark blue, black, orange 
 DISTINCT_4_2 = ["#8ECAE6", "#219EBC", "#023047", '#FFB703']
+# red, yellow, blue, black
 DISTINCT_4_3 = ["#D00000", "#FFBA08", "#3F88C5", '#032B43']
+# black, white yellow, orange
 DISTINCT_4_4 = ["#0D3B66", "#FAF0CA", "#F4D35E", '#EE964B']
+# black, orange blue, yellow
+DISTINCT_4_7 = ["#191716", "#EE964B", "#8ECAE6", '#F4D35E']
+# black, blue orange, red
+DISTINCT_4_6 = ["#3a405a", "#aec5eb", "#f9dec9", '#e9afa3']
+# red, orange blue, black
+# DISTINCT_4_7 = ["#8ECAE6", "#FFBA08", "#3F88C5", '#032B43']
+
 
 
 

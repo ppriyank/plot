@@ -58,7 +58,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
         grid_opacity=grid_opacity)
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     
 
 def bar_graph_X_Y_Gradient(Hists, COLORS=['#89CFF0', '#000080', '#000000'], 
@@ -112,7 +112,7 @@ def bar_graph_X_Y_Gradient(Hists, COLORS=['#89CFF0', '#000080', '#000000'],
         x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=True , x_min=min(X_pos) - barWidth, x_max= max(X_pos) + barWidth, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate)
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     
 
 
@@ -189,7 +189,7 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
         
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     
 
 
@@ -232,14 +232,12 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
     y_index = y_index[::-1]
 
     if side_by_side:
-        X_pos = Hists[0]
+        assert False, "broken not yet verified"
     else:
         X_pos = Hists
     Y_pos = y_index
     if side_by_side:
-        for hist in Hists:
-            for i, (X,Y) in enumerate(zip(hist, y_index)):
-                ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+        assert False, "broken not yet verified"
     else:
         for i, (X,Y) in enumerate(zip(Hists, y_index)):
             ax.barh(y=Y, width=X, height=barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
@@ -254,7 +252,6 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
             label = bar_labels[i]
             ax.text( X + bar_labels_x_offset, Y + bar_labels_y_offset, label,  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color[i] )
         
-        
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_right_offset,  y_down_off=x_left_offset, decimal_places=decimal_places)
 
     
@@ -266,7 +263,7 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
                   x_label_rotate=x_label_rotate, y_label_rotate=y_label_rotate)
             
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     
 
 

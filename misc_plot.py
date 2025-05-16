@@ -4,13 +4,15 @@ import matplotlib as mpl
 from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE
 from math import pi
 from plot_utils import range_calc
+import numpy as np 
 
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range
+#### selective coloring of columns : mask (column index)
 def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
     x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
     color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0, 
-    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", ):
+    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False):
     fig, ax = plt.subplots(figsize=figsize)
 
     plt.clf()
@@ -30,6 +32,11 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     
     if vmin is None and vmax is None :
         ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, cmap=cmap, fmt=fmt,  annot_kws={"size": ann_size})
+    elif mask is not False:
+        mask_column = np.ones_like(df, dtype=bool)
+        mask_column[:, 2] = False # Apply colormap to column 'C'
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=mask_column)
+        sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap='gray', center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=~mask_column, ax=ax, cbar=False)
     else:
         ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size})
 
@@ -85,7 +92,7 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     ax.set_ylabel('')
     
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
 
 
@@ -126,7 +133,7 @@ def word_cloud_plt(X, SIZE, COLOR_INDEX, COLORS=None, figsize=(500,500), colors_
     plt.imshow(wc)
     plt.axis("off")
     plt.tight_layout()
-    plt.savefig(f"{name}.png") 
+    plt.savefig(f"{name}.png", dpi=300) 
 
     
 
@@ -197,7 +204,7 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
     ax.grid(axis = "y", color="#A8BAC4", )
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     
 
 
@@ -243,6 +250,6 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
     ax.grid(axis = "both", color="#A8BAC4", lw=1.2)
 
     plt.tight_layout()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
 
