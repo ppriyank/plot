@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import matplotlib as mpl
-from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE
+from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE, generate_color_gradients2
 from math import pi
-from plot_utils import range_calc
+from plot_utils import range_calc, binning, contrast_ratio
 import numpy as np 
 
 # vmin= hardlimit of start range
@@ -253,3 +253,161 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
     plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
 
+
+
+# https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
+# column_to_be_colored  should be between 0 to 1 
+def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, 
+    N_CLUSTERS = 10,  plt_name="test", figsize=(20, 20), COLOR_MAP=None, map_vals_to_colors=True , N_BINS_COLORS = 1000,
+    use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
+    node_size_formula=lambda x :x, 
+    node_labels=True, node_labels_font_size=10, node_labels_colors='white',
+    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5
+    ):
+
+    
+    import networkx as nx
+    from netgraph import Graph
+    import pandas as pd 
+
+
+    ##### Range of values 0 --> white and 1 --> black (intermediate blue)
+    if map_vals_to_colors:
+        colors = [(0, "white"), (0.5, "#4169E1"), (1, 'black')]
+        cmap = generate_color_gradients2(N_BINS_COLORS, colors=colors)
+        
+        color_bucket_column = column_to_be_colored + "_color_bucket"
+        df[color_bucket_column] = df[column_to_be_colored] * N_BINS_COLORS  // 1
+        df[color_bucket_column] = df[color_bucket_column].astype(int)
+    else:
+        assert False, "custom Color values not yet tasted...."
+
+
+    ##### Node Size & Colors 
+    node_size = {}    
+    node_color = {}
+    all_nodes = df[node_column].tolist()
+    for name in all_nodes:
+        size = df[df[node_column] == name][column_to_be_binned]
+        size = size.item()
+        node_size[name] = node_size_formula(size)
+
+        color_index  = df[df[node_column] == name][color_bucket_column]
+        color_index = color_index.item()
+        node_color[name] = cmap[color_index]
+            
+
+    
+    ##### Making Clusters of Nodes based on specific column
+    bucket_column = column_to_be_binned + '_bucket'
+    df[ bucket_column ] = df[column_to_be_binned].apply( binning, 
+        **dict(
+            n_bins=N_CLUSTERS,
+            mini= df[column_to_be_binned].min(),
+            maxi=df[column_to_be_binned].max()) 
+    )
+
+    ##### Connecting points inside the cluster 
+    # can also connect points to other clusters
+    FROM = []
+    TO = []
+    node_to_community = dict()
+    all_nodes = df[node_column].tolist()
+    for bucket in range(N_CLUSTERS+1):
+        names = df[df[bucket_column] == bucket][node_column].tolist()
+        if use_bunding:
+            # all_other_buckets = df[df[bucket_column] != bucket][node_column].tolist()
+            buckets= df[bucket_column].unique()
+            all_other_buckets  = [ ]
+            for e in buckets: 
+                if e != bucket:
+                    # all_other_buckets += df[df[bucket_column] == e].sample(frac=0.25)[node_column].tolist()
+                    all_other_buckets += df[df[bucket_column] == e].sample(n=1)[node_column].tolist()
+             
+        for i,name in enumerate(names): 
+            node_to_community[name] = bucket 
+            if edges_with_cluster:
+                FROM +=  [name] * (len(names))
+                TO += names
+            elif use_bunding:
+                FROM +=  [name] * (len(all_other_buckets))
+                TO += all_other_buckets
+            else:
+                all_nodes.remove(name)
+                FROM +=  [name] * (len(all_nodes))
+                TO += all_nodes
+
+            
+            
+
+    df = pd.DataFrame({ 'from': FROM, 'to':TO})
+    G=nx.from_pandas_edgelist(df, 'from', 'to')
+
+    plt.clf()
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # Graph(G)
+    # nx.draw(G, with_labels=True)
+    # plt.savefig("temp.png", dpi=300)
+
+
+
+    ########### beatutification 
+    graph_style = dict(
+        node_color=node_color, 
+        node_edge_width=node_edge_width,     
+        node_edge_color=node_edge_color,
+        node_size = node_size,
+
+        edge_width=edge_width,        
+        edge_alpha=edge_alpha,
+        
+        node_labels=node_labels,  
+        node_label_fontdict=dict(
+            size=node_labels_font_size, 
+            color=node_labels_colors,
+            # rotation=20,
+        ),
+
+        reduce_edge_crossings=True,   
+        ## size of node (larger number means smaller nodes)
+        # scale=(2, 2), 
+    )
+
+    if use_bunding:
+        graph_style['edge_layout'] = 'bundled' # this is where bundling is made possible
+    
+    
+    graph_plot = Graph(G,
+      node_layout='community', node_layout_kwargs=dict(node_to_community=node_to_community),
+      ax=ax,
+      **graph_style
+    )
+
+    ########### Chaning Node fone size and colors
+    for i,e in enumerate(ax._children):
+        if type(e) == mpl.text.Text:
+            node_name = e.get_text()
+
+            default_font_size = node_labels_font_size
+            node_size_local = node_size[node_name]
+            ax._children[i].set_fontsize( node_size_local * default_font_size / 2 )
+
+            node_color_local = node_color[node_name]
+            default_label_color = node_labels_colors
+            color_contrast_ratio = contrast_ratio(node_color_local, default_label_color)
+
+            if color_contrast_ratio < color_contrast_ratio_threshold :
+                ax._children[i].set_color('black')
+            
+           
+           
+    
+    plt.tight_layout()
+    plt.savefig(f"{plt_name}.png", dpi=300)
+    plt.clf()
+
+
+    
+
+             

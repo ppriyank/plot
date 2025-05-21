@@ -95,7 +95,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)
-
+    plt.clf()
 
 
 

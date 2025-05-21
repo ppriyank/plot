@@ -1,4 +1,4 @@
-from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt
+from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_plt
 from colors import HEAT_MAP_COLOR, generate_color_gradient, generate_color_gradients2
 import pandas as pd 
 import torch 
@@ -8,10 +8,11 @@ from math import log
 import numpy as np 
 
 heat_map = False 
-heat_map2=True 
+heat_map2=False 
 word_cloud = False 
 radar_plot = False 
 box_plot = False 
+bubble_plot = True 
 
 ######### HEAT MAP
 cmap = None 
@@ -142,7 +143,6 @@ if radar_plot:
 
 
 ######### Box PLot 
-
 if box_plot:
     A = [42.4, 41.4, 39.6, 38.4, 42, 39.8, 38, 38]
     B = [44.4, 43.1, 40.1, 39.0, 44, 42.7, 38, 37]
@@ -163,6 +163,40 @@ if box_plot:
 
     box_plt(df, name="test_box_mean", figsize=(7, 10),
         y_up_offset=5, y_down_offset=5, y_points=4, width=0.6, use_mean=True, x_padding_factor=0.5, )
+
+
+
+
+######### BUBBLE PLOT 
+if bubble_plot:
+    from math import log 
+    ### Nodes
+    class_name = ['lobster', 'jellyfish', 'hand', 'pistol', 'cottontail', 'raccoon', 'motorcycle']
+
+    ### Sizes (This will be used to bin)
+    class_sizes = [60, 155, 1515, 346, 46, 64, 330]
+
+    ### COLOR decider (between 0-1)
+    class_scores = [0.700000, 0.285235, 0.182759, 0.098592, 0.005739, 0.063559, 0.052960]
+
+    df = pd.DataFrame({ 'Nodes': class_name, 'Sizes': class_sizes, 'Score': class_scores})
+
+    # (This will be used to bin or clustered
+    df['Sizes'] = df['Sizes'].apply(log)
+    print(df)
+
+
+    network_plt(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
+        plt_name="bubble_plot", figsize=(20, 20), 
+        N_CLUSTERS = 3, ## no of clusters
+        node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
+        node_edge_width=0.2, node_labels=True, 
+        node_labels_font_size=8, ### Node label prop to node size (5 is base size)
+        N_BINS_COLORS = 100, ### Binning of colors [Score ==0 -> white , Score == 1 --> black]
+        node_edge_color="black",
+        edge_width=0.5, edge_alpha=0.5, 
+    )
+
 
 
 

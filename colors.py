@@ -130,7 +130,15 @@ GRADIENT_COLORS_6_BLUE = ["#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6",
 #### LIGHT YELLOW TO DARK GREEN 
 GRADIENT_COLORS_6_GREEN = ["#CCFF33", "#70E000", "#38B000", "#008000", "#006400", "#004B23"]
 GRADIENT_COLORS_6_ORANGE=["#FFBA08", "#FAA307", "#F48C06", "#E85D04", "#DC2F02", "#D00000"]
+# 
 DISTINCT_6_1 = ["#ff9191", "#ffb75f", "#fff56a", "#64d380", "#5f8aee", "#a25fac"]
+# red orange, yellow green blue black
+DISTINCT_6_2 = ["#ef476f", "#f78c6b", "#ffd166", "#06d6a0", "#118ab2", "#073b4c"]
+# red orange, yellow green blue black
+DISTINCT_6_2 = ["#ef476f", "#ff99c8", "#ffd166", "#06d6a0", "#118ab2", "#073b4c"]
+# # blue pink green purple blue orange
+# DISTINCT_6_3 = ["#0015ff", "#ff00a1", "#90fe00", "#8400ff", "#00fff7", "#ff7300"]
+
 
 DISTINCT_5 = [
     "#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"
@@ -162,7 +170,7 @@ DISTINCT_4_7 = ["#191716", "#EE964B", "#8ECAE6", '#F4D35E']
 # black, blue orange, red
 DISTINCT_4_6 = ["#3a405a", "#aec5eb", "#f9dec9", '#e9afa3']
 # red, orange blue, black
-# DISTINCT_4_7 = ["#8ECAE6", "#FFBA08", "#3F88C5", '#032B43']
+DISTINCT_4_7 = ["#191716", "#EE964B", "#8ECAE6", '#38b000']
 
 
 

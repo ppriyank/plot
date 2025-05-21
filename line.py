@@ -64,7 +64,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     use_scatter=True, scatter_size=50, 
     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
     border_line_width=None, SHADE_Colors=None, artificial_darkening=1, artificial_light=2, 
-    background_vline=None, vline_color="black", 
+    background_vline=None, vline_color="black", ec="white", 
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -102,7 +102,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         ax.fill_between(X, Y_min, Y_max, color=shade_color, lw=border_line_width, zorder=12, alpha=alpha_line, ec="white")
         ax.plot(X, Y_min_mean, linestyle='--', color=color, lw=line_width, zorder=12, path_effects=mid_path_effects)    
         # ax.scatter(X_pos, percentage, fc=color, s=100,  )
-        if use_scatter:ax.scatter(X, Y_min_mean, fc=color, s=scatter_size, lw=1.5, ec="white", zorder=12)
+        if use_scatter:ax.scatter(X, Y_min_mean, fc=color, s=scatter_size, lw=1.5, ec=ec, zorder=12)
 
     if h_lines:
         Y_pose += h_lines
