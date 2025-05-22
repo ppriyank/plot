@@ -257,7 +257,7 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
 
 # https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
 # column_to_be_colored  should be between 0 to 1 
-def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, 
+def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
     N_CLUSTERS = 10,  plt_name="test", figsize=(20, 20), COLOR_MAP=None, map_vals_to_colors=True , N_BINS_COLORS = 1000,
     use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
     node_size_formula=lambda x :x, 
@@ -274,7 +274,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
     ##### Range of values 0 --> white and 1 --> black (intermediate blue)
     if map_vals_to_colors:
         colors = [(0, "white"), (0.5, "#4169E1"), (1, 'black')]
-        cmap = generate_color_gradients2(N_BINS_COLORS, colors=colors)
+        cmap = generate_color_gradients2(N_BINS_COLORS+1, colors=colors)
         
         color_bucket_column = column_to_be_colored + "_color_bucket"
         df[color_bucket_column] = df[column_to_be_colored] * N_BINS_COLORS  // 1
@@ -288,7 +288,10 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
     node_color = {}
     all_nodes = df[node_column].tolist()
     for name in all_nodes:
-        size = df[df[node_column] == name][column_to_be_binned]
+        if different_size_column:
+            size = df[df[node_column] == name][different_size_column]
+        else:
+            size = df[df[node_column] == name][column_to_be_binned]
         size = size.item()
         node_size[name] = node_size_formula(size)
 
@@ -315,6 +318,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
     all_nodes = df[node_column].tolist()
     for bucket in range(N_CLUSTERS+1):
         names = df[df[bucket_column] == bucket][node_column].tolist()
+        print(bucket, names)
         if use_bunding:
             # all_other_buckets = df[df[bucket_column] != bucket][node_column].tolist()
             buckets= df[bucket_column].unique()
@@ -358,6 +362,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
         node_edge_width=node_edge_width,     
         node_edge_color=node_edge_color,
         node_size = node_size,
+        node_alpha=0.95,
 
         edge_width=edge_width,        
         edge_alpha=edge_alpha,

@@ -14,16 +14,10 @@ def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, decimal_places=1):
     Y_range_label = [formatter(e) for e in Y_range]
     return Y_range, Y_range_label
     
-
-
-
 def binning(row, n_bins = 10, mini=0, maxi=1):
     deci = (row - mini ) / ( maxi - mini)
     bucket = int(deci * n_bins // 1)
     return bucket
-
-
-
 
 def luminance(color):
     """Calculate the relative luminance of an RGB color."""
@@ -40,4 +34,42 @@ def contrast_ratio(color1, color2):
     lighter = max(lum1, lum2)
     darker = min(lum1, lum2)
     return (lighter + 0.05) / (darker + 0.05)
+
+
+
+
+def lighten_color(color, amount=0.5):
+    try:
+        c = mc.cnames[color]
+    except:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    c= colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
+    c =[round(e, 15) for e in c]
+    return c
+
+
+def generate_color_gradient(n, colors = plt.cm.coolwarm(np.linspace(0, 1, 1000))):
+    # Generate a gradient of colors from blue to orange
+    colors = LinearSegmentedColormap.from_list("blue_to_orange", colors)
+    return colors
+
+def generate_color_gradients2(n, colors=["#4169E1", "#FF4500"]):
+    colors_template = LinearSegmentedColormap.from_list('custom_gradient', colors, N=n)
+    colors = [colors_template(i/n) for i in range(n)]
+    return colors
+
+
+def colors_heat_map(maxi,  mini, specific_values= [-2,0,2], n_bins=100 ):
+    zero_one_range = lambda x: (x - mini) / (maxi - mini)
+    colors = [
+        (zero_one_range(mini), lighten_color("#FF4500", 0.8) ), 
+        (zero_one_range( specific_values[0] ), lighten_color("#FF4500", 1.5)), 
+        (zero_one_range( specific_values[1] ), 'white'), 
+        (zero_one_range( specific_values[2] ), lighten_color("#4169E1", 1.5)), 
+        (zero_one_range(maxi), lighten_color("#4169E1", 0.8) )
+    ]
+    cmap = generate_color_gradients2(n_bins, colors)
+    return cmap
+
 
