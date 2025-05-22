@@ -30,19 +30,19 @@ COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bc
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;">
 <p>Simple Line</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_line.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_line.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <!-- Second row -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Line + Shade</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_shade.png" alt="Line + Shade" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_shade.png" alt="Line + Shade" style="width: 40%;"></div>
 </div>
 
 <!-- Third row -->
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div style="flex: 1; text-align: left;"><p>Multiple Lines</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_multiple.png" alt="Multiple Lines" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_multiple.png" alt="Multiple Lines" style="width: 40%;"></div>
 </div>
 
 </div>
@@ -58,32 +58,32 @@ COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bc
 <!-- First row -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Simple Hist X Y</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hx_hy.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_hx_hy.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
   <!-- Second row -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Hist X Y Z (Gradient)</p></div>
 <div style="flex: 1; text-align: right;">
-<img src="Pictures/test_hx_hy_gradient.png" alt="Line + Shade" style="width: 20%;"></div>
+<img src="Pictures/test_hx_hy_gradient.png" alt="Line + Shade" style="width: 40%;"></div>
 </div>
 
  <!-- Third row -->
 <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Multiple Hist Side by Side</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side.png" alt="Multiple Lines" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side.png" alt="Multiple Lines" style="width: 40%;"></div>
 </div>
 
 <!-- Fourth row -->
 <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Relative Comparison</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side_diff_labels.png" alt="Multiple Lines" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side_diff_labels.png" alt="Multiple Lines" style="width: 40%;"></div>
 </div>
 
 <!-- Fifth row -->
 <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Horizontal Plots</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_horizontal.png" alt="Multiple Lines" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_horizontal.png" alt="Multiple Lines" style="width: 40%;"></div>
 </div>
 
 </div>
@@ -102,7 +102,7 @@ COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bc
 <!-- First row -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Scatter Plot</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_scatter.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_scatter.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 </div>
@@ -120,44 +120,44 @@ COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bc
 <!-- First row -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Heat Map</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Heat Map2</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap3.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap3.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Word Cloud</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_word_cloud.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_word_cloud.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Radar Plot</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar2.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar2.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Radar Plot2</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar1.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar1.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Box Plot (median and qunatile)</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_box.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_box.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Box Plot (mean and std)</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_box_mean.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_box_mean.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 <div style="flex: 1; text-align: left;"><p>Bubble Plot (Better than Scatter) </p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/bubble_plot.png" alt="Simple Line" style="width: 20%;"></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/bubble_plot.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
 </div>
