@@ -19,6 +19,7 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     if type(Labels) == torch.Tensor:
         Labels = Labels.tolist()
     
+    COLORS = [tuple(e) for e in COLORS]
     print(len(COLORS), len(set(COLORS)), len(set(Labels)))
     if enable_relabeling:
         unique = sorted(set(Labels))

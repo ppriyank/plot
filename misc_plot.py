@@ -12,7 +12,7 @@ import numpy as np
 def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
     x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
     color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0, 
-    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False):
+    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False, y_font_colors=None, y_font_weights=None, cbar=True):
     fig, ax = plt.subplots(figsize=figsize)
 
     plt.clf()
@@ -35,10 +35,10 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     elif mask is not False:
         mask_column = np.ones_like(df, dtype=bool)
         mask_column[:, 2] = False # Apply colormap to column 'C'
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=mask_column)
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=mask_column, cbar=cbar)
         sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap='gray', center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=~mask_column, ax=ax, cbar=False)
     else:
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size})
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, cbar=cbar)
 
     # # Turn off the axis spines
     # ax.spines['top'].set_visible(False)
@@ -79,11 +79,15 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     # y axis 
     ax.vlines(0, ymin=0, ymax=len(df.index), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
     
-    for y_ticks in ax.get_yticklabels():
+    for index, y_ticks in enumerate(ax.get_yticklabels()):
         y_ticks.set_size(Y_label_fontsize)
         y_ticks.set_rotation(y_label_rotate)
-    
-    
+        if y_font_colors is not None:
+            y_ticks.set_color(y_font_colors[index])
+        if y_font_weights is not None:
+            y_ticks.set_fontweight(y_font_weights[index])# make it bold
+
+
     for i, label in enumerate(ax.get_yticklabels()):
         label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))
 

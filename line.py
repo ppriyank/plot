@@ -63,7 +63,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
     use_scatter=True, scatter_size=50, 
     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
-    border_line_width=None, SHADE_Colors=None, artificial_darkening=1, artificial_light=2, 
+    border_line_width=None, SHADE_Colors=None, artificial_darkening=1, artificial_shade_darkening=2, alpha_shade=0.5,
     background_vline=None, vline_color="black", ec="white", 
     ):
 
@@ -78,7 +78,7 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     if border_line_width == None:
         border_line_width = line_width
     if SHADE_Colors == None:
-        SHADE_Colors = [lighten_color(e, amount=artificial_light)  for e in COLORS]
+        SHADE_Colors = [lighten_color(e, amount=artificial_shade_darkening)  for e in COLORS]
 
     if background_vline is not None:
         Y_pose = []
@@ -99,8 +99,8 @@ def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         X, Y_max, Y_min_mean, Y_min = percentage
         X_pos += X
         Y_pose += Y_max + Y_min_mean + Y_min
-        ax.fill_between(X, Y_min, Y_max, color=shade_color, lw=border_line_width, zorder=12, alpha=alpha_line, ec="white")
-        ax.plot(X, Y_min_mean, linestyle='--', color=color, lw=line_width, zorder=12, path_effects=mid_path_effects)    
+        ax.fill_between(X, Y_min, Y_max, color=shade_color, lw=border_line_width, zorder=12, alpha=alpha_shade, ec="white")
+        ax.plot(X, Y_min_mean, linestyle='--', color=color, lw=line_width, zorder=12, )    
         # ax.scatter(X_pos, percentage, fc=color, s=100,  )
         if use_scatter:ax.scatter(X, Y_min_mean, fc=color, s=scatter_size, lw=1.5, ec=ec, zorder=12)
 

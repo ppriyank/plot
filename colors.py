@@ -128,7 +128,7 @@ DISTINCT_3_2 = ['#032B43', "#3F88C5", "#FFBA08",]
 # black - blue - orange - red 
 DISTINCT_4_2 = ['#032B43', "#3F88C5", "#FFBA08", "#D00000"]
 # black blue green orange red yellow
-# DISTINCT_6_2 = ["#ef476f", "#ff99c8", "#ffd166", "#06d6a0", "#118ab2", "#073b4c"]
+DISTINCT_6_2 = ["#ef476f", "#ff99c8", "#ffd166", "#06d6a0", "#118ab2", "#073b4c"]
 
 
 #### TEMPLACE   ### 3  (black - green - white - orange )
