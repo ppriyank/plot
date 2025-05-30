@@ -261,15 +261,14 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
 
 # https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
 # column_to_be_colored  should be between 0 to 1 
-def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
+def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
     N_CLUSTERS = 10,  plt_name="test", figsize=(20, 20), COLOR_MAP=None, map_vals_to_colors=True , N_BINS_COLORS = 1000,
     use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
     node_size_formula=lambda x :x, 
-    node_labels=True, node_labels_font_size=10, node_labels_colors='white',
-    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5
-    ):
+    node_labels=True, node_labels_font_size=10, node_labels_colors='white', node_alpha=1, 
+    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5, 
+    scale_x = 1, scale_y = 1):
 
-    
     import networkx as nx
     from netgraph import Graph
     import pandas as pd 
@@ -313,7 +312,16 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
             mini= df[column_to_be_binned].min(),
             maxi=df[column_to_be_binned].max()) 
     )
-
+    
+    for cluster in range(N_CLUSTERS+1):
+        selected_cluster = df[df[ bucket_column ] == cluster]
+        if len(selected_cluster) > 0:
+            mini = selected_cluster[column_to_be_binned].min()
+            maxi = selected_cluster[column_to_be_binned].max()
+            names = selected_cluster[node_column]
+            print(cluster, mini, maxi, names.tolist()[:10])
+    
+    
     ##### Connecting points inside the cluster 
     # can also connect points to other clusters
     FROM = []
@@ -366,7 +374,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
         node_edge_width=node_edge_width,     
         node_edge_color=node_edge_color,
         node_size = node_size,
-        node_alpha=0.95,
+        node_alpha=node_alpha,
 
         edge_width=edge_width,        
         edge_alpha=edge_alpha,
@@ -380,7 +388,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
 
         reduce_edge_crossings=True,   
         ## size of node (larger number means smaller nodes)
-        # scale=(2, 2), 
+        scale=(scale_x, scale_y), 
     )
 
     if use_bunding:

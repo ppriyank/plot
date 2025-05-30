@@ -22,6 +22,9 @@ ORANGE = "#f8a600"
 PINK="#f8a6e7"
 YELLOW="#fdeb01"
 # RED = "#D2042D"
+
+COOL_BLUE = "#219EBC"
+DARK_RED = "#AE2012"
 	
 path_effects = [withStroke(linewidth=10, foreground="white")]
 font_path_effects = [withStroke(linewidth=4, foreground="white")]
@@ -157,6 +160,10 @@ DISTINCT_2_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8)]
 DISTINCT_3_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8), lighten_color("#f9dec9", 0.8), ]
 # black - blue - orange - red 
 DISTINCT_4_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8), lighten_color("#f9dec9", 0.8), lighten_color('#e9afa3', 0.8)]
+# black - blue - orange - red - blue/green 
+DISTINCT_5_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8), lighten_color("#f9dec9", 0.8), lighten_color('#e9afa3', 0.8), "#219EBC"]
+
+
 
 
 #### TEMPLACE   ### 6  blue - red  - orange 
