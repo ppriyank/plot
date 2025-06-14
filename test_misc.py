@@ -89,7 +89,7 @@ if heat_map2:
 
     heatmap_plt(df, name="test_heatmap3", 
         X_label_fontsize=x_font_size, Y_label_fontsize=y_font_size, x_label_rotate=25, x_label_dist=x_label_dist, y_label_rotate=0, y_label_dist=y_label_dist, 
-        figsize=(10, 6), xticklabels= 1, vmin=mini, vmax=maxi, cmap=cmap, linewidths=.1 , annot=True, fmt=".1f", yticklabels=yticklabels, 
+        figsize=(10, 6), xticklabels= 1, vmin=mini, vmax=maxi, cmap=cmap, annot=True, fmt=".1f", yticklabels=yticklabels, 
         color_bar_labels=color_bar_labels, color_bar_labels_range=color_bar_labels_range, color_label_fontsize=15, ann_size=15)
 
 

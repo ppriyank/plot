@@ -3,7 +3,8 @@ import colorsys
 from matplotlib.colors import LinearSegmentedColormap
 
 import colorsys
-import matplotlib.colors as mc
+import matplotlib.pyplot as plt
+import numpy as np 
 
 def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, decimal_places=1):
     formatter = lambda x: f"{x:.{decimal_places}f}"
@@ -16,7 +17,10 @@ def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, decimal_places=1):
     
 def binning(row, n_bins = 10, mini=0, maxi=1):
     deci = (row - mini ) / ( maxi - mini)
-    bucket = int(deci * n_bins // 1)
+    if type(deci) == np.array or type(deci) == np.ndarray:
+        bucket = deci * n_bins // 1
+    else:
+        bucket = int(deci * n_bins // 1)
     return bucket
 
 def luminance(color):
