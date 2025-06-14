@@ -12,7 +12,7 @@ import numpy as np
 def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
     x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
     color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0, 
-    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False):
+    grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False, y_font_colors=None, y_font_weights=None, cbar=True):
     fig, ax = plt.subplots(figsize=figsize)
 
     plt.clf()
@@ -35,10 +35,10 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     elif mask is not False:
         mask_column = np.ones_like(df, dtype=bool)
         mask_column[:, 2] = False # Apply colormap to column 'C'
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=mask_column)
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=mask_column, cbar=cbar)
         sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap='gray', center = center, fmt=fmt, annot_kws={"size": ann_size}, mask=~mask_column, ax=ax, cbar=False)
     else:
-        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size})
+        ax = sns.heatmap(df, annot=annot, xticklabels=xticklabels, yticklabels=yticklabels, vmin=vmin, vmax=vmax, cmap=cmap, center = center, fmt=fmt, annot_kws={"size": ann_size}, cbar=cbar)
 
     # # Turn off the axis spines
     # ax.spines['top'].set_visible(False)
@@ -79,11 +79,15 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     # y axis 
     ax.vlines(0, ymin=0, ymax=len(df.index), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
     
-    for y_ticks in ax.get_yticklabels():
+    for index, y_ticks in enumerate(ax.get_yticklabels()):
         y_ticks.set_size(Y_label_fontsize)
         y_ticks.set_rotation(y_label_rotate)
-    
-    
+        if y_font_colors is not None:
+            y_ticks.set_color(y_font_colors[index])
+        if y_font_weights is not None:
+            y_ticks.set_fontweight(y_font_weights[index])# make it bold
+
+
     for i, label in enumerate(ax.get_yticklabels()):
         label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))
 
@@ -257,15 +261,14 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
 
 # https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
 # column_to_be_colored  should be between 0 to 1 
-def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
+def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
     N_CLUSTERS = 10,  plt_name="test", figsize=(20, 20), COLOR_MAP=None, map_vals_to_colors=True , N_BINS_COLORS = 1000,
     use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
     node_size_formula=lambda x :x, 
-    node_labels=True, node_labels_font_size=10, node_labels_colors='white',
-    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5
-    ):
+    node_labels=True, node_labels_font_size=10, node_labels_colors='white', node_alpha=1, 
+    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5, 
+    scale_x = 1, scale_y = 1):
 
-    
     import networkx as nx
     from netgraph import Graph
     import pandas as pd 
@@ -309,7 +312,16 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
             mini= df[column_to_be_binned].min(),
             maxi=df[column_to_be_binned].max()) 
     )
-
+    
+    for cluster in range(N_CLUSTERS+1):
+        selected_cluster = df[df[ bucket_column ] == cluster]
+        if len(selected_cluster) > 0:
+            mini = selected_cluster[column_to_be_binned].min()
+            maxi = selected_cluster[column_to_be_binned].max()
+            names = selected_cluster[node_column]
+            print(cluster, mini, maxi, names.tolist()[:10])
+    
+    
     ##### Connecting points inside the cluster 
     # can also connect points to other clusters
     FROM = []
@@ -362,7 +374,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
         node_edge_width=node_edge_width,     
         node_edge_color=node_edge_color,
         node_size = node_size,
-        node_alpha=0.95,
+        node_alpha=node_alpha,
 
         edge_width=edge_width,        
         edge_alpha=edge_alpha,
@@ -376,7 +388,7 @@ def network_plt(df, column_to_be_binned='Images_log', node_column='Images_log', 
 
         reduce_edge_crossings=True,   
         ## size of node (larger number means smaller nodes)
-        # scale=(2, 2), 
+        scale=(scale_x, scale_y), 
     )
 
     if use_bunding:

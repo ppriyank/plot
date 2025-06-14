@@ -6,6 +6,9 @@ import colorsys
 import matplotlib.pyplot as plt
 import numpy as np 
 
+import matplotlib.pyplot as plt
+import numpy as np 
+
 def range_calc(y_vals, no, y_up_off = 0 , y_down_off=0, decimal_places=1):
     formatter = lambda x: f"{x:.{decimal_places}f}"
     MAX_Y = max(y_vals) + y_up_off

@@ -1,4 +1,4 @@
-from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_plt
+from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble
 from colors import HEAT_MAP_COLOR, generate_color_gradient, generate_color_gradients2
 import pandas as pd 
 import torch 
@@ -186,7 +186,7 @@ if bubble_plot:
     print(df)
 
 
-    network_plt(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
+    network_bubble(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
         plt_name="bubble_plot", figsize=(20, 20), 
         N_CLUSTERS = 3, ## no of clusters
         node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator

@@ -12,29 +12,41 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     SHAPES = None, strict_order = None, 
     ):
 
-    fig, ax = plt.subplots(figsize=figsize)
-    
-    if Labels is None:
-        Labels = [0 for i in range(len(Points))]
-    if type(Labels) == torch.Tensor:
-        Labels = Labels.tolist()
-    
-    print(len(COLORS), len(set(COLORS)), len(set(Labels)))
-    if enable_relabeling:
-        unique = sorted(set(Labels))
-        unique = {e:i for i,e in enumerate(unique)}
-        print("NEW LABELS : ", unique)
-        Labels= [unique[e] for e in Labels]
-    
-    
+    ##### More colors if # labels > colors 
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_COLORS 
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_XKCD_COLORS 
     
+
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    ## default 0 label for no label 
+    if Labels is None:
+        Labels = [0 for i in range(len(Points))]
+    if type(Labels) == torch.Tensor:
+        Labels = Labels.tolist()
+    
+
+    ## COLOR == {label : color} 
+    if type(COLORS) != dict:
+        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
+        COLORS  = {e: COLORS[i] for i,e in enumerate(Labels)}
+        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
+    else:
+        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
+    
+    if enable_relabeling:
+        unique = sorted(set(Labels))
+        unique = {e:i for i,e in enumerate(unique)}
+        print("NEW LABELS : ", unique)
+        Labels= [unique[e] for e in Labels]
+        COLORS = {unique[key]: COLORS[key] for key in unique}
+    
     
     if artificial_darkening:
-        COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+        COLORS = {e: lighten_color(COLORS[e], amount=artificial_darkening)  for e in COLORS}
+
     if type(SIZE) == int or len(SIZE) == 1:
         SIZE = [SIZE for i in range(len(Points))]
         SIZE = torch.tensor(SIZE)
@@ -48,7 +60,8 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     Labels = np.array(Labels)[indices]
     if SHAPES is not None:
         SHAPES = np.array(SHAPES)[indices]
-
+    
+    
     X_pos =  Points[:,0]
     Y_pos = Points[:,1]
 
@@ -65,12 +78,12 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
             shape = SHAPES[selected_index]
             if len(set(shape)) == 1:
                 shape = shape[0]
-                ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
+                ax.scatter(X, Y, fc=COLORS[y], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
             else:
                 for s in set(shape):
-                    ax.scatter(X[shape == s], Y[shape == s], fc=COLORS[i], s=size[shape == s], zorder=12, ec=ec, lw=lw, alpha=alpha, marker=s)
+                    ax.scatter(X[shape == s], Y[shape == s], fc=COLORS[y], s=size[shape == s], zorder=12, ec=ec, lw=lw, alpha=alpha, marker=s)
         else:
-            ax.scatter(X, Y, fc=COLORS[i], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
+            ax.scatter(X, Y, fc=COLORS[y], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
             # (0.4562745098039217, 0.2133333333333331, 1.000000000000000)
             # COLORS[i] =[round(e, 15) for e in COLORS[i]]
             # [0.4562745098039217, 0.2133333333333332, 1.0000000000000002]
