@@ -158,6 +158,19 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
             X = list(X_index[:,i])
             for x,y in zip(X,Y):
                 ax.text( x + bar_labels_x_offset, y + bar_labels_y_offset, bar_label_formatter(y),  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color )
+    elif (bar_labels == 'diff'):
+        assert len(Hists) == 2, "Difference can be printed for pair of hists"
+        hist_x = Hists[0]
+        hist_y = Hists[1]
+        for i, (x,y) in enumerate(zip(hist_x, hist_y)):
+            x_pos = list(X_index[:,1])[i]
+            diff_label = bar_label_formatter(y - x)
+            if y > x :
+                ax.text( x_pos + bar_labels_x_offset, y + bar_labels_y_offset, diff_label,  ha="right", va="baseline", fontsize=bar_labels_font_size, color=LGREEN )
+            else:
+                ax.text( x_pos + bar_labels_x_offset, y + bar_labels_y_offset, diff_label,  ha="right", va="baseline", fontsize=bar_labels_font_size, color=RED )
+            
+            
     elif (bar_labels != None) and (bar_labels != False):
         for i,hist in enumerate(Hists):
             Y = hist
