@@ -11,7 +11,8 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
     hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
-    x_label_dist=None, grid_opacity=1,
+    x_label_dist=None, grid_opacity=1, enable_line=False,
+    legend=None,
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -27,9 +28,15 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
         Y_pos += Y
         X_pos += X
         if OVERLAPING_COLORS:
-            ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+            if legend:
+                ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
+            else:
+                ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
         else:
-            ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+            if legend:
+                ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
+            else:
+                ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
     
     if bar_labels == True:
         for i,hist in enumerate(Hists):
@@ -42,7 +49,11 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
         for h_line in hline:
             ax.plot([min(X_pos) - barWidth, max(X_pos) + barWidth], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, zorder=0)
             
-    
+    if enable_line:
+        for i,hist in enumerate(Hists):
+            X, Y = hist
+            ax.plot( X, Y, color=COLORS[i], lw=line_width, alpha=h_line_alpha, zorder=12,)
+
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
     
     
@@ -53,10 +64,13 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
         X_range = X_labels_pos
         X_range_label = X_labels 
     
+    
     simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
         x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=x_ticks_allowed , x_min=min(X_pos) - barWidth - x_down_offset, x_max= max(X_pos) + barWidth + x_up_offset, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist,
         grid_opacity=grid_opacity)
 
+    if legend:
+        ax.legend()
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)
     
