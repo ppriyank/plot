@@ -11,6 +11,7 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
     use_scatter=True, scatter_size=50, scatter_boder=1.5, scatter_color="white",
     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, add_black_outline=None, 
+    switch_off_yaxis=None, grid_opacity=1, grid_shape='y'
     ):
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -50,7 +51,8 @@ def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK],
         X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
 
     simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
-    y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor)
+    y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, switch_off_yaxis=switch_off_yaxis, grid_opacity=grid_opacity, 
+    grid_shape=grid_shape,)
 
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)

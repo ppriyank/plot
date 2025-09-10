@@ -174,6 +174,7 @@ DISTINCT_4_4 = ["#8ECAE6", "#219EBC", "#023047", '#FFB703']
 #### TEMPLACE   ### 5  blue - blue - orange - red 
 # black - blue
 DISTINCT_2_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8)]
+DISTINCT_2_5_1 = [lighten_color("#aec5eb", 0.8), lighten_color("#f9dec9", 0.8)]
 # black - blue orange 
 DISTINCT_3_5 = [lighten_color("#3a405a", 0.8), lighten_color("#aec5eb", 0.8), lighten_color("#f9dec9", 0.8), ]
 # black - blue - orange - red 
