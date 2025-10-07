@@ -12,6 +12,12 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     SHAPES = None, strict_order = None, 
     ):
 
+    ## default 0 label for no label 
+    if Labels is None:
+        Labels = [0 for i in range(len(Points))]
+    if type(Labels) == torch.Tensor:
+        Labels = Labels.tolist()
+    
     ##### More colors if # labels > colors 
     if len(COLORS) < len(set(Labels)):
         COLORS = ALL_COLORS 
@@ -21,17 +27,10 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
 
     fig, ax = plt.subplots(figsize=figsize)
     
-    ## default 0 label for no label 
-    if Labels is None:
-        Labels = [0 for i in range(len(Points))]
-    if type(Labels) == torch.Tensor:
-        Labels = Labels.tolist()
-    
-
     ## COLOR == {label : color} 
     if type(COLORS) != dict:
         print(len(COLORS), len(set(COLORS)), len(set(Labels)))
-        COLORS  = {e: COLORS[i] for i,e in enumerate(Labels)}
+        COLORS  = {e: COLORS[i] for i,e in enumerate(set(Labels))}
         print(len(COLORS), len(set(COLORS)), len(set(Labels)))
     else:
         print(len(COLORS), len(set(COLORS)), len(set(Labels)))
@@ -52,7 +51,6 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         SIZE = torch.tensor(SIZE)
     elif type(SIZE)== list:
         SIZE = torch.tensor(SIZE)
-    
     
     indices = torch.argsort(SIZE, descending=True)
     SIZE = np.array(SIZE)[indices]

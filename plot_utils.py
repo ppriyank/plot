@@ -67,7 +67,7 @@ def generate_color_gradients2(n, colors=["#4169E1", "#FF4500"]):
     return colors
 
 
-def colors_heat_map(maxi,  mini, specific_values= [-2,0,2], n_bins=100 ):
+def colors_heat_map(maxi,  mini, specific_values= [-2,0,2], n_bins=100 , specific_colors=None):
     zero_one_range = lambda x: (x - mini) / (maxi - mini)
     if specific_values is not None:
         if type(specific_values) == list:
