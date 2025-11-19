@@ -150,7 +150,7 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
     N_of_groups = len(Hists[0])
     num_of_columns_per_group = len(Hists)
     group1 = np.arange(0, num_of_columns_per_group * gap_between_bars, gap_between_bars)
-    
+    group1 = group1[: num_of_columns_per_group]
     # group1 
     # (group1[-1] + gap_between_groups) + group1 == 2 * group1 + gap_between_groups
     # ((2 * group1[-1] + gap_between_groups) + gap_between_groups ) + group1 ==  3 * group1 + 2 * gap_between_groups

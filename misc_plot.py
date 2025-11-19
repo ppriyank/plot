@@ -11,11 +11,11 @@ import numpy as np
 #### selective coloring of columns : mask (column index)
 def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
     x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
-    color_bar_labels=None, color_bar_labels_range=None, color_label_fontsize=20, color_label_rotate=0, 
+    color_bar_labels=[], color_bar_labels_range=[], color_label_fontsize=20, color_label_rotate=0, 
     grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False, y_font_colors=None, y_font_weights=None, 
-    cbar=True, cbarpos = [0.83, 0.2, 2, 0.7], # (xmin (0,1), ymin (0,1), width (0,1), 
+    cbar=True, cbarpos = [0.83, 0.2, 2, 0.7], # (xmin (0,1), ymin (0,1), width (0,1), height)
     specific_h_lines = None, specific_h_lines_alpha=1, specific_h_lines_width=1,
-    all_v_lines=True):
+    all_v_lines=True, hide_y_tick=True, hide_x_tick=False, ):
     fig, ax = plt.subplots(figsize=figsize)
 
     plt.clf()
@@ -60,7 +60,6 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         # colorbar.set_label('Custom Label')
         # plt.savefig(f"{name}.png", dpi=300)
         
-    
     for x_ticks in ax.get_xticklabels():
         x_ticks.set_size(X_label_fontsize)
         x_ticks.set_rotation(x_label_rotate)
@@ -92,6 +91,12 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
             y_ticks.set_color(y_font_colors[index])
         if y_font_weights is not None:
             y_ticks.set_fontweight(y_font_weights[index])# make it bold
+
+    if hide_y_tick:
+        ax.tick_params(axis='y', which='both', length=0)  # hide y-axis tick lines
+    if hide_x_tick:
+        ax.tick_params(axis='x', which='both', length=0)  # hide y-axis tick lines
+    
 
     for i, label in enumerate(ax.get_yticklabels()):
         label.set_position((label.get_position()[0], label.get_position()[1] - y_label_dist[i] ))

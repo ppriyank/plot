@@ -22,6 +22,7 @@ ORANGE = "#f8a600"
 PINK="#f8a6e7"
 YELLOW="#fdeb01"
 # RED = "#D2042D"
+DARK_BLUE=lighten_color("#4169E1", 0.8)
 
 COOL_BLUE = "#219EBC"
 DARK_RED = "#AE2012"
@@ -55,10 +56,11 @@ ALONE_COLORS = sns.color_palette("pastel", as_cmap=True)
 
 
 
-#### LIGHT BLUE TO DARK 
+#### LIGHT BLUE TO DARK ## Gradients 
 GRADIENT_BLUE_6 = ["#CAF0F8", "#48CAE4", "#00B4D8", "#0096C7", "#0077B6", "#023E8A", "#03045E",]
 GRADIENT_GREEN_6 = ["#CCFF33", "#70E000", "#38B000", "#008000", "#006400", "#004B23"]
 GRADIENT_ORANGE_6  = ["#FFBA08", "#FAA307", "#F48C06", "#E85D04", "#DC2F02", "#D00000"]
+
 
 # Orange Red White yellow black
 ORANGE_5= ["#0D3B66", "#FAF0CA", "#F4D35E", "#EE964B", "#F95738"]
