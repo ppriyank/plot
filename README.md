@@ -5,6 +5,9 @@ Reference : https://python-graph-gallery.com/
 ## Ussage 
 Download the folder in your directory 
 ```
+
+python -m pip install wordcloud netgraph
+
 from plot.colors import ALL_COLORS, lighten_color
 current_path = os.getcwd()
 sys.path.append(os.path.join(current_path, "plot"))

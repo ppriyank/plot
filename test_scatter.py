@@ -18,5 +18,5 @@ scatter_plt(POINTS, SIZE=SIZES, Labels=Labels, name="test_scatter",
     
 
 
-
+# cd ~/robustness_object_detection/Analysis/plot/
 # python test_scatter.py

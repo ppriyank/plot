@@ -83,7 +83,6 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     
     # y axis 
     ax.vlines(0, ymin=0, ymax=len(df.index), color='black', alpha=grid_alpha, linewidth=1.2, zorder=12)
-    
     for index, y_ticks in enumerate(ax.get_yticklabels()):
         y_ticks.set_size(Y_label_fontsize)
         y_ticks.set_rotation(y_label_rotate)
@@ -105,9 +104,9 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     ax.set_ylabel('')
     
     plt.tight_layout()
-
-    colorbar = ax.collections[0].colorbar
-    colorbar.ax.set_position(cbarpos)
+    if cbarpos:
+        colorbar = ax.collections[0].colorbar
+        colorbar.ax.set_position(cbarpos)
 
     plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
