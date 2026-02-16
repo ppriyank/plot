@@ -59,6 +59,7 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
         # # Set the label for the colorbar
         # colorbar.set_label('Custom Label')
         # plt.savefig(f"{name}.png", dpi=300)
+    
     if not enable_color_label:
         colorbar = ax.collections[0].colorbar
         colorbar.remove()
@@ -109,7 +110,7 @@ def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vm
     ax.set_ylabel('')
     
     plt.tight_layout()
-    if cbarpos:
+    if cbarpos and enable_color_label:
         colorbar = ax.collections[0].colorbar
         colorbar.ax.set_position(cbarpos)
 
