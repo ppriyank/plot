@@ -3,15 +3,13 @@
 Reference : https://python-graph-gallery.com/
 
 ## Ussage 
-Download the folder in your directory 
+Download the folder in your directory and install `python -m pip install wordcloud netgraph seaborn`
 ```
-
-python -m pip install wordcloud netgraph
-
-from plot.colors import ALL_COLORS, lighten_color
+import os, sys
 current_path = os.getcwd()
 sys.path.append(os.path.join(current_path, "plot"))
 from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_side
+from plot.colors import ALL_COLORS, lighten_color
 ```
 
 ## Colors 
