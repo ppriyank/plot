@@ -28,6 +28,9 @@ def grid_data(grid_shape='both', grid_opacity=1, switch_off_yaxis=False, switch_
     ax=None,):
     
     # Add grid lines
+    if grid_shape == 'xy':
+        grid_shape = 'both'
+
     ax.grid(axis = grid_shape, color="#A8BAC4", lw=1.2, alpha=grid_opacity)
     
     # Remove all spines but the one in the bottom
