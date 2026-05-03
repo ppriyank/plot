@@ -12,31 +12,55 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
     hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
     x_label_dist=None, grid_opacity=1, enable_line=False,
-    legend=None,
+    legend=None, stack=None, 
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
-    
+    if stack:
+        assert artificial_darkening == None, "When stacking, artificial_darkening is not available"
+
     if artificial_darkening:
         COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
 
     X_pos = [] 
     Y_pos = []
     
-    for i,hist in enumerate(Hists):
-        X, Y = hist
-        Y_pos += Y
-        X_pos += X
-        if OVERLAPING_COLORS:
-            if legend:
-                ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
+    if stack:
+        for i,hist in enumerate(Hists):
+            X  = hist[0]
+            X_pos += X
+            N = len(hist[1])
+            y_prev = [0 for i in range(N)]
+            for j,y in enumerate(hist[1:]):
+                # print(y_prev)
+                if OVERLAPING_COLORS:
+                    if legend:
+                        ax.bar(X, y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i], bottom=y_prev)
+                    else:
+                        ax.bar(X, y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, bottom=y_prev, )
+                else:
+                    if legend:
+                        ax.bar(X, y, width = barWidth, color=COLORS[i][j], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i], bottom=y_prev, )
+                    else:
+                        ax.bar(X, y, width = barWidth, color=COLORS[i][j], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, bottom=y_prev, )
+
+                y_prev =  [y_prev[k] + y[k] for k in range(N)]
+            Y_pos += y_prev        
+    else:
+        for i,hist in enumerate(Hists):
+            X, Y = hist
+            Y_pos += Y
+            X_pos += X
+            if OVERLAPING_COLORS:
+                if legend:
+                    ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
+                else:
+                    ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
             else:
-                ax.bar(X, Y, width = barWidth, color=COLORS, lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
-        else:
-            if legend:
-                ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
-            else:
-                ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+                if legend:
+                    ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
+                else:
+                    ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
     
     if bar_labels == True:
         for i,hist in enumerate(Hists):
@@ -63,7 +87,6 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     else:
         X_range = X_labels_pos
         X_range_label = X_labels 
-    
     
     simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
         x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=x_ticks_allowed , x_min=min(X_pos) - barWidth - x_down_offset, x_max= max(X_pos) + barWidth + x_up_offset, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist,
@@ -281,6 +304,10 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
         
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_right_offset,  y_down_off=x_left_offset, decimal_places=decimal_places)
 
+    
+    import pdb
+    pdb.set_trace()
+    
     
     # Y_range = Y_pos + 
     simplify_hist(ax, Y_pos, Y_labels, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
