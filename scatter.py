@@ -9,7 +9,8 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, enable_relabeling=None, 
     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, hard_y=None,
     x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_points=3, x_padding_factor=0, x_padding=0.04, hard_x=None,
-    SHAPES = None, strict_order = None, 
+    SHAPES = None, strict_order = None, switch_off_xaxis=None, switch_off_yaxis=None, grid_shape="y", grid_opacity=1,
+    x_ticks_allowed=True,
     ):
 
     ## default 0 label for no label 
@@ -101,8 +102,14 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
 
     simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
-        Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
-        y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor)
+        Y_label_fontsize, X_label_fontsize, 
+        x_padding=x_padding, x_padding_factor=x_padding_factor,
+        y_padding_factor=y_padding_factor, 
+        switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, grid_shape=grid_shape, grid_opacity= grid_opacity,
+        x_ticks_allowed=x_ticks_allowed , )
+
+    # switch_off_x_axis=None, y_padding=0, x_label_dist=None, 
+
 
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)

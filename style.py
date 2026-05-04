@@ -30,6 +30,9 @@ def grid_data(grid_shape='both', grid_opacity=1, switch_off_yaxis=False, switch_
     # Add grid lines
     if grid_shape == 'xy':
         grid_shape = 'both'
+    if grid_shape == None:
+        grid_shape = 'both'
+        grid_opacity = 0 
 
     ax.grid(axis = grid_shape, color="#A8BAC4", lw=1.2, alpha=grid_opacity)
     
