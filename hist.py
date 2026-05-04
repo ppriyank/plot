@@ -12,7 +12,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
     hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
     x_label_dist=None, grid_opacity=1, enable_line=False,
-    legend=None, stack=None, 
+    legend=None, stack=None, dump_pdf=None, 
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -95,7 +95,10 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     if legend:
         ax.legend()
     plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
+    if dump_pdf:
+        plt.savefig(f"{name}.pdf", format="pdf", dpi=300)
+    else:
+        plt.savefig(f"{name}.png", dpi=300)
     
 
 def bar_graph_X_Y_Gradient(Hists, COLORS=['#89CFF0', '#000080', '#000000'], 

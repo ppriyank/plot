@@ -67,27 +67,29 @@ def generate_color_gradients2(n, colors=["#4169E1", "#FF4500"]):
     return colors
 
 
+def zero_one_range(x, mini=0, maxi=1):
+    return (x - mini) / (maxi - mini)
+
 def colors_heat_map(maxi,  mini, specific_values= [-2,0,2], n_bins=100 , specific_colors=None):
-    zero_one_range = lambda x: (x - mini) / (maxi - mini)
     if specific_values is not None:
         if type(specific_values) == list:
             colors = [
-                (zero_one_range(mini), lighten_color("#FF4500", 0.8) ), 
-                (zero_one_range( specific_values[0] ), lighten_color("#FF4500", 1.5)), 
-                (zero_one_range( specific_values[1] ), 'white'), 
-                (zero_one_range( specific_values[2] ), lighten_color("#4169E1", 1.5)), 
-                (zero_one_range(maxi), lighten_color("#4169E1", 0.8) )
+                (zero_one_range(mini, mini, maxi), lighten_color("#FF4500", 0.8) ), 
+                (zero_one_range( specific_values[0], mini, maxi ), lighten_color("#FF4500", 1.5)), 
+                (zero_one_range( specific_values[1], mini, maxi ), 'white'), 
+                (zero_one_range( specific_values[2], mini, maxi ), lighten_color("#4169E1", 1.5)), 
+                (zero_one_range(maxi, mini, maxi), lighten_color("#4169E1", 0.8) )
             ]
         else:
             colors = [
-                (zero_one_range(mini), lighten_color("#FF4500", 0.8) ), 
-                (zero_one_range( specific_values ), 'white'), 
-                (zero_one_range(maxi), lighten_color("#4169E1", 0.8) )
+                (zero_one_range(mini, mini, maxi), lighten_color("#FF4500", 0.8) ), 
+                (zero_one_range( specific_values, mini, maxi ), 'white'), 
+                (zero_one_range(maxi, mini, maxi), lighten_color("#4169E1", 0.8) )
             ]
     else:
         colors = [
-            (zero_one_range(mini), lighten_color("#FF4500", 0.8) ), 
-            (zero_one_range(maxi), lighten_color("#4169E1", 0.8) )
+            (zero_one_range(mini, mini, maxi), lighten_color("#FF4500", 0.8) ), 
+            (zero_one_range(maxi, mini, maxi), lighten_color("#4169E1", 0.8) )
         ]
     cmap = generate_color_gradients2(n_bins, colors)
     return cmap

@@ -9,7 +9,7 @@ import numpy as np
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range
 #### selective coloring of columns : mask (column index)
-def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= 5, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
+def heatmap_plt(df, name="test", figsize=(10, 10), xticklabels= True, vmin=None, vmax=None,  cmap=None, yticklabels=False, center=None, 
     x_label_rotate=0, y_label_rotate=0, X_label_fontsize=25,  Y_label_fontsize=25, x_label_dist=0, y_label_dist=5, 
     color_bar_labels=[], color_bar_labels_range=[], color_label_fontsize=20, color_label_rotate=0, enable_color_label = True, 
     grid_color='white', grid_alpha=1, ann_size=20, grid_width=.5 , annot=False, fmt=".2f", mask=False, y_font_colors=None, y_font_weights=None, #['light', 'bold'] or [>700 for bold, <700 for light]
