@@ -98,9 +98,11 @@ def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, B
         X_pos = X_pos[X_pos >= min(hard_x) + x_down_offset]
         X_pos = X_pos[X_pos <= max(hard_x) - x_up_offset]
     
+    
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
-
+    # print(min(X_pos), X_range, X_range_label)
+    
     simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
         Y_label_fontsize, X_label_fontsize, 
         x_padding=x_padding, x_padding_factor=x_padding_factor,

@@ -5,6 +5,7 @@ from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BL
 from math import pi
 from plot_utils import range_calc, binning, contrast_ratio
 import numpy as np 
+from style import simplify
 
 # vmin= hardlimit of start range
 # vmax= hardlimit of end range
@@ -231,19 +232,32 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
 
 
 
-def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), cmap=None,
-    linewidths=.5 , decimal_places=1, COLOR= ALONE_COLORS,
+def box_plt(df, name="test", width=0.6, figsize=(10, 10), cmap=None,
+    linewidths=.5 , decimal_places=1, 
+    COLOR= ALONE_COLORS, OVERLAPING_COLORS=None, error_bar_color='black', error_bar_width=2,
     y_points=3, y_up_offset=0, y_down_offset=0, y_font_size=20, use_mean=None,
-    x_padding_factor=0.5, ):
+    x_padding_factor=0.5, x_padding=0.8, y_padding_factor=0, 
+    mean=None, std = None, X_range_label=None, switch_off_xaxis=None, switch_off_yaxis=None, x_ticks_allowed=True,
+    Y_label_fontsize=25, X_label_fontsize=25,  grid_shape='xy', grid_opacity= 1,
+    x_down_offset=0, x_up_offset=0, x_label_rotate=0,):
     
     plt.clf()
     fig, ax = plt.subplots(figsize=figsize)
     
-    COLORS = {e:COLOR[i] for i,e in enumerate(df["X"].unique())}
+    if df is not None:
+        COLORS = {e:COLOR[i] for i,e in enumerate(df["X"].unique())}
     
-    
+    Y_s = []
+    if mean:
+        for i, mean_val in enumerate(mean):
+            if OVERLAPING_COLORS:
+                plt.scatter(i, mean_val, color=COLOR, marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
+            else:
+                plt.scatter(i, mean_val, color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
+            plt.errorbar(i, mean_val, yerr=std[i], fmt='none', color=error_bar_color, capsize=12, lw=error_bar_width)
+            Y_s.append(mean_val)
 
-    if not use_mean:
+    elif not use_mean:
         boxplot = sns.boxplot(x="X", y="Y",  data=df, palette=COLORS, width=width)
         boxplot.set_xticklabels(boxplot.get_xticklabels(), fontsize=X_label_fontsize)
         boxplot.set(xlabel='', ylabel="")
@@ -254,22 +268,34 @@ def box_plt(df, name="test", width=0.6, X_label_fontsize=25, figsize=(10, 10), c
         # Overlay mean and standard deviation
         for i, day in enumerate(means.index):
             plt.scatter(i, means[day], color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
-            plt.errorbar(i, means[day], yerr=stds[day], fmt='none', color="black", capsize=12, lw=2)
-        ax.xaxis.set_ticks(range(len(means.index)))
-        ax.xaxis.set_ticklabels(means.index, fontsize=X_label_fontsize)
-        ax.xaxis.set_zorder(12)
-        plt.xlim(0 - x_padding_factor,  len(means.index) -1 + x_padding_factor)
-
+            plt.errorbar(i, means[day], yerr=stds[day], fmt='none', color=error_bar_color, capsize=12, lw=2)
     
+        if X_range_label is None:
+            X_range_label = means.index
+        
 
-    Y_range, Y_range_label = range_calc(df["Y"].tolist(), y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-    plt.ylim(min(Y_range),  max(Y_range))
-    ax.yaxis.set_ticks(Y_range)
-    ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size)
-    ax.yaxis.set_zorder(12)
 
-    ax.set_axisbelow(True)
-    ax.grid(axis = "both", color="#A8BAC4", lw=1.2)
+    X_range = range(len(X_range_label))
+    if df:
+        Y_range, Y_range_label = range_calc(df["Y"].tolist(), y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+    else:
+        Y_range, Y_range_label = range_calc(Y_s, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+        
+    
+    
+    
+    simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
+        Y_label_fontsize, X_label_fontsize, 
+        x_padding=x_padding, x_padding_factor=x_padding_factor,
+        y_padding_factor=y_padding_factor, 
+        switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, grid_shape=grid_shape, grid_opacity= grid_opacity,
+        x_ticks_allowed=x_ticks_allowed , 
+        x_min=min(X_range) - 1 - x_down_offset,  
+        x_max= max(X_range) + 1 + x_up_offset,
+        x_label_rotate=x_label_rotate,
+        )
+
+
 
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)
