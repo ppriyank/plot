@@ -11,8 +11,9 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
     hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
-    x_label_dist=None, grid_opacity=1, enable_line=False,
+    x_label_dist=None, grid_opacity=1, enable_line=False, 
     legend=None, stack=None, dump_pdf=None, 
+    xx_label_dist=None , 
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -90,7 +91,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     
     simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
         x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=x_ticks_allowed , x_min=min(X_pos) - barWidth - x_down_offset, x_max= max(X_pos) + barWidth + x_up_offset, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist,
-        grid_opacity=grid_opacity)
+        grid_opacity=grid_opacity, xx_label_dist=xx_label_dist)
 
     if legend:
         ax.legend()
@@ -307,10 +308,6 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
         
     X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_right_offset,  y_down_off=x_left_offset, decimal_places=decimal_places)
 
-    
-    import pdb
-    pdb.set_trace()
-    
     
     # Y_range = Y_pos + 
     simplify_hist(ax, Y_pos, Y_labels, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,

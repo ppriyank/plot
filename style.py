@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
-
+import matplotlib.transforms as transforms
 
 def axis_data(Y_range, Y_range_label, X_range, X_range_label, X_label_fontsize, 
-    x_label_rotate, x_label_dist, x_ticks_allowed, 
-    ax):
+    x_label_rotate, x_label_dist, x_ticks_allowed, ax, xx_label_dist=None, ):
     # Customize y-axis ticks
     ax.yaxis.set_ticks( Y_range )
     ax.yaxis.set_ticklabels( Y_range_label )
@@ -19,10 +18,20 @@ def axis_data(Y_range, Y_range_label, X_range, X_range_label, X_label_fontsize,
     # Make gridlines be below most artists.
     ax.set_axisbelow(True)
 
-    if x_label_dist:
+    if x_label_dist or xx_label_dist:
+        # print("=====", x_label_dist, xx_label_dist)
+        if xx_label_dist is None:
+            xx_label_dist = [0 for i in x_label_dist]
+        if x_label_dist is None:
+            x_label_dist = [0 for i in x_label_dist]
         for i, label in enumerate(ax.get_xticklabels()):
-            label.set_position((label.get_position()[0], label.get_position()[1] - x_label_dist[i] ))
-
+            offset = transforms.ScaledTranslation(- xx_label_dist[i], - x_label_dist[i], ax.figure.dpi_scale_trans)
+            label.set_transform(label.get_transform() + offset)
+            # label.set_position((label.get_position()[0] - , label.get_position()[1] - x_label_dist[i] ))
+    # plt.savefig("test.png", dpi=300)
+    # quit()
+    # import pdb
+    # pdb.set_trace()
     
 def grid_data(grid_shape='both', grid_opacity=1, switch_off_yaxis=False, switch_off_xaxis=False, 
     ax=None,):
@@ -85,11 +94,14 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
 # y_padding_factor == position of y axis labels  (veritical)
 def simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
     x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
-    switch_off_x_axis=None, x_label_rotate=0, switch_off_xaxis=None, y_padding=0, grid_shape="y", y_label_rotate=0, x_label_dist=None, grid_opacity=1):
+    switch_off_x_axis=None, x_label_rotate=0, switch_off_xaxis=None, y_padding=0, grid_shape="y", y_label_rotate=0, x_label_dist=None, grid_opacity=1,
+    xx_label_dist=None):
+    
     
     axis_data(Y_range, Y_range_label, X_range, X_range_label, X_label_fontsize, 
-        x_label_rotate, x_label_dist, x_ticks_allowed, ax)
+        x_label_rotate, x_label_dist, x_ticks_allowed, ax, xx_label_dist=xx_label_dist)
 
+    
     grid_data(grid_shape=grid_shape, grid_opacity=grid_opacity, switch_off_yaxis=switch_off_yaxis, switch_off_xaxis=switch_off_xaxis, ax=ax)
     
     # return 
