@@ -4,16 +4,20 @@ from style import simplify_hist
 
 # x_padding_factor == position of y axis (& y axis labels) (hortizontal)
 # y_padding_factor == position of y axis labels  (veritical)
+
+
+
 def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None, 
     figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=0, bar_opacity=1, 
     barWidth = 0.3, lw=1.5, ec="white", 
+    Y_labels=None, Y_labels_pos=None, Y_label_fontsize=25, y_padding_factor=0.1, y_up_offset=0, y_down_offset=0, y_label_dist=None, y_padding=0, y_label_rotate=0, switch_off_yaxis=True, y_ticks_allowed=None, y_points=3, 
     x_ticks_allowed=None, X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_padding=0.1, x_label_rotate=0,  x_up_offset=0, x_down_offset=0,
-    y_points=3, y_up_offset=1, y_down_offset=1,  Y_label_fontsize=20, switch_off_yaxis=True, y_padding_factor=-0.01, 
     bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
     hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
     x_label_dist=None, grid_opacity=1, enable_line=False, 
     legend=None, stack=None, dump_pdf=None, 
-    xx_label_dist=None , 
+    xx_label_dist=None , use_horizontal=None, 
+    grid_shape='y', 
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -33,6 +37,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
             N = len(hist[1])
             y_prev = [0 for i in range(N)]
             for j,y in enumerate(hist[1:]):
+                Y_pos += y_prev  
                 # print(y_prev)
                 if OVERLAPING_COLORS:
                     if legend:
@@ -44,9 +49,9 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
                         ax.bar(X, y, width = barWidth, color=COLORS[i][j], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i], bottom=y_prev, )
                     else:
                         ax.bar(X, y, width = barWidth, color=COLORS[i][j], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, bottom=y_prev, )
-
                 y_prev =  [y_prev[k] + y[k] for k in range(N)]
-            Y_pos += y_prev        
+            Y_pos += y_prev  
+
     else:
         for i,hist in enumerate(Hists):
             X, Y = hist
@@ -80,18 +85,16 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
             ax.plot( X, Y, color=COLORS[i], lw=line_width, alpha=h_line_alpha, zorder=12,)
 
     Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-    
-    
     if X_labels is None:
         X_range =   X_pos
         X_range_label = X_pos
     else:
         X_range = X_labels_pos
         X_range_label = X_labels 
-    
+
     simplify_hist(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize,
         x_padding = x_padding , y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, x_ticks_allowed=x_ticks_allowed , x_min=min(X_pos) - barWidth - x_down_offset, x_max= max(X_pos) + barWidth + x_up_offset, switch_off_yaxis=switch_off_yaxis, x_label_rotate=x_label_rotate, x_label_dist=x_label_dist,
-        grid_opacity=grid_opacity, xx_label_dist=xx_label_dist)
+        grid_opacity=grid_opacity, xx_label_dist=xx_label_dist, grid_shape=grid_shape, )
 
     if legend:
         ax.legend()
@@ -252,17 +255,24 @@ def bar_graph_side_by_side(Hists, COLORS=[ORANGE, BLUE, BROWN],
 
 
 
-def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None, 
-    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=1, grid_shape="x",
-    gap_between_bars = 1, barWidth = 0.3, bar_opacity=1,
-    lw=1.5, ec="white", 
-    y_ticks_allowed=None, Y_labels=None, Y_label_fontsize=25, 
-    bar_labels = None, bar_labels_x_offset=0.1, bar_labels_y_offset=0.1, bar_labels_font_size=5, bar_color=None, 
-    x_points=3, X_label_fontsize=20, x_left_offset=0.1, x_right_offset = 0.1, x_padding=0, x_ticks_allowed=True, switch_off_xaxis=True, x_label_rotate=0,
-    switch_off_yaxis=True, y_padding=0, x_padding_factor=0.1, y_padding_factor=0, y_label_rotate=0):
+def bar_graph_horizontal(
+    Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None, 
+    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, decimal_places=1, bar_opacity=1, 
+    barWidth = 0.3, lw=1.5, ec="white", grid_shape="x", gap_between_bars = 1,
+    X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_up_offset=0, x_down_offset=0,
+    y_points=3, y_up_offset=1, y_down_offset=1,  switch_off_yaxis=True, y_padding_factor=-0.01, y_ticks_allowed=None, Y_labels=None, Y_label_fontsize=25, y_padding=0, y_label_rotate=0,
+    bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
+    hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
+    x_label_dist=None, grid_opacity=1, enable_line=False, 
+    legend=None, stack=None, dump_pdf=None, 
+    xx_label_dist=None, side_by_side=None,
+    x_points=3, x_left_offset=0.1, x_right_offset = 0.1, x_padding=0, x_ticks_allowed=True, switch_off_xaxis=True, x_label_rotate=0):
+    
     bar_label_formatter = lambda x: f"{x:.{decimal_places}f}"
     fig, ax = plt.subplots(figsize=figsize)
-    
+    if stack:
+        assert artificial_darkening == None, "When stacking, artificial_darkening is not available"
+
     
     if artificial_darkening:
         COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
@@ -278,6 +288,7 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
         bar_color = [bar_color for i in range(N_of_hist)]
     elif bar_color is None:
         bar_color = COLORS
+
 
     for i in range(N_of_hist):
         index = index + gap_between_bars
@@ -319,5 +330,81 @@ def bar_graph_horizontal(Hists, COLORS=[ORANGE, BLUE, BROWN], side_by_side=None,
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)
     
+
+
+
+
+
+
+
+##### 
+# [
+# [Y points, stacked histograms ..... ]
+# [Y points, stacked histograms ..... ]
+# ]
+def bar_graph_horizontal2(
+    Hists, COLORS=[ORANGE, BLUE], 
+    figsize=(8, 6), name="test_hx_hy", artificial_darkening=1, bar_opacity=1, decimal_places=1, 
+    barWidth = 0.3, lw=1.5, ec="white", grid_shape="x", gap_between_bars = 1, grid_opacity=1, enable_line=False, dump_pdf=None, 
+    OVERLAPING_COLORS=None, 
+    Y_labels=None, Y_labels_pos=None, Y_label_fontsize=25, y_padding_factor=0.1, y_up_offset=0, y_down_offset=0, y_label_dist=None, y_padding=0, y_label_rotate=0, switch_off_yaxis=True, y_ticks_allowed=None, y_points=3, 
+    bar_label_formatter=lambda x: f"{x:.1f}", bar_labels = None, bar_labels_y_offset=0.1, bar_labels_x_offset=0.1, bar_color=BAR_LABEL, bar_labels_font_size=5, 
+    hline=None, hline_color='black', line_width=1.5, hline_style="-.", h_line_alpha=0.5,
+    x_points=3, x_left_offset=0.1, x_right_offset = 0.1, x_padding=0, x_ticks_allowed=True, switch_off_xaxis=True, x_label_rotate=0,
+    X_labels=None, X_labels_pos=None, X_label_fontsize=25, x_padding_factor=0.1, x_up_offset=0, x_down_offset=0, x_label_dist=None, 
+    legend=None, xx_label_dist=None, stack=True 
+    ):
+    
+    not_verified_arguments = (gap_between_bars, OVERLAPING_COLORS, bar_labels, hline, enable_line)
+    # X_labels, legend, xx_label_dist
+    assert any(not_verified_arguments) == False, "Not yet verified..."
+    assert stack == True, "Must be true"
+    
+
+    bar_label_formatter = lambda x: f"{x:.{decimal_places}f}"
+    fig, ax = plt.subplots(figsize=figsize)
+    if stack:
+        assert artificial_darkening == None, "When stacking, artificial_darkening is not available"
+
+    
+    if artificial_darkening:
+        COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+
+    N_of_hist = len(Hists)
+
+    X_pos = []
+    Y_pos = []
+    for i in range(N_of_hist):
+        Y = Hists[i][0]
+        X = Hists[i][1:]
+        no_of_histograms = len(X[0])
+        x_prev = [0 for i in range(no_of_histograms)]
+        for j in range(len(X)):
+            ax.barh(y=Y, width=X[j], height=barWidth, color=COLORS[i][j], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, left=x_prev)
+            x_prev = [x_prev[k] + X[j][k] for k in range(no_of_histograms)]
+
+            X_pos += X[j]  
+            Y_pos += Y
+    plt.savefig(f"{name}.png", dpi=300)
+
+    X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_right_offset,  y_down_off=x_left_offset, decimal_places=decimal_places)
+    if Y_labels_pos:
+        Y_pos = Y_labels_pos
+    
+    simplify_hist(ax, Y_pos, Y_labels, X_range, X_range_label, Y_label_fontsize, X_label_fontsize, 
+        x_min=min(X_range), x_max= max(X_range), x_ticks_allowed=x_ticks_allowed, switch_off_xaxis=switch_off_xaxis,
+        y_padding=y_padding + barWidth, switch_off_yaxis=switch_off_yaxis, 
+        grid_shape=grid_shape, 
+        x_label_rotate=x_label_rotate, y_label_rotate=y_label_rotate, 
+        x_padding = x_padding, x_padding_factor=x_padding_factor, y_padding_factor=y_padding_factor
+        )
+            
+    plt.tight_layout()
+    if dump_pdf:
+        plt.savefig(f"{name}.pdf", format="pdf", dpi=300)
+    else:
+        plt.savefig(f"{name}.png", dpi=300)
+    
+
 
 

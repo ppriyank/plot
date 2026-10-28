@@ -169,7 +169,7 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
     Y_range=None, Y_range_label=None, y_points=3, y_down_offset= 1, y_up_offset=0, y_axis_angle=0, y_axis_allowed = True, Y_font_color="grey", y_font_size=20,
     ):
     
-    if type(X):
+    if type(X) != list :
        X = [list(e) for e in X] 
     if curve_names == []:
         curve_names = ["random" for e in X]
