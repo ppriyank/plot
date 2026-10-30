@@ -167,9 +167,9 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
     artificial_darkening=None, ALPHAs=[], COLORS=ALONE_COLORS, decimal_places=1, alpha=0.1, lw=1, 
     x_axis_allowed=True, X_label_fontsize=10, X_pad=10, outer_circle= True,
     Y_range=None, Y_range_label=None, y_points=3, y_down_offset= 1, y_up_offset=0, y_axis_angle=0, y_axis_allowed = True, Y_font_color="grey", y_font_size=20, y_font_alpha=0.6,
-    radar_labels=None, radar_label_formatter=lambda x: f"{x:.1f}", radar_labels_font_size=25, radar_label_offset = 10, 
-    grid_opacity=1, grid_color = "#A8BAC4"
-    ):
+    radar_labels=None, radar_label_formatter=lambda x: f"{x:.1f}", radar_labels_font_size=25, radar_label_offset=10,
+    grid_opacity_y=1, grid_opacity_x=1, grid_color_y = "#A8BAC4", grid_color_x = "#A8BAC4",
+    y_padding = 0, grid_above=False):
     
     if type(X) != list :
        X = [list(e) for e in X] 
@@ -198,8 +198,8 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
         Y += Y[:1]
         print(i, len(angles), len(Y), len(curve_names), len(ALPHAs))
         # print(i, len(COLORS), len(curve_names), COLORS[i], curve_names[i])
-        ax.plot(angles, Y, color=COLORS[i], linewidth=lw, linestyle='solid', label=curve_names[i], alpha=ALPHAs[i])
-        ax.fill(angles, Y, color= COLORS[i], alpha=alpha)
+        ax.plot(angles, Y, color=COLORS[i], linewidth=lw, linestyle='solid', label=curve_names[i], alpha=ALPHAs[i], zorder=14)
+        ax.fill(angles, Y, color= COLORS[i], alpha=alpha, zorder=14)
         if radar_labels == True:
             for ang, val in zip(angles[:-1], Y[:-1]):
                 ax.text( ang, val + radar_label_offset, radar_label_formatter(val), ha="center", va="baseline", fontsize=radar_labels_font_size, color=COLORS[i])
@@ -213,25 +213,34 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
     if not outer_circle:
         ax.spines['polar'].set_visible(False)
     
-    ax.set_rlabel_position(y_axis_angle)
     if Y_range is None :
         Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
         plt.ylim(min(Y_range),  max(Y_range))
     else:
         plt.ylim(min(Y_pos) - y_down_offset,  max(Y_pos) + y_up_offset)
 
-    if y_axis_allowed:
-        ax.yaxis.set_ticks(Y_range)
-        ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
-        ax.yaxis.set_zorder(12)
+    # ax.set_rlabel_position(y_axis_angle)
+    ax.yaxis.set_ticks(Y_range)
+    ax.yaxis.set_zorder(12)
+    # if y_axis_allowed:
+        # ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
+    # else:
+    ax.yaxis.set_ticklabels([], fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
+    
+    
+    if grid_above:
+        grid_z_order = 13
     else:
-        ax.yaxis.set_ticks(Y_range)
-        ax.yaxis.set_ticklabels([], fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
-        ax.yaxis.set_zorder(12)
+        grid_z_order = 12
 
+    for r, label in zip(Y_range, Y_range_label):
+        ax.text(y_axis_angle * pi / 180 , r + y_padding, label,
+            fontsize=y_font_size, color=Y_font_color, alpha=y_font_alpha, ha='center', va='center', zorder=grid_z_order + 1)
     
     
-    ax.grid(axis = "y", color=grid_color, lw=1.2, alpha=grid_opacity)
+
+    ax.grid(axis = "y", color=grid_color_y, lw=1.2, alpha=grid_opacity_y, zorder=grid_z_order )
+    ax.grid(axis = "x", color=grid_color_x, lw=1.2, alpha=grid_opacity_x, zorder=grid_z_order )
 
     plt.tight_layout()
     plt.savefig(f"{name}.png", dpi=300)
