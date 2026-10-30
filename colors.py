@@ -204,7 +204,7 @@ DISTINCT_5_7 = ["#0D3B66", "#BFD7EA", "#F4D35E", "#EE964B", "#F95738"]
 
 
 
-#### TEMPLACE   ### 8  blue - white - orange 
+#### TEMPLACE   ### 8  blue - grey - orange 
 # orange - grey
 DISTINCT_2_8 = ["#dd6e42", "#4f6d7a"]
 # orange - yellow - grey 
