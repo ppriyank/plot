@@ -487,27 +487,85 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
 
     
 
-def Sankey_web(df, figsize=(20, 20), colors=None, 
+def Sankey_web(df, figsize=(20, 20), 
     plt_name="test", 
     left_axis=None, right_axis=None, 
     labels_font_size=15,
-    # column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
-    # N_CLUSTERS = 10,  map_vals_to_colors=True , N_BINS_COLORS = 1000,
-    # use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
-    #  node_labels_colors='white', node_alpha=1, 
-    # edges_with_cluster = True, color_contrast_ratio_threshold= 4.5, 
-    # scale_x = 1, scale_y = 1
+    gradient=False, edges=True, edge_width=0.75, edgecolor='black',  
+    left_axis_colors='black', right_axis_colors='blue', 
+    edge_alpha=0.5, opacity=1, 
     ):
 
     import pandas as pd
     from pySankey.sankey import sankey
     # python -m pip install pySankey
 
-    plt.clf()
-    fig, ax = plt.subplots(figsize=figsize)
+    left_labels = pd.unique(df[left_axis])
+    right_labels = pd.unique(df[right_axis])
     
-           
-    sankey(df[left_axis], df[right_axis], aspect=20, colorDict=colors, fontsize=labels_font_size)
+    if type(left_axis_colors) is not dict:
+        left_axis_colors = {k:left_axis_colors for k in left_labels}
+    if type(right_axis_colors) is not dict:
+        right_axis_colors = {k:right_axis_colors for k in right_labels}
+        
+    Dummy_colors = {k:'blue' for k in set(right_labels).union(right_labels)}
+    
+
+    sankey(df[left_axis], df[right_axis], aspect=20, colorDict=Dummy_colors, fontsize=labels_font_size)
+    plot_ax = plt.gca()
+    plot_ax.figure.set_size_inches(figsize, forward=True)
+    node_count = len(left_labels) + len(right_labels)
+    flow_collections = list(plot_ax.collections[node_count:])
+
+    flow_pairs = [
+            (left, right) for left in left_labels for right in right_labels if ((df[left_axis] == left) & (df[right_axis] == right)).any()
+    ]
+
+    assert len(flow_collections) == len(flow_pairs), "Unable to apply Sankey gradients: unexpected number of flow artists."
+    if gradient:
+        node_collections = plot_ax.collections[:node_count]
+        for collection, label in zip(node_collections[:len(left_labels)], left_labels):
+            collection.set_facecolor(left_axis_colors[label])
+            collection.set_edgecolor(left_axis_colors[label])
+        for collection, label in zip(node_collections[len(left_labels):], right_labels):
+            collection.set_facecolor(right_axis_colors[label])
+            collection.set_edgecolor(right_axis_colors[label])
+
+        x_min, x_max = plot_ax.get_xlim()
+        y_min, y_max = plot_ax.get_ylim()
+        gradient_values = np.linspace(0, 1, 256).reshape(1, -1)
+
+        for collection, (left, right) in zip(flow_collections, flow_pairs):
+            color_map = mpl.colors.LinearSegmentedColormap.from_list(
+                "sankey_flow", [left_axis_colors[left], right_axis_colors[right]]
+            )
+            image = plot_ax.imshow(
+                color_map(gradient_values),
+                extent=(x_min, x_max, y_min, y_max),
+                origin="lower",
+                aspect="auto",
+                interpolation="bilinear",
+                alpha=opacity,
+                zorder=collection.get_zorder(),
+            )
+            image.set_clip_path(
+                collection.get_paths()[0], collection.get_transform()
+            )
+    
+    if edges:
+        for collection in flow_collections:
+            outline = mpl.patches.PathPatch(
+                collection.get_paths()[0],
+                transform=collection.get_transform(),
+                facecolor="none",
+                edgecolor=edgecolor,
+                linewidth=edge_width,
+                zorder=collection.get_zorder() + 1,
+                alpha=edge_alpha,
+            )
+            plot_ax.add_patch(outline)
+            collection.remove()
+            
     plt.tight_layout()
     plt.savefig(f"{plt_name}.png", dpi=300)
     plt.clf()
@@ -515,7 +573,3 @@ def Sankey_web(df, figsize=(20, 20), colors=None,
 
     
              
-
-
-
-
