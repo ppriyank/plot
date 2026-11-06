@@ -1,4 +1,4 @@
-from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble
+from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble, Sankey_web
 from colors import HEAT_MAP_COLOR, generate_color_gradient, generate_color_gradients2
 import pandas as pd 
 import torch 
@@ -12,7 +12,8 @@ heat_map2=False
 word_cloud = False 
 radar_plot = False 
 box_plot = False 
-bubble_plot = True 
+bubble_plot = False  
+sankey_plot=True 
 
 ######### HEAT MAP
 cmap = None 
@@ -198,6 +199,19 @@ if bubble_plot:
     )
 
 
+if sankey_plot:
+    url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
+    df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
+    
+    colors = {
+        "apple": "#f71b1b",
+        "blueberry": "#1b7ef7",
+        "banana": "#f3f71b",
+        "lime": "#12e23f",
+        "orange": "#f78c1b"
+    }
+    
+    Sankey_web(df, colors=colors, left_axis='true', right_axis='predicted')
 
 
 # cd ~/plot/

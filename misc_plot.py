@@ -487,4 +487,35 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
 
     
 
+def Sankey_web(df, figsize=(20, 20), colors=None, 
+    plt_name="test", 
+    left_axis=None, right_axis=None, 
+    labels_font_size=15,
+    # column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
+    # N_CLUSTERS = 10,  map_vals_to_colors=True , N_BINS_COLORS = 1000,
+    # use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
+    #  node_labels_colors='white', node_alpha=1, 
+    # edges_with_cluster = True, color_contrast_ratio_threshold= 4.5, 
+    # scale_x = 1, scale_y = 1
+    ):
+
+    import pandas as pd
+    from pySankey.sankey import sankey
+    # python -m pip install pySankey
+
+    plt.clf()
+    fig, ax = plt.subplots(figsize=figsize)
+    
+           
+    sankey(df[left_axis], df[right_axis], aspect=20, colorDict=colors, fontsize=labels_font_size)
+    plt.tight_layout()
+    plt.savefig(f"{plt_name}.png", dpi=300)
+    plt.clf()
+
+
+    
              
+
+
+
+
