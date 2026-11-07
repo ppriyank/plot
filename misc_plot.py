@@ -487,8 +487,8 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
 
     
 
-def Sankey_web(df, figsize=(20, 20), 
-    plt_name="test", 
+def Sankey_web(df, figsize=None, 
+    name="test", 
     left_axis=None, right_axis=None, 
     labels_font_size=15,
     gradient=False, edges=True, edge_width=0.75, edgecolor='black',  
@@ -508,12 +508,12 @@ def Sankey_web(df, figsize=(20, 20),
     if type(right_axis_colors) is not dict:
         right_axis_colors = {k:right_axis_colors for k in right_labels}
         
-    Dummy_colors = {k:'blue' for k in set(right_labels).union(right_labels)}
+    Dummy_colors = {k:'blue' for k in set(left_labels).union(right_labels)}
     
-
     sankey(df[left_axis], df[right_axis], aspect=20, colorDict=Dummy_colors, fontsize=labels_font_size)
     plot_ax = plt.gca()
-    plot_ax.figure.set_size_inches(figsize, forward=True)
+    if figsize:
+        plot_ax.figure.set_size_inches(figsize, forward=True)
     node_count = len(left_labels) + len(right_labels)
     flow_collections = list(plot_ax.collections[node_count:])
 
@@ -567,7 +567,7 @@ def Sankey_web(df, figsize=(20, 20),
             collection.remove()
             
     plt.tight_layout()
-    plt.savefig(f"{plt_name}.png", dpi=300)
+    plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
 
 
