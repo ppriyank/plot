@@ -487,14 +487,42 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
 
     
 
+def _scale_sankey_flow_width(collection, width):
+    for path in collection.get_paths():
+        vertices = path.vertices.copy()
+        if len(vertices) < 5:
+            raise ValueError("Unexpected Sankey flow path; unable to scale its width.")
+
+        lower_end = np.argmax(vertices[1:, 0]) + 1
+        lower_indices = np.arange(1, lower_end + 1)
+        upper_indices = np.arange(len(vertices) - 2, lower_end + 1, -1)
+        if len(lower_indices) != len(upper_indices) or not np.allclose(
+            vertices[lower_indices, 0], vertices[upper_indices, 0]
+        ):
+            raise ValueError("Unexpected Sankey flow path; unable to scale its width.")
+
+        lower_y = vertices[lower_indices, 1]
+        upper_y = vertices[upper_indices, 1]
+        center_y = (lower_y + upper_y) / 2
+        vertices[lower_indices, 1] = center_y + (lower_y - center_y) * width
+        vertices[upper_indices, 1] = center_y + (upper_y - center_y) * width
+        vertices[0, 1] = vertices[-1, 1] = vertices[upper_indices[0], 1]
+        vertices[lower_end + 1, 1] = vertices[upper_indices[-1], 1]
+        path.vertices[:] = vertices
+    collection.stale = True
+
+
 def Sankey_web(df, figsize=None, 
     name="test", 
     left_axis=None, right_axis=None, 
     labels_font_size=15,
     gradient=False, edges=True, edge_width=0.75, edgecolor='black',  
     left_axis_colors='black', right_axis_colors='blue', 
-    edge_alpha=0.5, opacity=1, 
+    edge_alpha=0.5, opacity=1, flow_width=0.5,
     ):
+    """Create a Sankey plot; flow_width scales ribbon thickness (1 keeps the original width)."""
+    if not np.isfinite(flow_width) or flow_width < 0:
+        raise ValueError("flow_width must be a finite, non-negative number.")
 
     import pandas as pd
     from pySankey.sankey import sankey
@@ -522,6 +550,10 @@ def Sankey_web(df, figsize=None,
     ]
 
     assert len(flow_collections) == len(flow_pairs), "Unable to apply Sankey gradients: unexpected number of flow artists."
+    if flow_width != 1:
+        for collection in flow_collections:
+            _scale_sankey_flow_width(collection, flow_width)
+
     if gradient:
         node_collections = plot_ax.collections[:node_count]
         for collection, label in zip(node_collections[:len(left_labels)], left_labels):

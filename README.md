@@ -161,6 +161,11 @@ COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bc
 <div style="flex: 1; text-align: right;"><img src="Pictures/bubble_plot.png" alt="Simple Line" style="width: 40%;"></div>
 </div>
 
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+<div style="flex: 1; text-align: left;"><p>Sankey Plot (Mapping) </p></div>
+<div style="flex: 1; text-align: right;"><img src="Pictures/test_sankey.png" alt="Simple Line" style="width: 40%;"></div>
+</div>
+
 </div>
 
 

@@ -1,11 +1,13 @@
 from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble, Sankey_web
-from colors import HEAT_MAP_COLOR, generate_color_gradient, generate_color_gradients2
+from colors import *
 import pandas as pd 
 import torch 
 import torch.nn.functional as F
 import torch.nn as nn
 from math import log
 import numpy as np 
+import os 
+import random 
 
 heat_map = False 
 heat_map2=False 
@@ -199,20 +201,27 @@ if bubble_plot:
     )
 
 
-if sankey_plot:
+if sankey_plot:    
     url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
     df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
     
-    colors = {
-        "apple": "#f71b1b",
-        "blueberry": "#1b7ef7",
-        "banana": "#f3f71b",
-        "lime": "#12e23f",
-        "orange": "#f78c1b"
-    }
+    COLORS_LEFT = [lighten_color( DISTINCT_2_8[1], amount= 0.5 + 0.3 * i ) for i,k in enumerate(df.true.unique())]
+    random.shuffle(COLORS_LEFT)
+    COLORS_RIGHT = [lighten_color( DISTINCT_2_8[0], amount= 0.5 + 0.2 * i ) for i,k in enumerate(df.predicted.unique())]
+    random.shuffle(COLORS_RIGHT)
     
-    Sankey_web(df, colors=colors, left_axis='true', right_axis='predicted')
+    left_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k, color in zip(df.true.unique(), COLORS_LEFT)}
+    right_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k,color in zip(df.predicted.unique(), COLORS_RIGHT)}
 
+
+    Sankey_web(df, left_axis='true', right_axis='predicted', gradient=True, 
+    left_axis_colors=left_axis_colors, right_axis_colors=right_axis_colors, edges=True, edge_width=1, edgecolor='white', edge_alpha=0.6, 
+    flow_width=1, 
+    figsize=(5, 5),
+    name=os.path.join('Pictures', "test_sankey"), 
+    )
+    
+    
 
 # cd ~/plot/
 # python test_misc.py
