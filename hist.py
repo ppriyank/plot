@@ -1,3 +1,4 @@
+from matplotlib import colors as mcolors
 from colors import * 
 from plot_utils import range_calc
 from style import simplify_hist
@@ -18,6 +19,7 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
     legend=None, stack=None, dump_pdf=None, 
     xx_label_dist=None , use_horizontal=None, 
     grid_shape='y', 
+    PATTERNS=None, PATTERN_COLOR="black",
     ):
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -67,6 +69,21 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
                     ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity, label=legend[i])
                 else:
                     ax.bar(X, Y, width = barWidth, color=COLORS[i], lw=lw, ec=ec, capsize=7, zorder=2, alpha=bar_opacity)
+
+    if PATTERNS is not None:
+        for container in ax.containers:
+            if len(PATTERNS) != len(container.patches):
+                raise ValueError(
+                    f"Expected {len(container.patches)} patterns for bars, got {len(PATTERNS)}"
+                )
+            for patch, pattern in zip(container.patches, PATTERNS):
+                patch.set_hatch(pattern)
+                if hasattr(patch, "set_hatchcolor"):
+                    patch.set_hatchcolor(PATTERN_COLOR)
+                else:
+                    patch._hatch_color = mcolors.to_rgba(
+                        PATTERN_COLOR, patch.get_alpha()
+                    )
     
     if bar_labels == True:
         for i,hist in enumerate(Hists):
@@ -405,6 +422,3 @@ def bar_graph_horizontal2(
     else:
         plt.savefig(f"{name}.png", dpi=300)
     
-
-
-
