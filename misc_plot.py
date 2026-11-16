@@ -209,10 +209,10 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
         ax.xaxis.set_ticklabels(curve_points, fontsize=X_label_fontsize)
         ax.xaxis.set_tick_params(pad=X_pad)
         ax.xaxis.set_zorder(12)
-
+    
     if not outer_circle:
         ax.spines['polar'].set_visible(False)
-    
+
     if Y_range is None :
         Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
         plt.ylim(min(Y_range),  max(Y_range))
@@ -226,7 +226,6 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
         # ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
     # else:
     ax.yaxis.set_ticklabels([], fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
-    
     
     if grid_above:
         grid_z_order = 13
@@ -249,72 +248,123 @@ def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6)
 
 
 def box_plt(df, name="test", width=0.6, figsize=(10, 10), cmap=None,
-    linewidths=.5 , decimal_places=1, 
-    COLOR= ALONE_COLORS, OVERLAPING_COLORS=None, error_bar_color='black', error_bar_width=2,
-    y_points=3, y_up_offset=0, y_down_offset=0, y_font_size=20, use_mean=None,
-    x_padding_factor=0.5, x_padding=0.8, y_padding_factor=0, 
+    decimal_places=1, 
+    opacity=1,  artificial_darkening=0, 
+    COLOR= ALONE_COLORS, OVERLAPING_COLORS=None, error_bar_color='black',
+    y_points=3, y_up_offset=0, y_down_offset=0, use_mean=None,
+    x_padding_factor=0.5, x_padding=0.8, y_padding=0.8, y_padding_factor=0, 
     mean=None, std = None, X_range_label=None, switch_off_xaxis=None, switch_off_yaxis=None, x_ticks_allowed=True,
     Y_label_fontsize=25, X_label_fontsize=25,  grid_shape='xy', grid_opacity= 1,
-    x_down_offset=0, x_up_offset=0, x_label_rotate=0,):
-    
+    x_down_offset=0, x_up_offset=0, x_label_rotate=0, 
+    scatter_size=50,
+    labels_on_y_axis=False, connect_means=False, transparent_background=False):
+
+    error_bar_width=width
     plt.clf()
     fig, ax = plt.subplots(figsize=figsize)
-    
+    if artificial_darkening:
+        COLOR = [lighten_color(e, amount=artificial_darkening)  for e in COLOR]
+
     if df is not None:
         COLORS = {e:COLOR[i] for i,e in enumerate(df["X"].unique())}
     
+    
+    
     Y_s = []
     if mean:
-        for i, mean_val in enumerate(mean):
-            if OVERLAPING_COLORS:
-                plt.scatter(i, mean_val, color=COLOR, marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
-            else:
-                plt.scatter(i, mean_val, color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
-            plt.errorbar(i, mean_val, yerr=std[i], fmt='none', color=error_bar_color, capsize=12, lw=error_bar_width)
-            Y_s.append(mean_val)
-
+        for i, mean_vals in enumerate(mean):
+            mean_points = []
+            for j, mean_val in enumerate(mean_vals):
+                point = (mean_val, j) if labels_on_y_axis else (j, mean_val)
+                mean_points.append(point)
+                if OVERLAPING_COLORS:
+                    color=COLOR[i] 
+                    error_bar_color_arg = error_bar_color[i]
+                else:
+                    color = COLOR[i][j]
+                    error_bar_color_arg = error_bar_color
+                plt.scatter(*point, color=color, marker='o', s=scatter_size, label='Mean' if i == 0 else "", zorder=12, alpha=opacity)
+                if labels_on_y_axis:   
+                    if std is not None : 
+                        plt.errorbar(*point, xerr=std[i][j], fmt='none', color=error_bar_color_arg, capsize=12, lw=width, alpha=opacity)
+                    else:
+                        plt.errorbar(*point, fmt='none', color=error_bar_color_arg, capsize=12, lw=width, alpha=opacity)
+                else:
+                    if std is not None : 
+                        plt.errorbar(*point, yerr=std[i][j], fmt='none', color=error_bar_color_arg, capsize=12, lw=width, alpha=opacity)
+                    else:
+                        plt.errorbar(*point, fmt='none', color=error_bar_color_arg, capsize=12, lw=width, alpha=opacity)
+                Y_s.append(mean_val)
+            if connect_means and len(mean_points) > 1:
+                ax.plot(*zip(*mean_points), color=COLOR[i] if OVERLAPING_COLORS else error_bar_color, zorder=11)
     elif not use_mean:
-        boxplot = sns.boxplot(x="X", y="Y",  data=df, palette=COLORS, width=width)
-        boxplot.set_xticklabels(boxplot.get_xticklabels(), fontsize=X_label_fontsize)
+        if labels_on_y_axis:
+            args = dict(x="Y", y="X", orient="h")
+            Y_s  = df["Y"].tolist()
+        else:
+            args = dict(x="X", y="Y")
+            Y_s  = df["X"].tolist()
+        boxplot = sns.boxplot(data=df, palette=COLORS, width=width, **args)
+        if labels_on_y_axis:
+            boxplot.set_yticklabels(boxplot.get_yticklabels(), fontsize=Y_label_fontsize)
+        else:            
+            boxplot.set_xticklabels(boxplot.get_xticklabels(), fontsize=X_label_fontsize)
         boxplot.set(xlabel='', ylabel="")
+        
     else:
         # Calculate mean and standard deviation
         means = df.groupby('X')['Y'].mean()
         stds = df.groupby('X')['Y'].std()
+        Y_s  = means.tolist()
+        mean_points = []
         # Overlay mean and standard deviation
         for i, day in enumerate(means.index):
-            plt.scatter(i, means[day], color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
-            plt.errorbar(i, means[day], yerr=stds[day], fmt='none', color=error_bar_color, capsize=12, lw=2)
+            if labels_on_y_axis:
+                point = (means[day], i)
+                plt.scatter(*point, color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
+                plt.errorbar(means[day], i, xerr=stds[day], fmt='none', color=error_bar_color, capsize=12, lw=2)
+            else:
+                point = (i, means[day])
+                plt.scatter(*point, color=COLOR[i], marker='o', s=500, label='Mean' if i == 0 else "", zorder=12)
+                plt.errorbar(i, means[day], yerr=stds[day], fmt='none', color=error_bar_color, capsize=12, lw=2)
+            mean_points.append(point)
+        if connect_means and len(mean_points) > 1:
+            ax.plot(*zip(*mean_points), color=error_bar_color, zorder=11)
     
         if X_range_label is None:
             X_range_label = means.index
-        
-
-
+    
     X_range = range(len(X_range_label))
-    if df:
-        Y_range, Y_range_label = range_calc(df["Y"].tolist(), y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+    Y_range, Y_range_label = range_calc(Y_s, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+    if labels_on_y_axis:
+        simplify(ax, X_range, X_range_label, Y_range, Y_range_label,
+            Y_label_fontsize, X_label_fontsize,
+            y_padding=y_padding, 
+            x_padding=x_padding, x_padding_factor=x_padding_factor,
+            y_padding_factor=y_padding_factor,
+            switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, 
+            x_ticks_allowed=x_ticks_allowed,
+            x_label_rotate=x_label_rotate,
+            grid_shape=grid_shape, grid_opacity= grid_opacity,
+            )
     else:
-        Y_range, Y_range_label = range_calc(Y_s, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-        
-    
-    
-    
-    simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
-        Y_label_fontsize, X_label_fontsize, 
-        x_padding=x_padding, x_padding_factor=x_padding_factor,
-        y_padding_factor=y_padding_factor, 
-        switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, grid_shape=grid_shape, grid_opacity= grid_opacity,
-        x_ticks_allowed=x_ticks_allowed , 
-        x_min=min(X_range) - 1 - x_down_offset,  
-        x_max= max(X_range) + 1 + x_up_offset,
-        x_label_rotate=x_label_rotate,
-        )
+        simplify(ax, Y_range, Y_range_label, X_range, X_range_label,
+            Y_label_fontsize, X_label_fontsize,
+            x_padding=x_padding, x_padding_factor=x_padding_factor,
+            y_padding_factor=y_padding_factor,
+            switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, 
+            x_ticks_allowed=x_ticks_allowed,
+            x_label_rotate=x_label_rotate,
+            grid_shape=grid_shape, grid_opacity= grid_opacity,
+            )
 
 
-
+    
     plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
+    if transparent_background:
+        plt.savefig(f"{name}.png", dpi=300, transparent=True, bbox_inches='tight', pad_inches=0)
+    else:
+        plt.savefig(f"{name}.png", dpi=300)
     plt.clf()
 
 

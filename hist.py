@@ -84,12 +84,15 @@ def bar_graph_X_Y(Hists, COLORS=[ORANGE, BLUE], OVERLAPING_COLORS=None,
                     patch._hatch_color = mcolors.to_rgba(
                         PATTERN_COLOR, patch.get_alpha()
                     )
-    
+
     if bar_labels == True:
         for i,hist in enumerate(Hists):
-            X, Y = hist
+            X  = hist[0]
+            Y = [y for j,y in enumerate(hist[1:])]
+            Y = np.array(Y).sum(0)
+            Y = list(Y)
             for x,y in zip(X,Y):
-                ax.text( x + bar_labels_x_offset, y + bar_labels_y_offset, bar_label_formatter(y),  ha="right", va="baseline", fontsize=bar_labels_font_size, color=bar_color )
+                ax.text( x + bar_labels_x_offset, y + bar_labels_y_offset, bar_label_formatter(y),  ha="center", va="baseline", fontsize=bar_labels_font_size, color=bar_color )
     
     if hline:
         Y_pos += hline

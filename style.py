@@ -67,6 +67,7 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
     x_padding = 0 , y_padding_factor=0, x_padding_factor=0, x_ticks_allowed=True , x_min=None, x_max=None, switch_off_yaxis=None,
     switch_off_x_axis=None, x_label_rotate=0, switch_off_xaxis=None, y_padding=0, grid_shape="y", y_label_rotate=0, x_label_dist=None, grid_opacity=1):
     
+    assert x_min == None and x_max == None
     axis_data(Y_range, Y_range_label, X_range, X_range_label, X_label_fontsize, 
         x_label_rotate, x_label_dist, x_ticks_allowed, ax)
 
@@ -74,7 +75,7 @@ def simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsiz
 
 
     y_max, y_min = max(Y_range), min(Y_range)
-    ax.set_ylim(y_min, y_max)
+    ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
     x_max, x_min = max(X_range), min(X_range)    
     # # Set custom limits
