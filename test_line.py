@@ -1,64 +1,69 @@
+from ALL_PLOTS import ALL_PLOT
+from line import line_plot
+from colors import *
+
 import torch
-from line import line_plot, line_shade_plot
-from colors import ALONE_COLORS
 
-Y = [42.4, 41.4, 39.6, 38.4]
+
+
+
 X = [0, 1, 2, 3]
-
-Lines = [[X, Y]]
 X_labels = ['[0]','[5]', '[8]', '[11]']
-H_line = [38.0]
+Lines = [[X, torch.rand(4) * 100] for e in range(5)]
 
 
-line_plot(Lines, 
-    figsize=(6, 6), name="test_line", artificial_darkening=1,
-    line_width=5, alpha_line=1, decimal_places=0,
-    h_lines=H_line, hline_style="-", h_line_alpha=1, 
-    y_padding_factor=-0.0, y_points=2, Y_label_fontsize=25, y_up_offset=0.5, y_down_offset=0.5,
-    X_labels=X_labels, X_labels_pos = X, X_label_fontsize=25, x_padding_factor=-0.04, x_padding=0.08,
-    use_scatter=True, scatter_size=300,
-    )
+Line_config = dict(
+    line_width=5, alpha_line=1, 
+    use_scatter=True, scatter_size=300, scatter_boder_color='black',
+    h_lines=[40, 60], 
+)
 
-X = [0, 1, 2, 3]
-
-Y_max = [42.4, 41.4, 39.6, 38.4]
-Y_min = [42, 39.8, 38, 38]
-Y_min_mean = [(a + b)/2 for a,b in zip(Y_max, Y_min)]
-Lines = [[X, Y_max, Y_min_mean, Y_min]]
-
-Y_max = [44.4, 43.1, 40.1, 39.0]
-Y_min = [44, 42.7, 38, 37]
-Y_min_mean = [(a + b)/2 for a,b in zip(Y_max, Y_min)]
-Lines += [[X, Y_max, Y_min_mean, Y_min]]
-
-
-line_shade_plot(Lines, 
-    figsize=(6, 6), name="test_shade", artificial_darkening=1,
-    line_width=5, alpha_line=0.2, decimal_places=0,
-    h_lines=None, 
-    y_padding_factor=-0.0, y_points=2, Y_label_fontsize=25, y_up_offset=0.5, y_down_offset=0.5,
-    X_labels=X_labels, X_labels_pos = X, X_label_fontsize=25, x_padding_factor=-0.04, x_padding=0.1,
-    use_scatter=True, scatter_size=300, artificial_light=1.1
+PLOT_FN = ALL_PLOT(
+    figsize=(6, 6), 
+    colors=DISTINCT_7, artificial_darkening=0.7,
+    decimal_places=1,
+    y_up_offset=2, y_down_offset=2,
+    x_up_offset=2, x_down_offset=2,
+    x_axis_pos_offset=3, y_axis_pos_offset=0.1, 
+    **Line_config 
     )
 
 
-
-X = [0, 1, 2, 3]
-Lines = [[X, torch.rand(4) * 100] for e in range(10)]
     
-X_labels = ['[0]','[5]', '[8]', '[11]']
+## Normal line plot 
+PLOT_FN.plot(plt_type="line", name="test_lines",
+    X=X, Lines=Lines, 
+    X_range=X, X_labels=X_labels, 
+)
+
+
+Shades_MAX = [(e[0], e[1] + torch.randint(20, (4,))  )  for e in Lines]
+Shades_MIN = [(e[0], e[1] - torch.randint(20, (4,)) )  for e in Lines]
+
+
+## Normal line plot + up - down Shades for each line 
+PLOT_FN.plot(plt_type="line", name="test_lines2",
+    X=X, Lines=Lines, 
+    X_range=X, X_labels=X_labels, 
+    shade=True, shade_up=Shades_MAX, shade_down=Shades_MIN,
+)
 
 
 
-line_plot(Lines, COLORS=ALONE_COLORS,
-    figsize=(6, 6), name="test_multiple", artificial_darkening=0.85,
-    line_width=5, alpha_line=1, decimal_places=0,
-    y_padding_factor=-0.0, y_points=2, Y_label_fontsize=25, y_up_offset=2, y_down_offset=2,
-    X_labels=X_labels, X_labels_pos = X, X_label_fontsize=25, x_padding_factor=-0.04, x_padding=0.08,
-    use_scatter=True, scatter_size=300,
-    )
+
+
+
+
+
+
+
+
 
 
 
 # cd ~/plot/
 # python test_line.py
+
+
+
+

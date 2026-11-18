@@ -5,125 +5,130 @@ from colors import *
 from plot_utils import range_calc
 from style import simplify
 
-def line_plot(Lines, COLORS = [ORANGE, BLUE, PINK], 
-    figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha_line=1, line_width=5, 
-    y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
-    X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
-    use_scatter=True, scatter_size=50, scatter_boder=1.5, scatter_color="white",
-    h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, add_black_outline=None, 
-    switch_off_yaxis=None, grid_opacity=1, grid_shape='y'
-    ):
-
-    fig, ax = plt.subplots(figsize=figsize)
-    COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
-    assert len(COLORS) >= len(Lines), "COLORS < LINES (not all lines will be plotted"
-
-    X_pos = [] 
-    Y_pose = []
-    for percentage, color in zip(Lines, COLORS):
-        X, Y = percentage
-        X_pos += X
-        Y_pose += Y
-        if add_black_outline:
-            ax.plot(X, Y, color='black', lw=line_width+1, alpha=alpha_line, zorder=12)
-        
-        ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line, zorder=13)
-        if use_scatter:
-            if add_black_outline:
-                ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=12)
-            else:
-                ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_color, zorder=14)
-
-    if h_lines:
-        Y_pose += h_lines
-        for h_line in h_lines:            
-            ax.plot([min(X_pos), max(X_pos)], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
-
-
-    Y_range, Y_range_label = range_calc(Y_pose, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-    if X_labels:
-        X_range_label = X_labels
-        if X_labels_pos:
-            X_range =  X_labels_pos    
-        else:
-            X_range = X_pos
-    else:
-        X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
-
-    simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
-    y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, switch_off_yaxis=switch_off_yaxis, grid_opacity=grid_opacity, 
-    grid_shape=grid_shape,)
-
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
+# def line_plot(Lines, colors = [ORANGE, BLUE, PINK], 
+#     figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha_line=1, line_width=5, 
+#     y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
+#     X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
+#     use_scatter=True, scatter_size=50,  scatter_color="white",
+#     h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, add_black_outline=None, 
+#     switch_off_yaxis=None, grid_opacity=1, grid_shape='y', X=None, ax=None
+#     ):
 
 
 
-def line_shade_plot(Lines, COLORS = [ORANGE, BLUE, PINK], 
-    figsize=(8, 6), name="test_shade", decimal_places=1, alpha_line=1, line_width=5, 
-    y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, 
-    X_labels=None, X_labels_pos = None, x_points=3, x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_padding=0.04, x_padding_factor=0,
-    use_scatter=True, scatter_size=50, 
-    h_lines=None, hline_style="-.", h_line_alpha=1, hline_color=RED, 
-    border_line_width=None, SHADE_Colors=None, artificial_darkening=1, artificial_shade_darkening=2, alpha_shade=0.5,
-    background_vline=None, vline_color="black", ec="white", 
-    ):
 
-    fig, ax = plt.subplots(figsize=figsize)
-    COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
-    assert len(COLORS) >= len(Lines), "COLORS < LINES (not all lines will be plotted"
 
-    # average line dark color
-    mid_path_effects = [withStroke(linewidth=6, foreground="white")]
+#     Y_range, Y_range_label = range_calc(Y_pose, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
+#     if X_labels:
+#         X_range_label = X_labels
+#         if X_labels_pos:
+#             X_range =  X_labels_pos    
+#         else:
+#             X_range = X_pos
+#     else:
+#         X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
+
+#     simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
+#     y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor, switch_off_yaxis=switch_off_yaxis, grid_opacity=grid_opacity, 
+#     grid_shape=grid_shape,)
 
     
-    if border_line_width == None:
-        border_line_width = line_width
-    if SHADE_Colors == None:
-        SHADE_Colors = [lighten_color(e, amount=artificial_shade_darkening)  for e in COLORS]
-
-    if background_vline is not None:
-        Y_pose = []
-        for percentage in Lines:
-            _, Y_max, Y_min_mean, Y_min = percentage
-            Y_pose += Y_max + Y_min_mean + Y_min
-            
-
-        for v_line in background_vline:            
-            ax.plot([v_line, v_line], [min(Y_pose) - y_down_offset, max(Y_pose) + y_up_offset], color=vline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
+    
 
 
-    X_pos = [] 
-    Y_pose = []
-    # Add lines with dots
-    # Note the zorder to have dots be on top of the lines
-    for percentage, color, shade_color in zip(Lines, COLORS, SHADE_Colors):
-        X, Y_max, Y_min_mean, Y_min = percentage
-        X_pos += X
-        Y_pose += Y_max + Y_min_mean + Y_min
-        ax.fill_between(X, Y_min, Y_max, color=shade_color, lw=border_line_width, zorder=12, alpha=alpha_shade, ec="white")
-        ax.plot(X, Y_min_mean, linestyle='--', color=color, lw=line_width, zorder=12, )    
-        # ax.scatter(X_pos, percentage, fc=color, s=100,  )
-        if use_scatter:ax.scatter(X, Y_min_mean, fc=color, s=scatter_size, lw=1.5, ec=ec, zorder=12)
+def line_plot(ax=None,
 
+    Lines=None, 
+    colors = [ORANGE, BLUE, PINK],  
+    
+    line_width=5, 
+    alpha_line=1, 
+    
+    use_scatter=True, 
+    scatter_size=50, 
+    scatter_boder=1.5,
+    scatter_boder_color=None, 
+
+    h_lines=None,  # [40]
+    hline_style="-.", 
+    h_line_alpha=1, 
+    hline_color=RED, 
+    hline_offset = 3,
+
+    shade=False, 
+    shade_up=None,
+    shade_down=None,
+    shade_line_width = 2,  
+    shade_alpha=0.5, 
+    shade_darkening=1, 
+    
+    v_lines=None, 
+    vline_style="-.", 
+    v_line_alpha=1, 
+    vline_color=RED, 
+    vline_offset = 3,
+    
+    **args
+    ):
+
+    assert len(colors) >= len(Lines), "COLORS < LINES (not all lines will be plotted"
+
+
+    ### plot line 
+    X_values = [] 
+    Y_values = []
+    for (X, Y), color in zip(Lines, colors):
+        X_values += X
+        Y_values += Y
+        ax.plot(X, Y, color=color, lw=line_width, alpha=alpha_line, zorder=13)
+
+    ### plot scatter
+    if use_scatter:
+        for (X, Y), color in zip(Lines, colors):
+            ax.scatter(X, Y, fc=color, s=scatter_size, lw=scatter_boder, ec=scatter_boder_color, zorder=14)
+
+
+    ### plot horizontal_lines
     if h_lines:
-        Y_pose += h_lines
+        Y_values += h_lines
         for h_line in h_lines:            
-            ax.plot([min(X_pos), max(X_pos)], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
+            ax.plot([min(X_values) - hline_offset, max(X_values) + hline_offset], [h_line, h_line], color=hline_color, lw=line_width, linestyle=hline_style, alpha=h_line_alpha, )
 
-    Y_range, Y_range_label = range_calc(Y_pose, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-    if X_labels:
-        X_range_label = X_labels
-        if X_labels_pos:
-            X_range =  X_labels_pos    
-        else:
-            X_range = X_pos
-    else:
-        X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
+    ### plot horizontal_lines
+    if v_lines:
+        X_values += v_lines
+        for v_line in v_lines:            
+            ax.plot([v_line, v_line], [min(Y_values) - vline_offset, max(Y_values) + vline_offset], color=vline_color, lw=line_width, linestyle=hline_style, alpha=v_line_alpha, )
+        
+    
+    vline_style="-.", 
+    v_line_alpha=1, 
+    vline_color=RED, 
+    vline_offset = 3,
 
-    simplify(ax, Y_range, Y_range_label, X_range, X_range_label, Y_label_fontsize, X_label_fontsize, x_padding=x_padding, 
-    y_padding_factor=y_padding_factor, x_padding_factor=x_padding_factor)
 
+    ### plot shades
+    if shade:
+        shade_colors = [lighten_color(e, amount=shade_darkening)  for e in colors]
 
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
+        for y_max, y_min, shade_color in zip(shade_up, shade_down, shade_colors):
+            assert y_max[0] == y_min[0]
+            X = y_max[0]
+            
+            y_up = y_max[1]
+            y_down = y_min[1]
+            
+            Y_values += y_up 
+            Y_values += y_down
+            
+            ax.fill_between(X, y_down, y_up, color=shade_color, alpha=shade_alpha, zorder=12, ec="white", lw=shade_line_width)
+            
+    # plt.savefig("test_multiple.png", dpi=300)
+    return X_values, Y_values
+    
+    
+    
+    
+    
+    
+    

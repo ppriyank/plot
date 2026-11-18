@@ -12,6 +12,17 @@ from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_s
 from plot.colors import ALL_COLORS, lighten_color
 ```
 
+The plot helpers are also available through the `PLOT` class:
+```
+from plot.main import PLOT
+
+plotter = PLOT(figsize=(6, 6), name="line_example")
+plotter.plot("line", Lines=[[[0, 1, 2], [3, 5, 4]]])
+```
+`PLOT.plot()` supports line and shaded-line plots, bar and histogram variants, scatter,
+heatmap, word cloud, radar, box, network-bubble, and Sankey plots. The corresponding
+plot methods can also be called directly on the instance.
+
 ## Colors 
 
 Best colors for paper and generating Graphs are listed in [colors.py](colors.py). 
