@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from colors import *
+from colors_set import *
 from inspect import signature
 from plot_utils import range_calc
 from style import simplify
@@ -11,7 +11,7 @@ class ALL_PLOT:
     PLOT_METHODS = {
         # Map plot names and aliases to the class methods that implement them.
         "line": "line_plot",
-        
+        "scatter": "scatter_plt",
     
         "bar": "bar_graph_X_Y",
         "histogram": "bar_graph_X_Y",
@@ -24,8 +24,6 @@ class ALL_PLOT:
         "bar_graph_horizontal": "bar_graph_horizontal",
         "horizontal_stacked_bar": "bar_graph_horizontal2",
         "bar_graph_horizontal2": "bar_graph_horizontal2",
-        "scatter": "scatter_plt",
-        "scatter_plt": "scatter_plt",
         "heatmap": "heatmap_plt",
         "heatmap_plt": "heatmap_plt",
         "word_cloud": "word_cloud_plt",
@@ -41,6 +39,7 @@ class ALL_PLOT:
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
         name=None,  # Default base name for the saved PNG file.
+        pad_inches = 0.1, 
         colors=None,  # Default color or mapping used to draw plot elements.
         artificial_darkening=1,  # Adjusts the darkness of supplied colors.
         decimal_places=1,  # Sets decimal precision for generated axis labels.
@@ -54,7 +53,9 @@ class ALL_PLOT:
         Y_label_fontsize=20, X_label_fontsize=25,  # Set axis tick-label font sizes.
         Y_label_rotate=0, X_label_rotate =0 ,  # Rotate axis tick labels by these angles.
 
-        x_axis_pos_offset=0.1, y_axis_pos_offset=0.1,  # Add padding outside calculated axis limits.
+        x_axis_pos_offset=0, y_axis_pos_offset=0,  # Add padding outside calculated axis limits.
+        x_axis_end_limit_offset=0, y_axis_end_limit_offset=0, 
+
         **kwargs):  # Extra plot, setup, or save options forwarded to plot helpers.
         # Store class-wide defaults used by setup and styling methods.
         
@@ -63,7 +64,7 @@ class ALL_PLOT:
         self.defaults = kwargs
         self.fig = None
         self.ax = None
-
+        self.pad_inches = pad_inches
 
         self.colors = colors
         self.artificial_darkening = artificial_darkening
@@ -99,6 +100,11 @@ class ALL_PLOT:
 
         self.x_axis_pos_offset = x_axis_pos_offset
         self.y_axis_pos_offset = y_axis_pos_offset
+        if x_axis_pos_offset != 0 or y_axis_pos_offset != 0:
+            print("\n\n\n.... Shifting the axis away from origin!! \n\n\n")
+
+        self.x_axis_end_limit_offset=x_axis_end_limit_offset 
+        self.y_axis_end_limit_offset=y_axis_end_limit_offset 
 
         self.kwargs = kwargs
 
@@ -133,7 +139,7 @@ class ALL_PLOT:
         switch_off_yaxis=False,  # Hide the left y-axis spine.
         switch_off_xaxis=False,  # Hide the bottom x-axis spine.
         grid_color=None,  # Set the grid-line color.
-    ):
+        ):
         # Configure grid lines and hide or style the visible axis spines.
         # Add grid lines
         if grid_shape == 'xy':
@@ -164,8 +170,9 @@ class ALL_PLOT:
     def style_axis(self, 
         Y_range=None, Y_labels=None,  # Set y-axis tick positions and labels.
         X_range=None, X_labels=None,  # Set x-axis tick positions and labels.
-        xx_label_dist=0, xy_label_dist=0  # Shift x-axis tick labels horizontally and vertically.
-    ):
+        x_axis_label_dist_x=0, x_axis_label_dist_y=0,  # Shift x-axis tick labels horizontally and vertically.
+        y_axis_label_dist_x=0, y_axis_label_dist_y=0  # Shift y-axis tick labels horizontally and vertically.
+        ):
         # Apply tick values, labels, fonts, rotations, and optional label offsets.
          
         if self.y_ticks_allowed:
@@ -182,40 +189,52 @@ class ALL_PLOT:
         else:
             self.ax.xaxis.set_tick_params(labelbottom=False, length=0)
 
+        # print(Y_range, Y_labels)
+        # print(X_range, X_labels)
+
         # Make gridlines be below most artists.
         self.ax.set_axisbelow(True)
 
-        if xx_label_dist or xy_label_dist:
-            if isinstance(xx_label_dist, int):
-                xx_label_dist = [xx_label_dist for i in self.ax.get_xticklabels()]
-            if isinstance(xy_label_dist, int):
-                xy_label_dist = [xy_label_dist for i in self.ax.get_xticklabels()]
+        ###### distatnce of x labels from x axis 
+        if x_axis_label_dist_x or x_axis_label_dist_y:
+            if isinstance(x_axis_label_dist_x, int):
+                x_axis_label_dist_x = [x_axis_label_dist_x for i in self.ax.get_xticklabels()]
+            if isinstance(x_axis_label_dist_y, int):
+                x_axis_label_dist_y = [x_axis_label_dist_y for i in self.ax.get_xticklabels()]
 
             for i, label in enumerate(self.ax.get_xticklabels()):
-                offset = transforms.ScaledTranslation( xx_label_dist[i], xy_label_dist[i], ax.figure.dpi_scale_trans)
+                offset = transforms.ScaledTranslation( x_axis_label_dist_x[i], x_axis_label_dist_y[i], ax.figure.dpi_scale_trans)
+                label.set_transform(label.get_transform() + offset)
+
+        ###### distatnce of x labels from x axis 
+        if y_axis_label_dist_x or y_axis_label_dist_y:
+            if isinstance(y_axis_label_dist_x, int):
+                y_axis_label_dist_x = [y_axis_label_dist_x for i in self.ax.get_xticklabels()]
+            if isinstance(y_axis_label_dist_y, int):
+                y_axis_label_dist_y = [y_axis_label_dist_y for i in self.ax.get_xticklabels()]
+
+            for i, label in enumerate(self.ax.get_xticklabels()):
+                offset = transforms.ScaledTranslation( y_axis_label_dist_x[i], y_axis_label_dist_y[i], ax.figure.dpi_scale_trans)
                 label.set_transform(label.get_transform() + offset)
 
         # PAD = abs(y_max - y_min) * y_padding_factor
         # for i, (label_pos, label) in enumerate(zip(Y_range, Y_range_label)):
         #     ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )
-    
         
-    def limit_axis(self, Y_range, X_range):
-        # Expand and apply the y-axis and x-axis limits around the generated ranges.
+    def limit_axis(self, Y_range, X_range, Y_values, X_values):
+        # Derive the lower-left origin from the actual data ranges.
         y_max, y_min = max(Y_range), min(Y_range)
-        self.ax.set_ylim(y_min - self.x_axis_pos_offset, y_max + self.x_axis_pos_offset)
+        x_max, x_min = max(X_range), min(X_range)
 
-        x_max, x_min = max(X_range), min(X_range)    
-        self.ax.set_xlim(x_min - self.y_axis_pos_offset, x_max + self.y_axis_pos_offset)
+        self.ax.set_ylim(y_min - self.x_axis_pos_offset, y_max + self.y_axis_end_limit_offset)
+        self.ax.set_xlim(x_min - self.y_axis_pos_offset, x_max + self.x_axis_end_limit_offset)
 
         return 
         
-
     def stylize(self,
             Y_values, X_values,  # Data ranges used to generate automatic ticks.
             X_range=None, X_labels = None,  # Optional explicit x-axis tick positions and labels.
             Y_range=None, Y_labels = None,  # Optional explicit y-axis tick positions and labels.
-
             grid_shape = None, grid_opacity=None, grid_color=None,  # Override default grid settings.
             switch_off_yaxis = None, switch_off_xaxis = None,  # Override default axis-spine visibility.
         **kwargs,  # Extra label-offset options forwarded to axis styling.
@@ -239,18 +258,28 @@ class ALL_PLOT:
         self.style_axis(
             Y_range=Y_range, Y_labels=Y_labels,
             X_range=X_range, X_labels=X_labels,
-            xx_label_dist= kwargs.get('xx_label_dist', 0),
-            xy_label_dist= kwargs.get('xy_label_dist', 0)
-        )
-
-        self.limit_axis(
-            Y_range=Y_range, X_range=X_range, 
+            x_axis_label_dist_x= kwargs.get('x_axis_label_dist_x', 0),
+            x_axis_label_dist_y= kwargs.get('x_axis_label_dist_y', 0),
+            y_axis_label_dist_x= kwargs.get('y_axis_label_dist_x', 0),
+            y_axis_label_dist_y= kwargs.get('y_axis_label_dist_y', 0),
         )
         
+        # plt.savefig("test.png", dpi=300)
+        self.limit_axis(
+            Y_range=Y_range, X_range=X_range,
+            Y_values=Y_values, X_values=X_values,
+        )
         return 
         
         
-        
+    def update_params(self, vals : dict):
+        # key = 'switch_off_yaxis'
+        # self.__dict__[key]
+        for key, value in vals.items():
+            if hasattr(self, key):
+                self.__dict__[key] = value 
+            else:
+                assert False, f"Parameter {key} not yet intialized"
     
     def plot(self, plt_type="line", **kwargs):
         # Dispatch a plot type, style and render it, and save the resulting PNG.
@@ -271,7 +300,12 @@ class ALL_PLOT:
         from line import line_plot
         plot_kwargs = {"ax": self.ax, **kwargs}
         return line_plot(**plot_kwargs)
-        
+    
+    def scatter_plt(self, **kwargs):
+        from scatter import scatter_plt
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        return scatter_plt(**plot_kwargs)
+
     def save_plot(
         self,
         name=None,  # Override the output file's base name.
@@ -287,7 +321,7 @@ class ALL_PLOT:
         self.fig.savefig(
             output_path, dpi=dpi, 
             bbox_inches=kwargs.pop("bbox_inches", "tight"),
-            pad_inches=kwargs.pop("pad_inches", 0),
+            pad_inches=self.pad_inches,
             transparent=transparent,
         )
         return output_path
@@ -341,11 +375,7 @@ class ALL_PLOT:
 
     #     return self._invoke_plot(bar_graph_horizontal2, *args, **kwargs)
 
-    # def scatter_plt(self, *args, **kwargs):
-    #     from scatter import scatter_plt
-
-    #     return self._invoke_plot(scatter_plt, *args, **kwargs)
-
+    
     # def heatmap_plt(self, *args, **kwargs):
     #     from misc_plot import heatmap_plt
 

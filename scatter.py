@@ -1,123 +1,90 @@
 import matplotlib.pyplot as plt
-from colors import * 
-from plot_utils import range_calc
-from style import simplify
-
+from colors_set import * 
+from plot_add import * 
 import torch 
+import numpy as np 
 
-def scatter_plt(Points, Labels=None, SIZE=50, COLORS = ALONE_COLORS, #[ORANGE, BLUE, RED, GREEN], 
-    figsize=(8, 6), name="test", artificial_darkening=1, decimal_places=1, alpha=1, ec="white", lw=1.5, enable_relabeling=None, 
-    y_up_offset=0, y_down_offset=0, Y_label_fontsize=20, y_points=3, y_padding_factor=0, hard_y=None,
-    x_up_offset=0, x_down_offset=0, X_label_fontsize=25, x_points=3, x_padding_factor=0, x_padding=0.04, hard_x=None,
-    SHAPES = None, strict_order = None, switch_off_xaxis=None, switch_off_yaxis=None, grid_shape="y", grid_opacity=1,
-    x_ticks_allowed=True,
+def convert_to_tensor(x, Points=None, default_value=0, dtype=None):
+    if x is None:
+        x = [default_value for i in Points]
+    if dtype is 'numpy':
+        x = np.array(x)
+        return x
+
+    if type(x) != torch.Tensor:
+        x = torch.tensor(x)
+    return x
+
+
+
+
+def scatter_plt(ax=None,
+    Points=None, Labels=None, Sizes=50, Shapes='o', 
+    colors = [ORANGE, BLUE, PINK],  
+    scatter_boder=1.5,
+    scatter_boder_color='white', 
+    scatter_alpha=1, 
+
+    vline_offset = 10,
+    hline_offset = 10,
+    line_width=1,
+    
+    enable_relabeling=None,     
+    **args
     ):
 
-    ## default 0 label for no label 
-    if Labels is None:
-        Labels = [0 for i in range(len(Points))]
-    if type(Labels) == torch.Tensor:
-        Labels = Labels.tolist()
     
-    ##### More colors if # labels > colors 
-    if len(COLORS) < len(set(Labels)):
-        COLORS = ALL_COLORS 
-    if len(COLORS) < len(set(Labels)):
-        COLORS = ALL_XKCD_COLORS 
+    Points = convert_to_tensor(Points)
+    Labels = convert_to_tensor(Labels, Points) ### Process labels
+    unique_labels = sorted(Labels.unique())
+    Sizes = convert_to_tensor(Sizes) ### Process Sizes
     
+    
+    ### Process Colors 
+    # More colors if # labels > colors 
+    if isinstance(colors, str):
+        colors  = {e.item(): colors for i,e in enumerate(unique_labels)}
+    if len(colors) < len(unique_labels):
+        colors = ALL_XKCD_COLORS 
+    if isinstance(colors, list):
+        colors  = {e.item(): colors[i] for i,e in enumerate(unique_labels)}
+    assert isinstance(colors, dict), "Colors should be dictionary of label = colors" 
+    
+    ### Process Shape
+    if isinstance(Shapes, str):
+        Shapes  = {e.item(): Shapes for i,e in enumerate(unique_labels)}
+    elif isinstance(Shapes, list):
+        Shapes  = {e.item(): Shapes[i] for i,e in enumerate(unique_labels)}
+    
+    assert isinstance(Shapes, dict), "Shapes should be dictionary of label = shape" 
 
-    fig, ax = plt.subplots(figsize=figsize)
-    
-    ## COLOR == {label : color} 
-    if type(COLORS) != dict:
-        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
-        COLORS  = {e: COLORS[i] for i,e in enumerate(set(Labels))}
-        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
-    else:
-        print(len(COLORS), len(set(COLORS)), len(set(Labels)))
-    
     if enable_relabeling:
-        unique = sorted(set(Labels))
-        unique = {e:i for i,e in enumerate(unique)}
-        print("NEW LABELS : ", unique)
-        Labels= [unique[e] for e in Labels]
-        COLORS = {unique[key]: COLORS[key] for key in unique}
+        unique_labels = {e.item():i for i,e in enumerate(unique_labels)}
+        print("NEW LABELS : ", unique_labels)
+        Labels= [unique_labels[e.item()] for e in Labels]
+        Labels = convert_to_tensor(Labels) 
+        colors = {unique_labels[key.item()]: colors[key] for key in unique_labels}
+        Shapes = {unique_labels[key.item()]: Shapes[key] for key in unique_labels}
+
+    
+    indices = torch.argsort(Sizes, descending=True)
+    Sizes = Sizes[indices]
+    Points = Points[indices]
+    Labels = Labels[indices]
+    
+    X_values = [Points[:,0].max(), Points[:,0].min() ]
+    Y_values = [Points[:,1].max(), Points[:,1].min() ]
     
     
-    if artificial_darkening:
-        COLORS = {e: lighten_color(COLORS[e], amount=artificial_darkening)  for e in COLORS}
+    for label in Labels.unique():
+        indices = Labels == label
+        X, Y = Points[indices][:,0], Points[indices][:,1]
+        size  = Sizes[indices]
+        shape = Shapes[label.item()]
+        ax.scatter(X, Y, fc=colors[label.item()], s=size, zorder=12, ec=scatter_boder_color, lw=scatter_boder, alpha=scatter_alpha, marker=shape)
 
-    if type(SIZE) == int or len(SIZE) == 1:
-        SIZE = [SIZE for i in range(len(Points))]
-        SIZE = torch.tensor(SIZE)
-    elif type(SIZE)== list:
-        SIZE = torch.tensor(SIZE)
-    
-    indices = torch.argsort(SIZE, descending=True)
-    SIZE = np.array(SIZE)[indices]
-    Points = np.array(Points)[indices]
-    Labels = np.array(Labels)[indices]
-    if SHAPES is not None:
-        SHAPES = np.array(SHAPES)[indices]
-    
-    
-    X_pos =  Points[:,0]
-    Y_pos = Points[:,1]
+    local_X, local_Y = plot_background_lines_shades(hline_offset=hline_offset, vline_offset=vline_offset, ax=ax, X_values=X_values, Y_values=Y_values, line_width=line_width, **args)
+    # Y_values += local_Y
+    # X_values += local_X
 
-    curret_order_of_loop = sorted(set(Labels)) 
-    if strict_order is not None:
-        curret_order_of_loop = strict_order
-    for i,y in enumerate( curret_order_of_loop ):
-        # print(i,y, COLORS[i])
-        selected_index  = Labels == y
-        X, Y = Points[selected_index][:,0], Points[selected_index][:,1]
-        size  = SIZE[selected_index]
-        y = int(y)
-        if SHAPES is not None:
-            shape = SHAPES[selected_index]
-            if len(set(shape)) == 1:
-                shape = shape[0]
-                ax.scatter(X, Y, fc=COLORS[y], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha, marker=shape)
-            else:
-                for s in set(shape):
-                    ax.scatter(X[shape == s], Y[shape == s], fc=COLORS[y], s=size[shape == s], zorder=12, ec=ec, lw=lw, alpha=alpha, marker=s)
-        else:
-            ax.scatter(X, Y, fc=COLORS[y], s=size, zorder=12, ec=ec, lw=lw, alpha=alpha)
-            # (0.4562745098039217, 0.2133333333333331, 1.000000000000000)
-            # COLORS[i] =[round(e, 15) for e in COLORS[i]]
-            # [0.4562745098039217, 0.2133333333333332, 1.0000000000000002]
-            # (0.2048179271708681, 0.5431932773109239, 0.9069467787114849)
-    
-        
-    
-    if hard_y:
-        Y_pos = Y_pos[Y_pos >= (min(hard_y) - y_down_offset) ]
-        Y_pos = Y_pos[Y_pos <= (max(hard_y) + y_up_offset) ]
-
-    if hard_x:
-        X_pos = X_pos[X_pos >= min(hard_x) + x_down_offset]
-        X_pos = X_pos[X_pos <= max(hard_x) - x_up_offset]
-    
-    
-    Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-    X_range, X_range_label = range_calc(X_pos, x_points, y_up_off = x_up_offset , y_down_off=x_down_offset, decimal_places=decimal_places)
-    # print(min(X_pos), X_range, X_range_label)
-    
-    simplify(ax, Y_range, Y_range_label, X_range, X_range_label, 
-        Y_label_fontsize, X_label_fontsize, 
-        x_padding=x_padding, x_padding_factor=x_padding_factor,
-        y_padding_factor=y_padding_factor, 
-        switch_off_xaxis=switch_off_xaxis, switch_off_yaxis=switch_off_yaxis, grid_shape=grid_shape, grid_opacity= grid_opacity,
-        x_ticks_allowed=x_ticks_allowed , )
-
-    # switch_off_x_axis=None, y_padding=0, x_label_dist=None, 
-
-
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
-    plt.clf()
-
-
-
-
-
+    return X_values, Y_values
