@@ -49,9 +49,11 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Lines/test_lines.png" alt="Multiple lines with markers and horizontal lines" width="48%">
-  <img src="../Pictures/Lines/test_lines_h_shade.png" alt="Line plot with a horizontal shaded region" width="48%">
+  <img src="../Pictures/Lines/test_lines.png" alt="Three lines with markers and horizontal reference lines" width="40%">
 </p>
+
+This example draws three lines, adds a scatter marker at each point, and uses
+`h_lines` to add horizontal reference lines at 40 and 60.
 
 ## Reference lines and shaded regions
 
@@ -67,6 +69,9 @@ plots:
 | Scatter markers | `use_scatter=True, scatter_size=300, scatter_boder_color="black"` |
 | Swapped axes | `swap_axis=True, Y_range=X, Y_labels=X_labels` |
 
+Horizontal shading and vertical shading are separate annotations. The following
+example applies a vertical band to the x-axis:
+
 ```python
 plotter.plot(
     plt_type="line",
@@ -81,13 +86,31 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Lines/test_lines_v_shade.png" alt="Line plot with vertical shading" width="48%">
-  <img src="../Pictures/Lines/test_lines_h_shade.png" alt="Line plot with horizontal shading" width="48%">
+  <img src="../Pictures/Lines/test_lines_v_shade.png" alt="Line plot with vertical shading" width="40%">
+</p>
+
+For a band on the y-axis, use `h_line_shade`:
+
+```python
+plotter.plot(
+    plt_type="line",
+    name="Pictures/Lines/test_lines_h_shade",
+    Lines=Lines,
+    X_range=X,
+    X_labels=X_labels,
+    h_line_shade=[[40, 60]],
+    h_line_shade_color="black",
+    h_line_shade_color_alpha=0.15,
+)
+```
+
+<p align="center">
+  <img src="../Pictures/Lines/test_lines_h_shade.png" alt="Line plot with horizontal shading" width="40%">
 </p>
 
 ## Uncertainty bands
 
-Use `shade_up` and `shade_down` to draw a filled range around each line:
+Use `shade_up` and `shade_down` to draw one filled range around each line:
 
 ```python
 Shades_MAX = [(X, [line[1][i] + 20 for i in range(4)]) for line in Lines]
@@ -104,8 +127,7 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Lines/test_lines_shade.png" alt="Line plot with uncertainty bands" width="48%">
-  <img src="../Pictures/Lines/test_lines_error.png" alt="Line plot with error bars" width="48%">
+  <img src="../Pictures/Lines/test_lines_shade.png" alt="Line plot with uncertainty bands" width="40%">
 </p>
 
 ## Error bars
@@ -130,6 +152,10 @@ plotter.plot(
 )
 ```
 
+<p align="center">
+  <img src="../Pictures/Lines/test_lines_error.png" alt="Line plot with error bars" width="40%">
+</p>
+
 ## Swapped axes
 
 The same line, band, and error-bar logic can swap X and Y values:
@@ -153,12 +179,14 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Lines/test_lines_axis_swap.png" alt="Line plot with swapped axes" width="48%">
+  <img src="../Pictures/Lines/test_lines_axis_swap.png" alt="Line plot with swapped axes" width="40%">
 </p>
 
+The uncertainty-band and error-bar sections can also be swapped:
+
 <p align="center">
-  <img src="../Pictures/Lines/test_lines_shade_swap.png" alt="Swapped axes with uncertainty bands" width="48%">
-  <img src="../Pictures/Lines/test_lines_error_swap.png" alt="Swapped axes with error bars" width="48%">
+  <img src="../Pictures/Lines/test_lines_shade_swap.png" alt="Swapped axes with uncertainty bands" width="40%">
+  <img src="../Pictures/Lines/test_lines_error_swap.png" alt="Swapped axes with error bars" width="40%">
 </p>
 
 ## Colors

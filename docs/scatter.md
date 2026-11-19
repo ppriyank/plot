@@ -7,12 +7,12 @@ plots accept 2D points, group labels, and marker sizes.
 
 ```python
 from ALL_PLOTS import ALL_PLOT
-from colors_set import DISTINCT_3_6
+from colors_set import ORANGE_LIGHTBLUE_10
 import torch
 
 plotter = ALL_PLOT(
     figsize=(6, 6),
-    colors=DISTINCT_3_6,
+    colors=ORANGE_LIGHTBLUE_10,
     artificial_darkening=0.8,
     decimal_places=0,
     y_up_offset=20,
@@ -26,7 +26,7 @@ plotter = ALL_PLOT(
 )
 
 points = torch.randn(100, 2) * 100
-labels = torch.randint(0, 3, (100,))
+labels = torch.randint(0, 9, (100,))
 sizes = torch.randint(50, 500, (100,))
 
 plotter.plot(
@@ -39,11 +39,13 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Scatter/test_scatter.png" alt="Grouped scatter plot with variable sizes" width="70%">
+  <img src="../Pictures/Scatter/test_scatter.png" alt="Scatter plot with 100 points grouped by nine integer labels and drawn at variable sizes" width="50%">
 </p>
 
-Labels are assigned colors and marker shapes. Points are sorted by size before
-drawing, so smaller markers are less likely to be hidden behind larger markers.
+The 100 points are grouped into nine integer labels. Labels are assigned colors
+from `ORANGE_LIGHTBLUE_10`, and each point uses an individual marker size.
+Points are drawn from largest to smallest so smaller markers are less likely to
+be hidden behind larger markers.
 
 ## Marker and label options
 
@@ -58,6 +60,30 @@ drawing, so smaller markers are less likely to be hidden behind larger markers.
 | `scatter_boder_color` | Marker border color |
 | `scatter_alpha` | Marker transparency |
 | `enable_relabeling` | Renumber labels for a compact label set |
+
+## Marker shapes
+
+Pass a shape dictionary to give each label its own marker:
+
+```python
+SHAPE = {
+    0: "o", 1: "v", 2: "*", 3: "^", 4: "<",
+    5: ">", 6: "8", 7: "s", 8: "P",
+}
+
+plotter.plot(
+    plt_type="scatter",
+    name="Pictures/Scatter/test_scatter_shape",
+    Points=points,
+    Labels=labels,
+    Sizes=sizes,
+    Shapes=SHAPE,
+)
+```
+
+<p align="center">
+  <img src="../Pictures/Scatter/test_scatter_shape.png" alt="Grouped scatter plot using a different marker shape for each label" width="50%">
+</p>
 
 ## Scatter plot with shaded regions
 
@@ -81,7 +107,7 @@ plotter.plot(
 ```
 
 <p align="center">
-  <img src="../Pictures/Scatter/test_scatter_shade.png" alt="Scatter plot with shaded regions" width="70%">
+  <img src="../Pictures/Scatter/test_scatter_shade.png" alt="Scatter plot with two horizontal shaded bands" width="50%">
 </p>
 
 The same annotation arguments used in [`line.md`](line.md) are available:

@@ -24,6 +24,7 @@ class ALL_PLOT:
         "bar_graph_horizontal": "bar_graph_horizontal",
         "horizontal_stacked_bar": "bar_graph_horizontal2",
         "bar_graph_horizontal2": "bar_graph_horizontal2",
+        
         "heatmap": "heatmap_plt",
         "heatmap_plt": "heatmap_plt",
         "word_cloud": "word_cloud_plt",
