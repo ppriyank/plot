@@ -1,190 +1,48 @@
-# Plots 
+# Plot
 
-Reference : https://python-graph-gallery.com/
+Plot is a small collection of Matplotlib helpers for creating publication-ready
+line, scatter, bar, histogram, heatmap, radar, box, word-cloud, network, and
+Sankey plots.
 
-## Ussage 
-Download the folder in your directory and install `python -m pip install wordcloud netgraph seaborn`
+## Documentation
+
+- [Line plots](docs/line.md)
+- [Scatter plots](docs/scatter.md)
+- [Line examples](test_line.py)
+- [Scatter examples](test_scatter.py)
+
+## Quick start
+
+```python
+from ALL_PLOTS import ALL_PLOT
+from colors_set import DISTINCT_3_6
+
+plotter = ALL_PLOT(
+    figsize=(6, 6),
+    colors=DISTINCT_3_6,
+    artificial_darkening=0.8,
+)
+
+plotter.plot(
+    plt_type="line",
+    name="Pictures/Lines/my_line_plot",
+    Lines=[
+        [[0, 1, 2, 3], [10, 45, 35, 75]],
+        [[0, 1, 2, 3], [20, 30, 55, 60]],
+    ],
+)
 ```
-import os, sys
-current_path = os.getcwd()
-sys.path.append(os.path.join(current_path, "plot"))
-from plot.hist import bar_graph_X_Y, bar_graph_X_Y_Gradient, bar_graph_side_by_side
-from plot.colors import ALL_COLORS, lighten_color
+
+## Installation
+
+```bash
+python -m pip install matplotlib torch numpy
+python -m pip install seaborn wordcloud netgraph
 ```
 
-The plot helpers are also available through the `PLOT` class:
+Run the example scripts from the repository root:
+
+```bash
+python test_line.py
+python test_scatter.py
 ```
-from plot.main import PLOT
-
-plotter = PLOT(figsize=(6, 6), name="line_example")
-plotter.plot("line", Lines=[[[0, 1, 2], [3, 5, 4]]])
-```
-`PLOT.plot()` supports line and shaded-line plots, bar and histogram variants, scatter,
-heatmap, word cloud, radar, box, network-bubble, and Sankey plots. The corresponding
-plot methods can also be called directly on the instance.
-
-## Colors 
-
-Best colors for paper and generating Graphs are listed in [colors.py](colors.py). 
-Choose any template. 
-
-COLOR PALLETS : were generated using https://coolors.co/palette/3a5a40-9ec7b9-bcd8e7-e58f65-e8b545-f8ddb0
-
-[plot_utils.py](plot_utils.py) has all kind of functions to manipulate colors, generate gradient, compute contrast ratio, 
-
-
-
-## Line Plots `test_line.py`
-
-
-<div style="width: 100%;">
-<!-- First row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;">
-<p>Simple Line</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_line.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<!-- Second row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Line + Shade</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_shade.png" alt="Line + Shade" style="width: 40%;"></div>
-</div>
-
-<!-- Third row -->
-<div style="display: flex; justify-content: space-between; align-items: center;">
-<div style="flex: 1; text-align: left;"><p>Multiple Lines</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_multiple.png" alt="Multiple Lines" style="width: 40%;"></div>
-</div>
-
-</div>
-
-
-
-
-
-## Histogram Plots `test_hist.py`
-
-<div style="width: 100%;">
-
-<!-- First row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Simple Hist X Y</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hx_hy.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-  <!-- Second row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Hist X Y Z (Gradient)</p></div>
-<div style="flex: 1; text-align: right;">
-<img src="Pictures/test_hx_hy_gradient.png" alt="Line + Shade" style="width: 40%;"></div>
-</div>
-
- <!-- Third row -->
-<div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Multiple Hist Side by Side</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side.png" alt="Multiple Lines" style="width: 40%;"></div>
-</div>
-
-<!-- Fourth row -->
-<div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Relative Comparison</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_side_diff_labels.png" alt="Multiple Lines" style="width: 40%;"></div>
-</div>
-
-<!-- Fifth row -->
-<div style="display: flex; justify-content: space-between; align-items: center;margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Horizontal Plots</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_hist_horizontal.png" alt="Multiple Lines" style="width: 40%;"></div>
-</div>
-
-</div>
-
-
-
-
-
-
-
-## Scatter Plots `test_scatter.py`
-
-
-<div style="width: 100%;">
-
-<!-- First row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Scatter Plot</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_scatter.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-</div>
-
-
-
-
-
-
-## Misc `test_misc.py` : Radar, Word Cloud, Heamtmp
-
-
-<div style="width: 100%;">
-
-<!-- First row -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Heat Map</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Heat Map2</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_heatmap3.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Word Cloud</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_word_cloud.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Radar Plot</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar2.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Radar Plot2</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_radar1.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Box Plot (median and qunatile)</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_box.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Box Plot (mean and std)</p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_box_mean.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Bubble Plot (Better than Scatter) </p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/bubble_plot.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
-<div style="flex: 1; text-align: left;"><p>Sankey Plot (Mapping) </p></div>
-<div style="flex: 1; text-align: right;"><img src="Pictures/test_sankey.png" alt="Simple Line" style="width: 40%;"></div>
-</div>
-
-</div>
-
-
-
-
-
-  
-  
-  
-
-

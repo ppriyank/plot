@@ -39,7 +39,7 @@ class ALL_PLOT:
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
         name=None,  # Default base name for the saved PNG file.
-        pad_inches = 0.1, 
+        pad_inches = 0.1,  # Padding around the saved figure, in inches.
         colors=None,  # Default color or mapping used to draw plot elements.
         artificial_darkening=1,  # Adjusts the darkness of supplied colors.
         decimal_places=1,  # Sets decimal precision for generated axis labels.
@@ -53,8 +53,8 @@ class ALL_PLOT:
         Y_label_fontsize=20, X_label_fontsize=25,  # Set axis tick-label font sizes.
         Y_label_rotate=0, X_label_rotate =0 ,  # Rotate axis tick labels by these angles.
 
-        x_axis_pos_offset=0, y_axis_pos_offset=0,  # Add padding outside calculated axis limits.
-        x_axis_end_limit_offset=0, y_axis_end_limit_offset=0, 
+        x_axis_pos_offset=0, y_axis_pos_offset=0,  # Move the y/x axis origin outward by the given data-range padding.
+        x_axis_end_limit_offset=0, y_axis_end_limit_offset=0,  # Extend the x/y upper limit beyond the calculated maximum.
 
         **kwargs):  # Extra plot, setup, or save options forwarded to plot helpers.
         # Store class-wide defaults used by setup and styling methods.
@@ -109,13 +109,13 @@ class ALL_PLOT:
         self.kwargs = kwargs
 
 
-    def basic_setup(self, **kwargs):
+    def basic_setup(self, **kwargs):  # kwargs may override figsize with a per-plot figure size.
         # Create the Matplotlib figure and axes, optionally overriding the default size.
         figsize = kwargs.get('figsize', self.figsize)
         self.fig, self.ax = plt.subplots(figsize=figsize or self.figsize)
         return self.fig, self.ax
 
-    def fix_colors(self, **kwargs):
+    def fix_colors(self, **kwargs):  # kwargs may provide colors and artificial_darkening overrides.
         # Normalize colors and apply the configured darkness adjustment.
         colors = kwargs.get('colors', self.colors)
         artificial_darkening = kwargs.get('artificial_darkening', self.artificial_darkening)
@@ -221,7 +221,13 @@ class ALL_PLOT:
         # for i, (label_pos, label) in enumerate(zip(Y_range, Y_range_label)):
         #     ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )
         
-    def limit_axis(self, Y_range, X_range, Y_values, X_values):
+    def limit_axis(
+        self,
+        Y_range,  # Tick range used to determine the y-axis bounds.
+        X_range,  # Tick range used to determine the x-axis bounds.
+        Y_values,  # Unused data values retained for the styling interface.
+        X_values,  # Unused data values retained for the styling interface.
+        ):
         # Derive the lower-left origin from the actual data ranges.
         y_max, y_min = max(Y_range), min(Y_range)
         x_max, x_min = max(X_range), min(X_range)
@@ -272,7 +278,7 @@ class ALL_PLOT:
         return 
         
         
-    def update_params(self, vals : dict):
+    def update_params(self, vals : dict):  # vals maps existing instance attribute names to new values.
         # key = 'switch_off_yaxis'
         # self.__dict__[key]
         for key, value in vals.items():
@@ -281,7 +287,11 @@ class ALL_PLOT:
             else:
                 assert False, f"Parameter {key} not yet intialized"
     
-    def plot(self, plt_type="line", **kwargs):
+    def plot(
+        self,
+        plt_type="line",  # Plot implementation or alias to dispatch.
+        **kwargs,  # Per-plot options, including setup, styling, data, and save overrides.
+        ):
         # Dispatch a plot type, style and render it, and save the resulting PNG.
         self.basic_setup(**kwargs, **self.kwargs)
         colors = self.fix_colors(**kwargs, **self.kwargs)
@@ -295,13 +305,13 @@ class ALL_PLOT:
         self.save_plot(**kwargs, **self.kwargs)
 
     
-    def line_plot(self, **kwargs):
+    def line_plot(self, **kwargs):  # kwargs are forwarded to line_plot from line.py.
         # Forward line-plot options to the line plotting implementation.
         from line import line_plot
         plot_kwargs = {"ax": self.ax, **kwargs}
         return line_plot(**plot_kwargs)
     
-    def scatter_plt(self, **kwargs):
+    def scatter_plt(self, **kwargs):  # kwargs are forwarded to scatter_plt from scatter.py.
         from scatter import scatter_plt
         plot_kwargs = {"ax": self.ax, **kwargs}
         return scatter_plt(**plot_kwargs)
