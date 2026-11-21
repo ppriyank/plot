@@ -10,10 +10,14 @@ from ALL_PLOTS import ALL_PLOT
 from colors_set import ORANGE_LIGHTBLUE_10
 import torch
 
-plotter = ALL_PLOT(
+Scatter_config = dict(
+    scatter_boder_color="black",
+    scatter_alpha=0.8,
+)
+
+PLOT_FN = ALL_PLOT(
     figsize=(6, 6),
     colors=ORANGE_LIGHTBLUE_10,
-    artificial_darkening=0.8,
     decimal_places=0,
     y_up_offset=20,
     y_down_offset=20,
@@ -21,20 +25,18 @@ plotter = ALL_PLOT(
     x_down_offset=20,
     Y_label_fontsize=10,
     X_label_fontsize=10,
-    scatter_boder_color="black",
-    scatter_alpha=0.9,
+    **Scatter_config,
 )
 
-points = torch.randn(100, 2) * 100
-labels = torch.randint(0, 9, (100,))
-sizes = torch.randint(50, 500, (100,))
+N_POINTS = 100
+POINTS = torch.randn(N_POINTS, 2) * 100
+Labels = torch.randint(0, 9, (N_POINTS,))
+SIZES = torch.randint(50, 500, (N_POINTS,))
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="scatter",
     name="Pictures/Scatter/test_scatter",
-    Points=points,
-    Labels=labels,
-    Sizes=sizes,
+    Points=POINTS, Labels=Labels, Sizes=SIZES,
 )
 ```
 
@@ -42,10 +44,11 @@ plotter.plot(
   <img src="../Pictures/Scatter/test_scatter.png" alt="Scatter plot with 100 points grouped by nine integer labels and drawn at variable sizes" width="50%">
 </p>
 
-The 100 points are grouped into nine integer labels. Labels are assigned colors
-from `ORANGE_LIGHTBLUE_10`, and each point uses an individual marker size.
-Points are drawn from largest to smallest so smaller markers are less likely to
-be hidden behind larger markers.
+This follows `test_scatter.py`: the coordinates, labels, and sizes are generated
+with PyTorch, so the exact plot varies on each run. The nine integer labels are
+colored from `ORANGE_LIGHTBLUE_10`, and each point receives an individual
+marker size. Points are drawn from largest to smallest so smaller markers are
+less likely to be hidden behind larger markers.
 
 ## Marker and label options
 
@@ -71,12 +74,12 @@ SHAPE = {
     5: ">", 6: "8", 7: "s", 8: "P",
 }
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="scatter",
     name="Pictures/Scatter/test_scatter_shape",
-    Points=points,
-    Labels=labels,
-    Sizes=sizes,
+    Points=POINTS,
+    Labels=Labels,
+    Sizes=SIZES,
     Shapes=SHAPE,
 )
 ```
@@ -87,22 +90,29 @@ plotter.plot(
 
 ## Scatter plot with shaded regions
 
-[`plot_add.py`](../plot_add.py) annotations can be combined with scatter plots:
+[`plot_add.py`](../plot_add.py) annotations can be combined with scatter plots.
+This shaded example follows `test_scatter.py`:
 
 ```python
 from colors_set import DISTINCT_2_8
 
-plotter.plot(
+UPDATE = dict(
+    switch_off_yaxis=True,
+    y_points=5,
+)
+PLOT_FN.update_params(UPDATE)
+
+PLOT_FN.plot(
     plt_type="scatter",
     name="Pictures/Scatter/test_scatter_shade",
-    Points=points,
-    Labels=labels,
-    Sizes=sizes,
+    Points=POINTS,
+    Labels=Labels,
+    Sizes=SIZES,
     h_line_shade=[[-50, 50], [50, 300]],
     h_line_shade_color=DISTINCT_2_8,
     h_line_shade_color_alpha=0.3,
-    vline_offset=50,
-    hline_offset=50,
+    line_width=1,
+    vline_offset=50, hline_offset=50,
 )
 ```
 

@@ -10,12 +10,11 @@ Line_config = dict(
 
 PLOT_FN = ALL_PLOT(
     figsize=(6, 6), 
-    colors=DISTINCT_3_6, artificial_darkening=0.8,
+    colors=DISTINCT_3_6, 
     decimal_places=1,
     y_up_offset=5, y_down_offset=2,
     x_up_offset=3, x_down_offset=2,
-    x_axis_end_limit_offset=0.1, y_axis_end_limit_offset=1, 
-    grid_opacity=0.3, 
+    y_axis_end_limit_offset=1, 
     x_axis_pos_offset=3, 
     y_axis_pos_offset=0.1,
     **Line_config 
@@ -30,14 +29,14 @@ Lines = [[X, torch.rand(4) * 100] for e in range(3)]
 
 ################## Normal line plot 
 PLOT_FN.plot(plt_type="line", name="Pictures/Lines/test_lines",
-    Lines=Lines, h_lines=[40, 60], hline_color='black', h_line_width=3,
+    Lines=Lines, h_lines=[40, 60], hline_color='black', h_line_width=1,
     X_range=X, X_labels=X_labels, 
 )
 ################## Shade y-axis regioin
 PLOT_FN.plot(plt_type="line", name="Pictures/Lines/test_lines_h_shade",
     Lines=Lines, 
     X_range=X, X_labels=X_labels, 
-    h_line_shade=[[40, 60]], h_line_shade_color='black', h_line_shade_color_alpha=0.15, h_line_width=3,
+    h_line_shade=[[10, 30]], h_line_shade_color='black', h_line_shade_color_alpha=0.15, h_line_width=3,
 )
 ################## Shade x-axis regioin
 PLOT_FN.plot(plt_type="line", name="Pictures/Lines/test_lines_v_shade",
@@ -78,7 +77,7 @@ UPDATE = dict(
     x_axis_end_limit_offset=1, 
     y_axis_end_limit_offset=0.1, 
 )
-PLOT_FN.update_params(UPDATE)
+PLOT_FN.update(UPDATE)
 ##########################################################################################
 
 

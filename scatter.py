@@ -33,7 +33,6 @@ def scatter_plt(ax=None,
     **args
     ):
 
-    
     Points = convert_to_tensor(Points)
     Labels = convert_to_tensor(Labels, Points) ### Process labels
     unique_labels = sorted(Labels.unique())

@@ -9,17 +9,9 @@ colors, labels, and image saving.
 ```python
 from ALL_PLOTS import ALL_PLOT
 from colors_set import DISTINCT_3_6
+import torch
 
-plotter = ALL_PLOT(
-    figsize=(6, 6),
-    colors=DISTINCT_3_6,
-    artificial_darkening=0.8,
-    decimal_places=1,
-    y_up_offset=5,
-    y_down_offset=2,
-    x_up_offset=3,
-    x_down_offset=2,
-    grid_opacity=0.3,
+Line_config = dict(
     line_width=5,
     alpha_line=1,
     use_scatter=True,
@@ -28,21 +20,29 @@ plotter = ALL_PLOT(
     scatter_alpha=0.5,
 )
 
+PLOT_FN = ALL_PLOT(
+    figsize=(6, 6),
+    colors=DISTINCT_3_6,
+    decimal_places=1,
+    y_up_offset=5,
+    y_down_offset=2,
+    x_up_offset=3,
+    x_down_offset=2,
+    y_axis_end_limit_offset=1,
+    x_axis_pos_offset=3,
+    y_axis_pos_offset=0.1,
+    **Line_config,
+)
+
 X = [0, 1, 2, 3]
 X_labels = ["[A]", "[B]", "[C]", "[D]"]
-Lines = [
-    [X, [20, 45, 70, 55]],
-    [X, [35, 60, 40, 80]],
-    [X, [50, 25, 65, 35]],
-]
+Lines = [[X, torch.rand(4) * 100] for _ in range(3)]
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines",
     Lines=Lines,
-    h_lines=[40, 60],
-    hline_color="black",
-    h_line_width=3,
+    h_lines=[40, 60], hline_color="black", h_line_width=1,
     X_range=X,
     X_labels=X_labels,
 )
@@ -52,8 +52,9 @@ plotter.plot(
   <img src="../Pictures/Lines/test_lines.png" alt="Three lines with markers and horizontal reference lines" width="40%">
 </p>
 
-This example draws three lines, adds a scatter marker at each point, and uses
-`h_lines` to add horizontal reference lines at 40 and 60.
+This follows the setup in `test_line.py`: three lines use random y-values,
+scatter markers are enabled in `Line_config`, and `h_lines` adds horizontal
+guides at 40 and 60. The random values mean each run can look different.
 
 ## Reference lines and shaded regions
 
@@ -73,7 +74,7 @@ Horizontal shading and vertical shading are separate annotations. The following
 example applies a vertical band to the x-axis:
 
 ```python
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines_v_shade",
     Lines=Lines,
@@ -92,13 +93,13 @@ plotter.plot(
 For a band on the y-axis, use `h_line_shade`:
 
 ```python
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines_h_shade",
     Lines=Lines,
     X_range=X,
     X_labels=X_labels,
-    h_line_shade=[[40, 60]],
+    h_line_shade=[[10, 30]],
     h_line_shade_color="black",
     h_line_shade_color_alpha=0.15,
 )
@@ -113,10 +114,10 @@ plotter.plot(
 Use `shade_up` and `shade_down` to draw one filled range around each line:
 
 ```python
-Shades_MAX = [(X, [line[1][i] + 20 for i in range(4)]) for line in Lines]
-Shades_MIN = [(X, [line[1][i] - 20 for i in range(4)]) for line in Lines]
+Shades_MAX = [(e[0], e[1] + torch.randint(20, (4,))) for e in Lines]
+Shades_MIN = [(e[0], e[1] - torch.randint(20, (4,))) for e in Lines]
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines_shade",
     Lines=Lines,
@@ -135,13 +136,9 @@ plotter.plot(
 Error bars use paired X/Y data and one standard-deviation value per point:
 
 ```python
-STD = [
-    (X, [5, 8, 6, 9]),
-    (X, [7, 4, 8, 5]),
-    (X, [6, 9, 5, 7]),
-]
+STD = [(e[0], torch.randint(10, (4,))) for e in Lines]
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines_error",
     Lines=Lines,
@@ -161,19 +158,21 @@ plotter.plot(
 The same line, band, and error-bar logic can swap X and Y values:
 
 ```python
-plotter.update_params({
-    "x_axis_pos_offset": 0.1,
-    "y_axis_pos_offset": 3,
-    "Y_label_fontsize": 25,
-    "X_label_fontsize": 20,
-})
+PLOT_FN.update(dict(
+    x_axis_pos_offset=0.1,
+    y_axis_pos_offset=3,
+    Y_label_fontsize=25,
+    X_label_fontsize=20,
+    x_axis_end_limit_offset=1,
+    y_axis_end_limit_offset=0.1,
+))
 
-plotter.plot(
+PLOT_FN.plot(
     plt_type="line",
     name="Pictures/Lines/test_lines_axis_swap",
     Lines=Lines,
-    Y_range=X,
-    Y_labels=X_labels,
+    v_lines=[40], vline_color="black", v_line_width=3,
+    Y_range=X, Y_labels=X_labels,
     swap_axis=True,
 )
 ```

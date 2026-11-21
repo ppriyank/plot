@@ -13,41 +13,35 @@ class ALL_PLOT:
         "line": "line_plot",
         "scatter": "scatter_plt",
     
-        "bar": "bar_graph_X_Y",
-        "histogram": "bar_graph_X_Y",
-        "bar_graph_x_y": "bar_graph_X_Y",
-        "gradient_histogram": "bar_graph_X_Y_Gradient",
-        "bar_graph_x_y_gradient": "bar_graph_X_Y_Gradient",
-        "side_by_side": "bar_graph_side_by_side",
-        "bar_graph_side_by_side": "bar_graph_side_by_side",
-        "horizontal_bar": "bar_graph_horizontal",
-        "bar_graph_horizontal": "bar_graph_horizontal",
-        "horizontal_stacked_bar": "bar_graph_horizontal2",
-        "bar_graph_horizontal2": "bar_graph_horizontal2",
+        "bar": "bar_plt",
+
         
-        "heatmap": "heatmap_plt",
-        "heatmap_plt": "heatmap_plt",
-        "word_cloud": "word_cloud_plt",
-        "word_cloud_plt": "word_cloud_plt",
-        "radar": "radar_spider_plot",
-        "radar_spider_plot": "radar_spider_plot",
-        "box": "box_plt",
-        "box_plt": "box_plt",
-        "network_bubble": "network_bubble",
-        "sankey": "Sankey_web",
-        "sankey_web": "Sankey_web",
+        
+        # "heatmap": "heatmap_plt",
+        # "heatmap_plt": "heatmap_plt",
+        # "word_cloud": "word_cloud_plt",
+        # "word_cloud_plt": "word_cloud_plt",
+        # "radar": "radar_spider_plot",
+        # "radar_spider_plot": "radar_spider_plot",
+        # "box": "box_plt",
+        # "box_plt": "box_plt",
+        # "network_bubble": "network_bubble",
+        # "sankey": "Sankey_web",
+        # "sankey_web": "Sankey_web",
     }
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
         name=None,  # Default base name for the saved PNG file.
         pad_inches = 0.1,  # Padding around the saved figure, in inches.
         colors=None,  # Default color or mapping used to draw plot elements.
-        artificial_darkening=1,  # Adjusts the darkness of supplied colors.
+        artificial_darkening=0.8,  # Adjusts the darkness of supplied colors.
         decimal_places=1,  # Sets decimal precision for generated axis labels.
+        legend = False , 
+        
         y_points = 2, x_points = 2,  # Set the number of generated tick points on each axis.
-        y_up_offset=0, y_down_offset=0,x_up_offset=0, x_down_offset=0,  # Extend or contract axis ranges around the data.
+        y_up_offset=0, y_down_offset=0, x_up_offset=0, x_down_offset=0,  # Extend or contract axis ranges around the data.
 
-        grid_shape='both', grid_opacity=1, grid_color="#A8BAC4",  # Configure grid visibility, transparency, and color.
+        grid_shape='both', grid_opacity=0.3, grid_color="#A8BAC4",  # Configure grid visibility, transparency, and color.
         switch_off_yaxis=False, switch_off_xaxis=False,  # Hide individual axis spines when enabled.
         y_axis_width=1.2, x_axis_width=1.2,  # Set the line width of the visible axis spines.
         y_ticks_allowed=True, x_ticks_allowed=True,  # Enable or disable tick labels on each axis.
@@ -55,7 +49,7 @@ class ALL_PLOT:
         Y_label_rotate=0, X_label_rotate =0 ,  # Rotate axis tick labels by these angles.
 
         x_axis_pos_offset=0, y_axis_pos_offset=0,  # Move the y/x axis origin outward by the given data-range padding.
-        x_axis_end_limit_offset=0, y_axis_end_limit_offset=0,  # Extend the x/y upper limit beyond the calculated maximum.
+        x_axis_end_limit_offset=0.1, y_axis_end_limit_offset=0.1,  # Extend the x/y upper limit beyond the calculated maximum.
 
         **kwargs):  # Extra plot, setup, or save options forwarded to plot helpers.
         # Store class-wide defaults used by setup and styling methods.
@@ -66,6 +60,7 @@ class ALL_PLOT:
         self.fig = None
         self.ax = None
         self.pad_inches = pad_inches
+        self.legend = legend
 
         self.colors = colors
         self.artificial_darkening = artificial_darkening
@@ -108,7 +103,8 @@ class ALL_PLOT:
         self.y_axis_end_limit_offset=y_axis_end_limit_offset 
 
         self.kwargs = kwargs
-
+        self.storage = {} # save all init params in case they are overwritten
+        self.newly_added = set() # all params passed for that run 
 
     def basic_setup(self, **kwargs):  # kwargs may override figsize with a per-plot figure size.
         # Create the Matplotlib figure and axes, optionally overriding the default size.
@@ -140,6 +136,7 @@ class ALL_PLOT:
         switch_off_yaxis=False,  # Hide the left y-axis spine.
         switch_off_xaxis=False,  # Hide the bottom x-axis spine.
         grid_color=None,  # Set the grid-line color.
+        **kwargs,
         ):
         # Configure grid lines and hide or style the visible axis spines.
         # Add grid lines
@@ -151,7 +148,7 @@ class ALL_PLOT:
             grid_opacity = 0 
 
         
-        self.ax.grid(axis = grid_shape, color=grid_color, lw=1.2, alpha=grid_opacity)
+        self.ax.grid(axis=grid_shape, color=grid_color, lw=1.2, alpha=grid_opacity, zorder=1)
         
         # Remove all spines but the one in the bottom
         self.ax.spines["right"].set_visible(False)
@@ -159,33 +156,49 @@ class ALL_PLOT:
         if switch_off_yaxis:
             self.ax.spines["left"].set_visible(False)
         else:
-            self.ax.spines["left"].set_linewidth(self.y_axis_width)
+            self.ax.spines["left"].set_linewidth(
+                kwargs.get("y_axis_width", self.y_axis_width)
+            )
+        self.ax.spines["left"].set_zorder(50)
 
         # Customize bottom spine
         if switch_off_xaxis:
             self.ax.spines["bottom"].set_visible(False)
         else:
-            self.ax.spines["bottom"].set_lw(self.x_axis_width)
+            self.ax.spines["bottom"].set_lw(
+                kwargs.get("x_axis_width", self.x_axis_width)
+            )
             self.ax.spines["bottom"].set_capstyle("butt")
+        self.ax.spines["bottom"].set_zorder(50)
+        
+        
 
     def style_axis(self, 
         Y_range=None, Y_labels=None,  # Set y-axis tick positions and labels.
         X_range=None, X_labels=None,  # Set x-axis tick positions and labels.
         x_axis_label_dist_x=0, x_axis_label_dist_y=0,  # Shift x-axis tick labels horizontally and vertically.
-        y_axis_label_dist_x=0, y_axis_label_dist_y=0  # Shift y-axis tick labels horizontally and vertically.
+        y_axis_label_dist_x=0, y_axis_label_dist_y=0,  # Shift y-axis tick labels horizontally and vertically.
+        **kwargs
         ):
         # Apply tick values, labels, fonts, rotations, and optional label offsets.
-         
-        if self.y_ticks_allowed:
+        if kwargs.get('y_ticks_allowed', self.y_ticks_allowed):
             self.ax.yaxis.set_ticks( Y_range )
-            self.ax.yaxis.set_ticklabels( Y_labels, fontsize=self.Y_label_fontsize, rotation=self.Y_label_rotate )
+            self.ax.yaxis.set_ticklabels(
+                Y_labels,
+                fontsize=kwargs.get("Y_label_fontsize", self.Y_label_fontsize),
+                rotation=kwargs.get("Y_label_rotate", self.Y_label_rotate),
+            )
             self.ax.yaxis.set_tick_params(length=6, width=1.2)
         else:
             self.ax.yaxis.set_tick_params(labelbottom=False, length=0)
 
-        if self.x_ticks_allowed:
+        if kwargs.get('x_ticks_allowed', self.x_ticks_allowed):
             self.ax.xaxis.set_ticks(X_range)
-            self.ax.xaxis.set_ticklabels(X_labels, fontsize=self.X_label_fontsize, rotation=self.X_label_rotate)
+            self.ax.xaxis.set_ticklabels(
+                X_labels,
+                fontsize=kwargs.get("X_label_fontsize", self.X_label_fontsize),
+                rotation=kwargs.get("X_label_rotate", self.X_label_rotate),
+            )
             self.ax.xaxis.set_tick_params(length=6, width=1.2)
         else:
             self.ax.xaxis.set_tick_params(labelbottom=False, length=0)
@@ -195,7 +208,7 @@ class ALL_PLOT:
 
         # Make gridlines be below most artists.
         self.ax.set_axisbelow(True)
-
+        
         ###### distatnce of x labels from x axis 
         if x_axis_label_dist_x or x_axis_label_dist_y:
             if isinstance(x_axis_label_dist_x, int):
@@ -221,20 +234,30 @@ class ALL_PLOT:
         # PAD = abs(y_max - y_min) * y_padding_factor
         # for i, (label_pos, label) in enumerate(zip(Y_range, Y_range_label)):
         #     ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )
-        
+
+    ##### Sets the limit of plot and position of axis     
     def limit_axis(
         self,
         Y_range,  # Tick range used to determine the y-axis bounds.
         X_range,  # Tick range used to determine the x-axis bounds.
         Y_values,  # Unused data values retained for the styling interface.
         X_values,  # Unused data values retained for the styling interface.
+        **kwargs
         ):
         # Derive the lower-left origin from the actual data ranges.
         y_max, y_min = max(Y_range), min(Y_range)
         x_max, x_min = max(X_range), min(X_range)
 
-        self.ax.set_ylim(y_min - self.x_axis_pos_offset, y_max + self.y_axis_end_limit_offset)
-        self.ax.set_xlim(x_min - self.y_axis_pos_offset, x_max + self.x_axis_end_limit_offset)
+        self.ax.set_ylim(
+            y_min - kwargs.get("x_axis_pos_offset", self.x_axis_pos_offset), 
+            y_max + kwargs.get("y_axis_end_limit_offset", self.y_axis_end_limit_offset), 
+        )
+
+        
+        self.ax.set_xlim(
+            x_min - kwargs.get("y_axis_pos_offset", self.y_axis_pos_offset), 
+            x_max + kwargs.get("x_axis_end_limit_offset", self.x_axis_end_limit_offset), 
+        )
 
         return 
         
@@ -244,24 +267,43 @@ class ALL_PLOT:
             Y_range=None, Y_labels = None,  # Optional explicit y-axis tick positions and labels.
             grid_shape = None, grid_opacity=None, grid_color=None,  # Override default grid settings.
             switch_off_yaxis = None, switch_off_xaxis = None,  # Override default axis-spine visibility.
-        **kwargs,  # Extra label-offset options forwarded to axis styling.
+            **kwargs,  # Extra label-offset options forwarded to axis styling.
         ):
         if (not Y_range) and (not Y_labels):
             Y_range, Y_labels = range_calc(
-                Y_values, self.y_points, y_up_off = self.y_up_offset , y_down_off=self.y_down_offset, decimal_places=self.decimal_places)
+                Y_values,
+                kwargs.get("y_points", self.y_points),
+                y_up_off=kwargs.get("y_up_offset", self.y_up_offset),
+                y_down_off=kwargs.get("y_down_offset", self.y_down_offset),
+                decimal_places=kwargs.get("decimal_places", self.decimal_places),
+            )
 
         if (not X_range) and (not X_labels):
             X_range, X_labels = range_calc(
-                X_values, self.x_points, y_up_off = self.x_up_offset, y_down_off=self.x_down_offset, decimal_places=self.decimal_places)
+                X_values,
+                kwargs.get("x_points", self.x_points),
+                y_up_off=kwargs.get("x_up_offset", self.x_up_offset),
+                y_down_off=kwargs.get("x_down_offset", self.x_down_offset),
+                decimal_places=kwargs.get("decimal_places", self.decimal_places),
+            )
 
         self.style_grid( 
-            grid_shape=grid_shape or self.grid_shape, 
-            grid_opacity=grid_opacity or self.grid_opacity, 
-            grid_color = grid_color or self.grid_color,
-            switch_off_yaxis=switch_off_yaxis or self.switch_off_yaxis, 
-            switch_off_xaxis=switch_off_xaxis or self.switch_off_xaxis
+            grid_shape=self.grid_shape if grid_shape is None else grid_shape,
+            grid_opacity=self.grid_opacity if grid_opacity is None else grid_opacity,
+            grid_color=self.grid_color if grid_color is None else grid_color,
+            switch_off_yaxis=(
+                self.switch_off_yaxis
+                if switch_off_yaxis is None
+                else switch_off_yaxis
+            ),
+            switch_off_xaxis=(
+                self.switch_off_xaxis
+                if switch_off_xaxis is None
+                else switch_off_xaxis
+            ),
+            **kwargs
         )
-        
+
         self.style_axis(
             Y_range=Y_range, Y_labels=Y_labels,
             X_range=X_range, X_labels=X_labels,
@@ -269,17 +311,19 @@ class ALL_PLOT:
             x_axis_label_dist_y= kwargs.get('x_axis_label_dist_y', 0),
             y_axis_label_dist_x= kwargs.get('y_axis_label_dist_x', 0),
             y_axis_label_dist_y= kwargs.get('y_axis_label_dist_y', 0),
+            **kwargs
         )
         
         # plt.savefig("test.png", dpi=300)
         self.limit_axis(
             Y_range=Y_range, X_range=X_range,
             Y_values=Y_values, X_values=X_values,
+            **kwargs
         )
         return 
         
         
-    def update_params(self, vals : dict):  # vals maps existing instance attribute names to new values.
+    def update(self, vals : dict):  # vals maps existing instance attribute names to new values.
         # key = 'switch_off_yaxis'
         # self.__dict__[key]
         for key, value in vals.items():
@@ -287,24 +331,27 @@ class ALL_PLOT:
                 self.__dict__[key] = value 
             else:
                 assert False, f"Parameter {key} not yet intialized"
+
+    def add_legends(self, **kwargs):
+        if kwargs.get('legend', self.legend):
+            legend = self.ax.legend()
+            legend.set_zorder(50)
     
-    def plot(
-        self,
-        plt_type="line",  # Plot implementation or alias to dispatch.
-        **kwargs,  # Per-plot options, including setup, styling, data, and save overrides.
-        ):
-        # Dispatch a plot type, style and render it, and save the resulting PNG.
-        self.basic_setup(**kwargs, **self.kwargs)
-        colors = self.fix_colors(**kwargs, **self.kwargs)
-        if kwargs.get('colors', None) :
-            kwargspop('colors')
-
-        method_name = self.PLOT_METHODS.get(plt_type.lower())
-        X_vals, Y_vals = getattr(self, method_name)(colors=colors, **kwargs, **self.kwargs)
-
-        self.stylize( Y_values=Y_vals, X_values=X_vals, **kwargs, **self.kwargs)
-        self.save_plot(**kwargs, **self.kwargs)
-
+    def check_update_params(self, kwargs):
+        for key, value in kwargs.items():
+            self.newly_added.add(key)
+            if key in self.kwargs:
+                self.storage[key] = self.kwargs[key] 
+            self.kwargs[key]  = value 
+        
+    def restore_params(self, ):
+        while self.newly_added:
+            key = self.newly_added.pop()
+            if key in self.storage:
+                self.kwargs[key] = self.storage.pop(key)
+            else:
+                self.kwargs.pop(key, None)
+        
     
     def line_plot(self, **kwargs):  # kwargs are forwarded to line_plot from line.py.
         # Forward line-plot options to the line plotting implementation.
@@ -316,6 +363,37 @@ class ALL_PLOT:
         from scatter import scatter_plt
         plot_kwargs = {"ax": self.ax, **kwargs}
         return scatter_plt(**plot_kwargs)
+
+    def bar_plt(self, *args, **kwargs):
+        from hist import bar_plt
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        return bar_plt(**plot_kwargs)
+
+
+    def plot(
+        self,
+        plt_type="line",  # Plot implementation or alias to dispatch.
+        **kwargs,  # Per-plot options, including setup, styling, data, and save overrides.
+        ):
+
+        self.check_update_params(kwargs)
+        plot_kwargs = self.kwargs.copy()
+        self.basic_setup(**plot_kwargs)
+
+        colors = self.fix_colors(**plot_kwargs)
+        plot_kwargs.pop('colors', None)
+
+        method_name = self.PLOT_METHODS.get(plt_type.lower())
+        X_vals, Y_vals = getattr(self, method_name)(
+                colors=colors, **plot_kwargs
+            )
+        
+        self.stylize(Y_values=Y_vals, X_values=X_vals, **plot_kwargs)
+        self.add_legends(**plot_kwargs)
+        self.save_plot(**plot_kwargs)
+
+        self.restore_params()
+
 
     def save_plot(
         self,
@@ -332,7 +410,7 @@ class ALL_PLOT:
         self.fig.savefig(
             output_path, dpi=dpi, 
             bbox_inches=kwargs.pop("bbox_inches", "tight"),
-            pad_inches=self.pad_inches,
+            pad_inches=kwargs.get("pad_inches", self.pad_inches),
             transparent=transparent,
         )
         return output_path
@@ -343,48 +421,7 @@ class ALL_PLOT:
 
 
 
-    # def _invoke_plot(self, plot_function, *args, output_name="name", **kwargs):
-    #     options = {**self.defaults, **kwargs}
-    #     if output_name != "name" and "name" in options and output_name not in options:
-    #         options[output_name] = options.pop("name")
 
-    #     plot_signature = signature(plot_function)
-    #     bound = plot_signature.bind_partial(*args, **options)
-    #     if "figsize" in plot_signature.parameters and "figsize" not in bound.arguments:
-    #         bound.arguments["figsize"] = self.figsize
-    #     if (
-    #         self.name is not None
-    #         and output_name in plot_signature.parameters
-    #         and output_name not in bound.arguments
-    #     ):
-    #         bound.arguments[output_name] = self.name
-    #     return plot_function(*bound.args, **bound.kwargs)
-
-    
-    # def bar_graph_X_Y(self, *args, **kwargs):
-    #     from hist import bar_graph_X_Y
-
-    #     return self._invoke_plot(bar_graph_X_Y, *args, **kwargs)
-
-    # def bar_graph_X_Y_Gradient(self, *args, **kwargs):
-    #     from hist import bar_graph_X_Y_Gradient
-
-    #     return self._invoke_plot(bar_graph_X_Y_Gradient, *args, **kwargs)
-
-    # def bar_graph_side_by_side(self, *args, **kwargs):
-    #     from hist import bar_graph_side_by_side
-
-    #     return self._invoke_plot(bar_graph_side_by_side, *args, **kwargs)
-
-    # def bar_graph_horizontal(self, *args, **kwargs):
-    #     from hist import bar_graph_horizontal
-
-    #     return self._invoke_plot(bar_graph_horizontal, *args, **kwargs)
-
-    # def bar_graph_horizontal2(self, *args, **kwargs):
-    #     from hist import bar_graph_horizontal2
-
-    #     return self._invoke_plot(bar_graph_horizontal2, *args, **kwargs)
 
     
     # def heatmap_plt(self, *args, **kwargs):

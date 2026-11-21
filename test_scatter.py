@@ -9,14 +9,11 @@ Scatter_config = dict(
 
 PLOT_FN = ALL_PLOT(
     figsize=(6, 6), 
-    artificial_darkening=0.8,
     # colors=DISTINCT_3_6, 
     colors=ORANGE_LIGHTBLUE_10, 
     decimal_places=0,
     y_up_offset=20, y_down_offset=20,
     x_up_offset=20, x_down_offset=20,
-    x_axis_end_limit_offset=0.1, y_axis_end_limit_offset=0.1, 
-    grid_opacity=0.3, 
     Y_label_fontsize=10, X_label_fontsize=10,
     **Scatter_config 
     )
@@ -32,11 +29,23 @@ PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter",
     Points=POINTS, Labels=Labels, Sizes=SIZES
 )
 
-################## Shade y-axis regioin
+
+
+
+################## Different Shapes 
 UPDATE = dict(
     switch_off_yaxis=True,
     y_points=5,
 )
+
+SHAPE={0: 'o' , 1:'v', 2:'*', 3:'^', 4:'<', 5:'>', 6:'8', 7:'s', 8:'P'}
+PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shape",
+    Points=POINTS, Labels=Labels, Sizes=SIZES, Shapes=SHAPE, 
+    v_line_shade=[[-50, 50]], v_line_shade_color='black', v_line_shade_color_alpha=0.2, v_line_alpha=0,     
+    vline_offset = 50, hline_offset = 50,
+)
+
+################## Shade y-axis regioin
 PLOT_FN.update_params(UPDATE)
 PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shade",
     Points=POINTS, Labels=Labels, Sizes=SIZES,
@@ -44,15 +53,6 @@ PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shade",
     vline_offset = 50, hline_offset = 50,
 )
 
-
-
-################## Different Shapes 
-SHAPE={0: 'o' , 1:'v', 2:'*', 3:'^', 4:'<', 5:'>', 6:'8', 7:'s', 8:'P'}
-PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shape",
-    Points=POINTS, Labels=Labels, Sizes=SIZES, Shapes=SHAPE, 
-    v_line_shade=[[-50, 50]], v_line_shade_color='black', h_line_shade_color_alpha=0.3, line_width=1,     
-    vline_offset = 50, hline_offset = 50,
-)
 
 
 
