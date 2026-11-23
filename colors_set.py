@@ -7,7 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import numpy as np 
 
-from plot_utils import generate_color_gradient, generate_color_gradients2, colors_heat_map, lighten_color
+from plot_utils import generate_color_gradients2, lighten_color
 
 
 BROWN = "#AD8C97"

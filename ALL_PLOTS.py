@@ -16,13 +16,12 @@ class ALL_PLOT:
         "line": "line_plot",
         "scatter": "scatter_plt",
         "bar": "bar_plt",
-        
+        "heatmap": "heatmap_plt",
 
         # Misc Plots 
-        "heatmap": "heatmap_plt",
+        "word_cloud": "word_cloud_plt",
         
-        # "word_cloud": "word_cloud_plt",
-        # "word_cloud_plt": "word_cloud_plt",
+    
         # "radar": "radar_spider_plot",
         # "radar_spider_plot": "radar_spider_plot",
         # "box": "box_plt",
@@ -31,12 +30,10 @@ class ALL_PLOT:
         # "sankey": "Sankey_web",
         # "sankey_web": "Sankey_web",
     }
-
     MISC_PLOTS = set(
-        "heatmap", 
+        "word_cloud"
     )
 
-    
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
         name=None,  # Default base name for the saved PNG file.
@@ -283,7 +280,7 @@ class ALL_PLOT:
             x_min - kwargs.get("y_axis_pos_offset", self.y_axis_pos_offset),
             x_max + kwargs.get("x_axis_end_limit_offset", self.x_axis_end_limit_offset), 
         )
-
+        
         return 
         
     def stylize(self,
@@ -374,6 +371,8 @@ class ALL_PLOT:
                 self.kwargs.pop(key, None)
         
     
+
+    ##### ALL Plots 
     def line_plot(self, **kwargs):  # kwargs are forwarded to line_plot from line.py.
         # Forward line-plot options to the line plotting implementation.
         from line import line_plot
@@ -408,7 +407,13 @@ class ALL_PLOT:
         plot_kwargs.update(additional_params)
         return heatmap_plt(**plot_kwargs)
 
-        
+    def word_cloud_plt(self, **kwargs):
+        from misc_plot import word_cloud_plt
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        if 'figsize' not in plot_kwargs:
+            plot_kwargs
+        return word_cloud_plt(**plot_kwargs)
+
         
     def update_plot_kwargs(self, Add_parms, plot_kwargs):
         for k,v in Add_parms.items():
@@ -475,11 +480,7 @@ class ALL_PLOT:
 
     
     
-    # def word_cloud_plt(self, *args, **kwargs):
-    #     from misc_plot import word_cloud_plt
-
-    #     return self._invoke_plot(word_cloud_plt, *args, **kwargs)
-
+    
     # def radar_spider_plot(self, *args, **kwargs):
     #     from misc_plot import radar_spider_plot
 

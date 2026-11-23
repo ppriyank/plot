@@ -3,7 +3,7 @@ from matplotlib.colors import TwoSlopeNorm
 from numbers import Integral
 from typing import Literal
 from plot_add import *
-from plot_utils import range_calc
+from plot_utils import range_calc, create_color_gradient
 
 def generate_axis(df):
     X_labels = list(df.columns)
@@ -11,14 +11,6 @@ def generate_axis(df):
     X_range = [index + 0.5 for index in range(len(X_labels))]
     Y_range = [index + 0.5 for index in range(len(Y_labels))]
     return X_range, X_labels, Y_range, Y_labels
-
-
-def create_color_gradient(colors, n_bins=100):
-    if isinstance(colors, dict):
-        assert False 
-    colors_template = LinearSegmentedColormap.from_list('custom_gradient', colors, N=n_bins)
-    return colors_template
-
 
 def _annotation_text_color(rgba, annot_black_threshold):
     channels = np.asarray(rgba[:3])
@@ -121,6 +113,7 @@ def heatmap_plt(
     if data.ndim != 2 or not all(data.shape):
         raise ValueError("df must contain a non-empty two-dimensional heatmap")
     if mask is not None:
+        mask = ~mask
         data = np.ma.masked_where(np.asarray(mask, dtype=bool), data)
 
     colors = create_color_gradient(colors, n_bins=n_bins)

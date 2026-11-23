@@ -28,7 +28,7 @@ PLOT_FN = ALL_PLOT(
     grid_color='white', 
     grid_widths=0.2,
     grid_shape='xy',
-    pad_inches=0, 
+    pad_inches=0.06, 
     )
 
 
@@ -76,7 +76,6 @@ PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_x_axis_pos"
 
 
 ################## Plot with Color Bar 
-# Higher y-axis is higher position on y axis
 df =df.T
 df = df.iloc[:-3]
 PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_color_bar",
@@ -88,6 +87,28 @@ PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_color_bar",
     figsize=(4, 4), 
 )
 
+################## Heatmap with masking 
+
+masked = np.array([
+    [True, True, False, False, True, True ],
+    [False, False, True, True, True, True ],
+    [False, False, True, False,  True, True ],
+    [False, False, True, False,  True, True ],
+    [False, True,  True, False,  True, True ],
+    [True,  False, True, True, True, True ],
+    [True,  False, True, True, True, True ],
+    [False, True,  False, False, True, True ],
+    [False, True,  True, True, False, False,],
+])
+
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_mask",
+    df=df, mask=masked, 
+    colors=GRADIENT_GREEN_6[::-1], 
+    n_bins=6, 
+    grid_widths=0.3,
+    annot_font_size=5, artificial_darkening=0.8,
+    figsize=(4, 4), 
+)
 
 
      

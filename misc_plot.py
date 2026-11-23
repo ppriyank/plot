@@ -1,52 +1,95 @@
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
-import matplotlib as mpl
-from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE, generate_color_gradients2
-from math import pi
-from plot_utils import range_calc, binning, contrast_ratio
-import numpy as np 
+from colors_set import * 
 
+from plot_utils import range_calc, create_color_gradient
+
+
+# from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE, generate_color_gradients2
+# from math import pi
+# from plot_utils import range_calc, binning, contrast_ratio
+# import numpy as np 
+
+# import numpy as np
+# from matplotlib.colors import TwoSlopeNorm
+# from numbers import Integral
+# from typing import Literal
+# from plot_add import *
+
+# import matplotlib.pyplot as plt
+
+# from plot_add import * 
 
 
   
 
 
-def word_cloud_plt(X, SIZE, COLOR_INDEX, COLORS=None, figsize=(500,500), colors_template=None, name="temp"):
-    plt.clf()
-    fig_H, fig_W = figsize
+def word_cloud_plt(
+    ax,
+    word_cloud_shape = (2000, 3500),
+    Nodes=None, # words
+    Sizes=None, # Frequency / Size / Count 
+    Values=None, # Decide color value 
     
-    maxi, mini = max(COLOR_INDEX), min(COLOR_INDEX)
-    N = int( (maxi - mini + 1)  // 1)
+    colors = [ORANGE, BLUE, PINK],
+    n_bins=10, 
+    scale_factor = 3, # HD-ness
+    
+    **args,
+    ):
+    
+    fig_H, fig_W = word_cloud_shape
+    colors = create_color_gradient(colors, n_bins=n_bins)
+    
+    wc = WordCloud(background_color='white', 
+        colormap=colors,
+        width = fig_W, height = fig_H, repeat=False,
+        margin=0, 
+        prefer_horizontal=0.9,
+        relative_scaling=0.4,
+        # collocations=False,
+        # min_font_size=4,
+        scale=scale_factor,
+        )
 
-    if COLORS:
-        colors_template = LinearSegmentedColormap.from_list('custom_gradient', COLORS, N=N)
-    else:
-        colors_template = LinearSegmentedColormap.from_list('custom_gradient', ['#18aef5', '#000080', '#000000'], N=N)
-    
-    colors = [colors_template(i/N) for i in range(N)]
 
     dict_freq = {}
-    colors_freq = {}
-    for data_name,size,n_c in sorted(list(zip(X, SIZE, COLOR_INDEX)), key=lambda x : -x[1]):
-        dict_freq[data_name] = size
-        colors_freq[data_name] = mpl.colors.to_hex(colors[n_c - mini])
-    
-    
-    wc = WordCloud(background_color='white', colormap = 'binary',
-        width = fig_W, height = fig_H, repeat=False)
+    for node, size in zip(Nodes, Sizes) :
+        dict_freq[node] = size
+
     wc = wc.generate_from_frequencies(dict_freq)
 
-    layout_ = []
-    for e in wc.layout_:
-        e = list(e)
-        e[4] = colors_freq[e[0][0]]
-        layout_.append(e)
+    #### Custom Colors based on Value     
+    if Values:
+        maxi, mini = max(Values), min(Values)
+        N = int( (maxi - mini + 1)  // 1)
+        color_dict ={ }
+        for node, value in zip(Nodes, Values) :
+            color_dict[node] =  mpl.colors.to_hex ( colors ( (value - mini) / N ) )
+        
+        layout_ = []
+        for e in wc.layout_:
+            # print(e)
+            e = list(e)
+            node = e[0][0]
+            old_color = e[4]
+            e[4] = color_dict[node]
+            # e[4] = old_color
+            layout_.append(e)
+        wc.layout_ = layout_
 
-    wc.layout_ = layout_
-    plt.imshow(wc)
-    plt.axis("off")
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300) 
+    ax.imshow(np.flipud(wc))
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.axis('off')
+    ax.margins(x=0, y=0)
+    
+    # plt.savefig("test_wordcloud.png", dpi=300)
+    # X_values , Y_values 
+    return [0, fig_W * scale_factor], [0, fig_H * scale_factor], {}
+
 
     
 

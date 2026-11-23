@@ -1,227 +1,219 @@
-from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble, Sankey_web
-from colors import *
+from ALL_PLOTS import ALL_PLOT
+from line import line_plot
+from colors_set import *
+import torch
 import pandas as pd 
-import torch 
-import torch.nn.functional as F
-import torch.nn as nn
-from math import log
-import numpy as np 
-import os 
-import random 
+from math import log 
 
-heat_map = False 
-heat_map2=False 
-word_cloud = False 
-radar_plot = False 
-box_plot = False 
-bubble_plot = False  
-sankey_plot=True 
-
-######### HEAT MAP
-cmap = None 
-cmap = 'viridis'
-cmap = 'YlGnBu'
-cmap = HEAT_MAP_COLOR
-
-X = torch.rand(12, 1025)
-X = F.normalize(X, p=2, dim=-1)
-
-dist = X.unsqueeze(1) - X.unsqueeze(0)
-dist = (dist ** 2).sum(-1)
-
-df = pd.DataFrame( dist.cpu(), columns=[f"Layer-{e+1}" for e in range(len(dist))])
-if heat_map:
-    heatmap_plt(df, name="test_heatmap", X_label_fontsize=25, figsize=(10, 10), xticklabels= 5, vmin=0, vmax=2,  cmap=cmap,
-        linewidths=.5 , annot=False, fmt=".2f")
-
-    cmap = generate_color_gradient(1000)
-    heatmap_plt(df, name="test_heatmap2", X_label_fontsize=25, figsize=(10, 10), xticklabels= 5, vmin=0, vmax=2,  cmap=cmap,
-        linewidths=.5 , annot=False, fmt=".2f")
-
-
-if heat_map2:
-    df = [
-        ['OG',0.46637,0.28055,0.31158,0.29258,0.26106,0.24943,0.28391,0.30787,0.29770,0.24134,0.24697,0.18378,0.18099],
-        ['Pixel Drop' ,0.46270,0.32030,0.31650,0.30429,0.26057,0.24561,0.28561,0.30278,0.29277,0.23024,0.24792,0.18063,0.18516],
-        ['ISO',0.46285,0.28526,0.33376,0.30581,0.26062,0.23708,0.28597,0.30110,0.29686,0.23022,0.24723,0.18088,0.18308],
-        ['Rain',0.46222,0.28413,0.31994,0.29493,0.26391,0.24224,0.28614,0.30456,0.29054,0.22817,0.26122,0.18915,0.17661],
-        ['Snow',0.46179,0.28874,0.31019,0.28975,0.25547,0.24122,0.27872,0.30408,0.29134,0.22660,0.24992,0.20279,0.18498],
-        ['Atmospheric',0.46359,0.28827,0.31609,0.29267,0.26541,0.25755,0.30398,0.30282,0.29951,0.24740,0.24463,0.18213,0.20890]
-    ]
+PLOT_FN = ALL_PLOT(
+    figsize=(6, 4), 
+    artificial_darkening=1,
+    pad_inches=0.1, 
     
-    df = pd.DataFrame(df, columns=['LR-TK0','OG','Pixel Drop','ISO','Salt','Low Res','Focus Blur','JPG','Chromatic','Motion Blur','Fog','Rain','Snow','Atmospheric'])
-    df.set_index('LR-TK0', inplace=True)
-    df = df.sub(df.iloc[0])
-    df = df * 100 
-    df = df.iloc[1:]
-    print(df)
+    # X_label_fontsize=8,
+    # X_label_rotate=45,
 
-    mini= df.min().min()
-    maxi= df.max().max()
-    ##### smoothness
-    n_bins=  20
+    # Y_label_rotate=0,
+    # Y_label_fontsize=8,
 
-    ## Min val ==> "#FF4500", 0 special case ==> 'black' , maxi ==> "#4169E1"
-    zero_one_range = lambda x: (x - mini) / (maxi - mini)
-    colors = [(zero_one_range(mini), "#FF4500"), (zero_one_range(0), 'white'), (zero_one_range(maxi), "#4169E1")]
-    cmap = generate_color_gradients2(n_bins, colors)
+    # annot=True,
+    # annot_decimal_places=2, 
+    # annot_font_size=9,
 
-    offset  =(maxi - mini) / n_bins
-    color_bar_labels_range = [mini, 0, maxi]
-    color_bar_labels=[f"{e:.1f}" for e in color_bar_labels_range]
+    # switch_off_yaxis=True,
+    # switch_off_xaxis=True,
 
-    yticklabels=True
-    x_font_size=13
-    y_font_size = 15
+    # colors=DISTINCT_2_7, 
     
-    #### Position of x labels 
-    x_padding = {'OG': -0.01, 'Pixel Drop ': -0.025, 
-        'ISO': -0.005, 'Salt': -0.01, 'Low Res': -0.025, 
-        'Focus Blur': -0.025, 'JPG': 0.005, 
-        'Chromatic': -0.025, 'Motion Blur ': -0.03, 
-        'Fog': 0.0, 'Rain': -0.025, 
-        'Snow': -0.02, 'Atmospheric': -0.04}
     
-    #### Position of y labels 
-    y_padding = {'Pixel Drop ': 0.0, 
-        'ISO': 0.0, 'Rain': 0, 
-        'Snow': 0.0, 'Atmospheric': -0.0}
-
-    x_label_dist = [val for key,val in x_padding.items()]
-    y_label_dist = [val for key,val in y_padding.items()]
-
-    heatmap_plt(df, name="test_heatmap3", 
-        X_label_fontsize=x_font_size, Y_label_fontsize=y_font_size, x_label_rotate=25, x_label_dist=x_label_dist, y_label_rotate=0, y_label_dist=y_label_dist, 
-        figsize=(10, 6), xticklabels= 1, vmin=mini, vmax=maxi, cmap=cmap, annot=True, fmt=".1f", yticklabels=yticklabels, 
-        color_bar_labels=color_bar_labels, color_bar_labels_range=color_bar_labels_range, color_label_fontsize=15, ann_size=15)
+)
 
 
-     
 
 
 ######### WORD CLOUD 
+# Nodes, Values (colors), Size
 
 names = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars', 'FGVC-Aircraft', 'Oxford-Pets', 'Oxford-Flowers102', 'EuroSAT', 'UCF101']
+
 sizes = ['50000', '50000', '7500', '10000', '30000', '6085', '1880', '25250', '19850', '8041', '3333', '3669', '6149', '5000', '1794']
-sizes = [int(e) for e in sizes]
-sizes = [log(e+1000)  for e in sizes]
+sizes = [ int(e)  for e in sizes]
 
-n_classes = ['1000', '1000', '200', '1000', '200', '102', '47', '102', '397', '196', '102', '37', '102', '10', '101']
-n_classes = [int(e) for e in n_classes]
+rng = np.random.default_rng(seed=42)
+values = rng.standard_normal(len(sizes)).tolist()
 
-COLOR_INDEX = n_classes
-SIZE = sizes
-COLORS = ['#207eab', '#000080', '#000000']
-COLORS = ['#FFAC1C', '#C04000', '#000000']
-if word_cloud:
-    word_cloud_plt(names, COLOR_INDEX=COLOR_INDEX, SIZE=SIZE, COLORS=COLORS, figsize=(2000, 3500), name="test_word_cloud")
-
-
-######### RADAR PLOT 
-# 3 radars is top limit for visualization 
-
-A = torch.rand(10) * 100
-B = torch.rand(10) * 100
-C = torch.rand(10) * 100
-
-custom_Y_yxis = [10, 20, 30]
-custom_Y_yxis_label = ["10", "20", "30"]
-
-Radar_label = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars']
-curve_names = ["Curve A", "Curve B", "Curve C"]
-
-if radar_plot:
-    radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar1", 
-        ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
-        x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
-        y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
-        y_axis_allowed=False, Y_range=custom_Y_yxis, Y_range_label=custom_Y_yxis_label)
-
-
-    radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar2", 
-        ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
-        x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
-        y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
-        y_axis_allowed=False)
-
-
-######### Box PLot 
-if box_plot:
-    A = [42.4, 41.4, 39.6, 38.4, 42, 39.8, 38, 38]
-    B = [44.4, 43.1, 40.1, 39.0, 44, 42.7, 38, 37]
-    C = [40.4, 36.1, 50.1, 60.0, 44, 50.7, 40, 30]
-
-    Y = [A,B,C]
-    X_labels = ["Dataset_A", "Dataset_B", "Dataset_C"]
-
-    vals = []
-    for i,ele in enumerate(Y):
-        for val in ele:
-            vals.append([X_labels[i], val])
-
-    df = pd.DataFrame(vals, columns=["X", "Y"])
-    box_plt(df, name="test_box", figsize=(7, 10),
-        y_up_offset=5, y_down_offset=5, y_points=4, width=0.6)
-
-
-    box_plt(df, name="test_box_mean", figsize=(7, 10),
-        y_up_offset=5, y_down_offset=5, y_points=4, width=0.6, use_mean=True, x_padding_factor=0.5, )
+PLOT_FN.plot(plt_type="word_cloud", name="Pictures/Misc/test_word_cloud",
+    Nodes=names, Sizes=sizes, Values=values,    
+    colors=DISTINCT_2_2, 
+    word_cloud_shape = (650, 850),
+)
 
 
 
-
-######### BUBBLE PLOT 
-if bubble_plot:
-    from math import log 
-    ### Nodes
-    class_name = ['lobster', 'jellyfish', 'hand', 'pistol', 'cottontail', 'raccoon', 'motorcycle']
-
-    ### Sizes (This will be used to bin)
-    class_sizes = [60, 155, 1515, 346, 46, 64, 330]
-
-    ### COLOR decider (between 0-1)
-    class_scores = [0.700000, 0.285235, 0.182759, 0.098592, 0.005739, 0.063559, 0.052960]
-
-    df = pd.DataFrame({ 'Nodes': class_name, 'Sizes': class_sizes, 'Score': class_scores})
-
-    # (This will be used to bin or clustered
-    df['Sizes'] = df['Sizes'].apply(log)
-    print(df)
-
-
-    network_bubble(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
-        plt_name="bubble_plot", figsize=(20, 20), 
-        N_CLUSTERS = 3, ## no of clusters
-        node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
-        node_edge_width=0.2, node_labels=True, 
-        node_labels_font_size=8, ### Node label prop to node size (5 is base size)
-        N_BINS_COLORS = 100, ### Binning of colors [Score ==0 -> white , Score == 1 --> black]
-        node_edge_color="black",
-        edge_width=0.5, edge_alpha=0.5, 
-    )
-
-
-if sankey_plot:    
-    url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
-    df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
-    
-    COLORS_LEFT = [lighten_color( DISTINCT_2_8[1], amount= 0.5 + 0.3 * i ) for i,k in enumerate(df.true.unique())]
-    random.shuffle(COLORS_LEFT)
-    COLORS_RIGHT = [lighten_color( DISTINCT_2_8[0], amount= 0.5 + 0.2 * i ) for i,k in enumerate(df.predicted.unique())]
-    random.shuffle(COLORS_RIGHT)
-    
-    left_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k, color in zip(df.true.unique(), COLORS_LEFT)}
-    right_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k,color in zip(df.predicted.unique(), COLORS_RIGHT)}
-
-
-    Sankey_web(df, left_axis='true', right_axis='predicted', gradient=True, 
-    left_axis_colors=left_axis_colors, right_axis_colors=right_axis_colors, edges=True, edge_width=1, edgecolor='white', edge_alpha=0.6, 
-    flow_width=1, 
-    figsize=(5, 5),
-    name=os.path.join('Pictures', "test_sankey"), 
-    )
-    
-    
 
 # cd ~/plot/
 # python test_misc.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from misc_plot import heatmap_plt, word_cloud_plt, radar_spider_plot, box_plt, network_bubble, Sankey_web
+# from colors import *
+# import pandas as pd 
+# import torch 
+# import torch.nn.functional as F
+# import torch.nn as nn
+# from math import log
+# import numpy as np 
+# import os 
+# import random 
+
+# heat_map = False 
+# heat_map2=False 
+# word_cloud = False 
+# radar_plot = False 
+# box_plot = False 
+# bubble_plot = False  
+# sankey_plot=True 
+
+# ######### HEAT MAP
+# cmap = None 
+# cmap = 'viridis'
+# cmap = 'YlGnBu'
+# cmap = HEAT_MAP_COLOR
+
+# X = torch.rand(12, 1025)
+# X = F.normalize(X, p=2, dim=-1)
+
+# dist = X.unsqueeze(1) - X.unsqueeze(0)
+# dist = (dist ** 2).sum(-1)
+
+# df = pd.DataFrame( dist.cpu(), columns=[f"Layer-{e+1}" for e in range(len(dist))])
+
+
+
+
+# ######### RADAR PLOT 
+# # 3 radars is top limit for visualization 
+
+# A = torch.rand(10) * 100
+# B = torch.rand(10) * 100
+# C = torch.rand(10) * 100
+
+# custom_Y_yxis = [10, 20, 30]
+# custom_Y_yxis_label = ["10", "20", "30"]
+
+# Radar_label = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars']
+# curve_names = ["Curve A", "Curve B", "Curve C"]
+
+# if radar_plot:
+#     radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar1", 
+#         ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
+#         x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
+#         y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
+#         y_axis_allowed=False, Y_range=custom_Y_yxis, Y_range_label=custom_Y_yxis_label)
+
+
+#     radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar2", 
+#         ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
+#         x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
+#         y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
+#         y_axis_allowed=False)
+
+
+# ######### Box PLot 
+# if box_plot:
+#     A = [42.4, 41.4, 39.6, 38.4, 42, 39.8, 38, 38]
+#     B = [44.4, 43.1, 40.1, 39.0, 44, 42.7, 38, 37]
+#     C = [40.4, 36.1, 50.1, 60.0, 44, 50.7, 40, 30]
+
+#     Y = [A,B,C]
+#     X_labels = ["Dataset_A", "Dataset_B", "Dataset_C"]
+
+#     vals = []
+#     for i,ele in enumerate(Y):
+#         for val in ele:
+#             vals.append([X_labels[i], val])
+
+#     df = pd.DataFrame(vals, columns=["X", "Y"])
+#     box_plt(df, name="test_box", figsize=(7, 10),
+#         y_up_offset=5, y_down_offset=5, y_points=4, width=0.6)
+
+
+#     box_plt(df, name="test_box_mean", figsize=(7, 10),
+#         y_up_offset=5, y_down_offset=5, y_points=4, width=0.6, use_mean=True, x_padding_factor=0.5, )
+
+
+
+
+# ######### BUBBLE PLOT 
+# if bubble_plot:
+#     from math import log 
+#     ### Nodes
+#     class_name = ['lobster', 'jellyfish', 'hand', 'pistol', 'cottontail', 'raccoon', 'motorcycle']
+
+#     ### Sizes (This will be used to bin)
+#     class_sizes = [60, 155, 1515, 346, 46, 64, 330]
+
+#     ### COLOR decider (between 0-1)
+#     class_scores = [0.700000, 0.285235, 0.182759, 0.098592, 0.005739, 0.063559, 0.052960]
+
+#     df = pd.DataFrame({ 'Nodes': class_name, 'Sizes': class_sizes, 'Score': class_scores})
+
+#     # (This will be used to bin or clustered
+#     df['Sizes'] = df['Sizes'].apply(log)
+#     print(df)
+
+
+#     network_bubble(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
+#         plt_name="bubble_plot", figsize=(20, 20), 
+#         N_CLUSTERS = 3, ## no of clusters
+#         node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
+#         node_edge_width=0.2, node_labels=True, 
+#         node_labels_font_size=8, ### Node label prop to node size (5 is base size)
+#         N_BINS_COLORS = 100, ### Binning of colors [Score ==0 -> white , Score == 1 --> black]
+#         node_edge_color="black",
+#         edge_width=0.5, edge_alpha=0.5, 
+#     )
+
+
+# if sankey_plot:    
+#     url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
+#     df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
+    
+#     COLORS_LEFT = [lighten_color( DISTINCT_2_8[1], amount= 0.5 + 0.3 * i ) for i,k in enumerate(df.true.unique())]
+#     random.shuffle(COLORS_LEFT)
+#     COLORS_RIGHT = [lighten_color( DISTINCT_2_8[0], amount= 0.5 + 0.2 * i ) for i,k in enumerate(df.predicted.unique())]
+#     random.shuffle(COLORS_RIGHT)
+    
+#     left_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k, color in zip(df.true.unique(), COLORS_LEFT)}
+#     right_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k,color in zip(df.predicted.unique(), COLORS_RIGHT)}
+
+
+#     Sankey_web(df, left_axis='true', right_axis='predicted', gradient=True, 
+#     left_axis_colors=left_axis_colors, right_axis_colors=right_axis_colors, edges=True, edge_width=1, edgecolor='white', edge_alpha=0.6, 
+#     flow_width=1, 
+#     figsize=(5, 5),
+#     name=os.path.join('Pictures', "test_sankey"), 
+#     )
+    
+    
+
+# # cd ~/plot/
+# # python test_misc.py
