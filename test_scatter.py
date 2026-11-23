@@ -33,11 +33,6 @@ PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter",
 
 
 ################## Different Shapes 
-UPDATE = dict(
-    switch_off_yaxis=True,
-    y_points=5,
-)
-
 SHAPE={0: 'o' , 1:'v', 2:'*', 3:'^', 4:'<', 5:'>', 6:'8', 7:'s', 8:'P'}
 PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shape",
     Points=POINTS, Labels=Labels, Sizes=SIZES, Shapes=SHAPE, 
@@ -46,7 +41,13 @@ PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shape",
 )
 
 ################## Shade y-axis regioin
-PLOT_FN.update_params(UPDATE)
+UPDATE = dict(
+    switch_off_yaxis=True,
+    y_points=5,
+)
+
+PLOT_FN.update(UPDATE)
+
 PLOT_FN.plot(plt_type="scatter", name="Pictures/Scatter/test_scatter_shade",
     Points=POINTS, Labels=Labels, Sizes=SIZES,
     h_line_shade=[[-50, 50], [50, 300]], h_line_shade_color=DISTINCT_2_8, h_line_shade_color_alpha=0.3, line_width=1,     

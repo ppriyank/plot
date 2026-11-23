@@ -86,4 +86,4 @@ def scatter_plt(ax=None,
     # Y_values += local_Y
     # X_values += local_X
 
-    return X_values, Y_values
+    return X_values, Y_values, {}

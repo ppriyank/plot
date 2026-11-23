@@ -107,7 +107,7 @@ def line_plot(ax=None,
 
       
     # plt.savefig("test_line.png", dpi=300)
-    return X_values, Y_values
+    return X_values, Y_values, {}
     
     
   

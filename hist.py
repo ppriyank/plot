@@ -113,7 +113,6 @@ def add_patterns(Patterns, ax):
                     PATTERN_COLOR, patch.get_alpha()
                 )
 
-
 ### color assigned by max color
 def create_color_gradient(Hists, colors, bins=100):
     Y_values = []
@@ -135,8 +134,6 @@ def create_color_gradient(Hists, colors, bins=100):
         
     return new_colors
     
-
-
 def bin_histogram(Hists, n_bins, use_log=None):
     if not isinstance(n_bins, int) or n_bins <= 0:
         raise ValueError("Hist_N_Bins must be a positive integer")
@@ -337,7 +334,7 @@ def bar_plt(ax=None,
     X_values += local_X
 
     # plt.savefig("test_hist.png", dpi=300)
-    return X_values, Y_values
+    return X_values, Y_values, {}
 
 
 
