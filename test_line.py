@@ -9,7 +9,7 @@ Line_config = dict(
 )
 
 PLOT_FN = ALL_PLOT(
-    figsize=(6, 6), 
+    figsize=(6, 6.2), 
     colors=DISTINCT_3_6, 
     decimal_places=1,
     y_up_offset=5, y_down_offset=2,

@@ -130,12 +130,11 @@ Hists = [
 ]
 
 PLOT_FN.update(dict(
-        figsize=(4, 6), 
-        X_label_fontsize=5,
+        figsize=(4, 5.5), 
+        X_label_fontsize=10,
         grid_shape='x', 
-        switch_off_yaxis=False, 
-        switch_off_xaxis=True, 
-        x_points=10, 
+        switch_off_yaxis=False, switch_off_xaxis=True, 
+        x_points=5, 
         
         y_up_offset=0,
         y_axis_pos_offset=0,
@@ -149,7 +148,7 @@ PLOT_FN.update(dict(
 
 PLOT_FN.plot(plt_type="bar", name="Pictures/Hist/test_hist_swap",
     Hists=Hists, bar_border_color='black', swap_axis=True, 
-    stack_dist=1, bar_group_sep=2,
+    stack_dist=1, bar_group_sep=1,
     automatic_adjust_width=True, bar_border_width=0.06, 
     bar_labels=True, bar_labels_font_size=10, bar_labels_color='black', bar_label_decimal_places=1, bar_labels_x_offset=1,
 )

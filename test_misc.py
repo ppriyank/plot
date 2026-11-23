@@ -5,34 +5,18 @@ import torch
 import pandas as pd 
 from math import log 
 
+
+
+
+############################################################################################################
+#################################### WORD CLOUD 
+# Nodes, Values (colors), Size
+
 PLOT_FN = ALL_PLOT(
     figsize=(6, 4), 
     artificial_darkening=1,
-    pad_inches=0.1, 
-    
-    # X_label_fontsize=8,
-    # X_label_rotate=45,
-
-    # Y_label_rotate=0,
-    # Y_label_fontsize=8,
-
-    # annot=True,
-    # annot_decimal_places=2, 
-    # annot_font_size=9,
-
-    # switch_off_yaxis=True,
-    # switch_off_xaxis=True,
-
-    # colors=DISTINCT_2_7, 
-    
-    
+    pad_inches=0.1,     
 )
-
-
-
-
-######### WORD CLOUD 
-# Nodes, Values (colors), Size
 
 names = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars', 'FGVC-Aircraft', 'Oxford-Pets', 'Oxford-Flowers102', 'EuroSAT', 'UCF101']
 
@@ -42,10 +26,97 @@ sizes = [ int(e)  for e in sizes]
 rng = np.random.default_rng(seed=42)
 values = rng.standard_normal(len(sizes)).tolist()
 
-PLOT_FN.plot(plt_type="word_cloud", name="Pictures/Misc/test_word_cloud",
-    Nodes=names, Sizes=sizes, Values=values,    
-    colors=DISTINCT_2_2, 
-    word_cloud_shape = (650, 850),
+# PLOT_FN.plot(plt_type="word_cloud", name="Pictures/Misc/test_word_cloud",
+#     Nodes=names, Sizes=sizes, 
+#     Values=values, ## override default colors based on Values     
+#     colors=DISTINCT_2_2, 
+#     word_cloud_shape = (650, 850),
+# )
+
+
+############################################################################################################
+#################################### RADAR PLOT 
+# 3 radars is top limit for visualization 
+
+## Needs to setup figure in 'polar'
+PLOT_FN = ALL_PLOT(
+    subplot_kw={'projection': 'polar'}, 
+    polaroid_coordinates=True, 
+
+    figsize=(6, 4), 
+    colors=DISTINCT_3_2, 
+    artificial_darkening=0.8,
+    
+    grid_shape='xy', 
+    grid_opacity=0.3, 
+    switch_off_xaxis=True,
+    switch_off_yaxis=True,
+    X_label_fontsize=10,
+    Y_label_fontsize=8,
+
+    x_axis_label_dist_y = 0.2, # radial distance 
+    x_axis_label_dist_x = 0, # angular distance 
+
+    y_axis_end_limit_offset=10, # extra ticks beyond plot y axis   
+    y_axis_angle=10, 
+)
+
+torch.manual_seed(100)
+torch.cuda.manual_seed_all(100)
+A = torch.rand(10) * 100 # "Curve A"
+B = torch.rand(10) * 100 # "Curve B"
+C = torch.rand(10) * 100 # "Curve C"
+
+curve_names = ["Curve A", "Curve B", "Curve C"]
+
+v_max = max(max(A), max(B), max(C))
+Y_range = [50,   v_max]
+Y_labels = ["50", f"{v_max:.0f}"]
+
+Radar_label = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars']
+Radar_label_dist = {
+    'ImageNet': 0.12, 
+    'ImageNet-Sketch': 0.12, 
+    'ImageNet-A': -0.1, 
+    'ImageNet-V2': -0.1, 
+    'ImageNet-R': 0, 
+    'Caltech': 0.04, 
+    'DTD': -0.08, 
+    'food101': -0.1, 
+    'SUN397': -0.1, 
+    'Stanford-Cars': 0.1, 
+}
+
+
+PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar",
+    Curves=[A,B,C],  Alphas = [0.5,0.5,.5], 
+    Curves_names = curve_names, 
+    Y_range=Y_range, Y_labels= Y_labels, 
+    X_labels= Radar_label, 
+    x_axis_label_dist_y = Radar_label_dist,
+)
+
+Radar_label_dist = {
+    'ImageNet': 0, 
+    'ImageNet-Sketch': 0.12, 
+    'ImageNet-A': -0.2, 
+    'ImageNet-V2': -0.2, 
+    'ImageNet-R': 0, 
+    'Caltech': 0.0, 
+    'DTD': -0.08, 
+    'food101': -0.2, 
+    'SUN397': -0.2, 
+    'Stanford-Cars': 0, 
+}
+
+PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar_derive_ylabels",
+    Curves=[A,B,C],  Alphas = 0.4, 
+    X_labels= Radar_label, Curves_names = curve_names, x_axis_label_dist_y = Radar_label_dist, 
+    colors=DISTINCT_3_3,
+    y_points=3, Y_label_opacity=0.4,
+    grid_shape='y', grid_opacity=0.5, 
+    decimal_places=1,
+    curve_line_opacity=0.1,
 )
 
 
@@ -92,72 +163,8 @@ PLOT_FN.plot(plt_type="word_cloud", name="Pictures/Misc/test_word_cloud",
 # bubble_plot = False  
 # sankey_plot=True 
 
-# ######### HEAT MAP
-# cmap = None 
-# cmap = 'viridis'
-# cmap = 'YlGnBu'
-# cmap = HEAT_MAP_COLOR
-
-# X = torch.rand(12, 1025)
-# X = F.normalize(X, p=2, dim=-1)
-
-# dist = X.unsqueeze(1) - X.unsqueeze(0)
-# dist = (dist ** 2).sum(-1)
-
-# df = pd.DataFrame( dist.cpu(), columns=[f"Layer-{e+1}" for e in range(len(dist))])
 
 
-
-
-# ######### RADAR PLOT 
-# # 3 radars is top limit for visualization 
-
-# A = torch.rand(10) * 100
-# B = torch.rand(10) * 100
-# C = torch.rand(10) * 100
-
-# custom_Y_yxis = [10, 20, 30]
-# custom_Y_yxis_label = ["10", "20", "30"]
-
-# Radar_label = ['ImageNet', 'ImageNet-Sketch', 'ImageNet-A', 'ImageNet-V2', 'ImageNet-R', 'Caltech', 'DTD', 'food101', 'SUN397', 'Stanford-Cars']
-# curve_names = ["Curve A", "Curve B", "Curve C"]
-
-# if radar_plot:
-#     radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar1", 
-#         ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
-#         x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
-#         y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
-#         y_axis_allowed=False, Y_range=custom_Y_yxis, Y_range_label=custom_Y_yxis_label)
-
-
-#     radar_spider_plot([A,B,C], curve_points=Radar_label, curve_names=curve_names, name=f"test_radar2", 
-#         ALPHAs=[1,1,1], artificial_darkening = 1, lw=2, alpha=0.2, 
-#         x_axis_allowed=True, X_label_fontsize=10, X_pad=20, outer_circle=False,
-#         y_axis_angle=10, Y_font_color='black', y_points=2, y_font_size=15, y_up_offset=2, y_down_offset=2, 
-#         y_axis_allowed=False)
-
-
-# ######### Box PLot 
-# if box_plot:
-#     A = [42.4, 41.4, 39.6, 38.4, 42, 39.8, 38, 38]
-#     B = [44.4, 43.1, 40.1, 39.0, 44, 42.7, 38, 37]
-#     C = [40.4, 36.1, 50.1, 60.0, 44, 50.7, 40, 30]
-
-#     Y = [A,B,C]
-#     X_labels = ["Dataset_A", "Dataset_B", "Dataset_C"]
-
-#     vals = []
-#     for i,ele in enumerate(Y):
-#         for val in ele:
-#             vals.append([X_labels[i], val])
-
-#     df = pd.DataFrame(vals, columns=["X", "Y"])
-#     box_plt(df, name="test_box", figsize=(7, 10),
-#         y_up_offset=5, y_down_offset=5, y_points=4, width=0.6)
-
-
-#     box_plt(df, name="test_box_mean", figsize=(7, 10),
-#         y_up_offset=5, y_down_offset=5, y_points=4, width=0.6, use_mean=True, x_padding_factor=0.5, )
 
 
 

@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from colors_set import *
 from inspect import signature
-from plot_utils import range_calc
+from plot_utils import range_calc, compute_radial_offset
 from typing import Literal
 import matplotlib.transforms as transforms
-
 
 class ALL_PLOT:
     """Class-based entry point for the plotting helpers in this package."""  # Provides shared setup and dispatch for every plot type.
@@ -20,12 +20,8 @@ class ALL_PLOT:
 
         # Misc Plots 
         "word_cloud": "word_cloud_plt",
+        "radar": "radar_plot",
         
-    
-        # "radar": "radar_spider_plot",
-        # "radar_spider_plot": "radar_spider_plot",
-        # "box": "box_plt",
-        # "box_plt": "box_plt",
         # "network_bubble": "network_bubble",
         # "sankey": "Sankey_web",
         # "sankey_web": "Sankey_web",
@@ -36,6 +32,7 @@ class ALL_PLOT:
 
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
+        subplot_kw = None, 
         name=None,  # Default base name for the saved PNG file.
         pad_inches = 0.1,  # Padding around the saved figure, in inches.
         colors=None,  # Default color or mapping used to draw plot elements.
@@ -52,14 +49,18 @@ class ALL_PLOT:
         y_ticks_allowed=True, x_ticks_allowed=True,  # Enable or disable tick labels on each axis.
         Y_label_fontsize=20, X_label_fontsize=25,  # Set axis tick-label font sizes.
         Y_label_rotate=0, X_label_rotate =0 ,  # Rotate axis tick labels by these angles.
+        Y_label_opacity=1, X_label_opacity=1,  # Set axis tick-label opacity (0 = invisible, 1 = solid).
 
         x_axis_pos_offset=0, y_axis_pos_offset=0,  # Move the y/x axis origin outward by the given data-range padding.
         x_axis_end_limit_offset=0.1, y_axis_end_limit_offset=0.1,  # Extend the x/y upper limit beyond the calculated maximum.
-
+        
+        polaroid_coordinates=False, 
         **kwargs):  # Extra plot, setup, or save options forwarded to plot helpers.
         # Store class-wide defaults used by setup and styling methods.
         
         self.figsize = figsize
+        self.subplot_kw = subplot_kw
+
         self.name = name
         self.defaults = kwargs
         self.fig = None
@@ -82,6 +83,9 @@ class ALL_PLOT:
         self.Y_label_fontsize = Y_label_fontsize
         self.X_label_fontsize = X_label_fontsize
 
+        self.Y_label_opacity = Y_label_opacity
+        self.X_label_opacity = X_label_opacity
+        
         self.Y_label_rotate = Y_label_rotate
         self.X_label_rotate = X_label_rotate
 
@@ -92,6 +96,8 @@ class ALL_PLOT:
         self.grid_shape = grid_shape
         self.grid_opacity = grid_opacity
         self.grid_color = grid_color
+
+        self.polaroid_coordinates = polaroid_coordinates
 
         #### Axis Manipulate 
         self.y_up_offset = y_up_offset
@@ -114,7 +120,11 @@ class ALL_PLOT:
     def basic_setup(self, **kwargs):  # kwargs may override figsize with a per-plot figure size.
         # Create the Matplotlib figure and axes, optionally overriding the default size.
         figsize = kwargs.get('figsize', self.figsize)
-        self.fig, self.ax = plt.subplots(figsize=figsize or self.figsize)
+        if self.subplot_kw:
+            self.fig, self.ax = plt.subplots(figsize=figsize or self.figsize, subplot_kw=self.subplot_kw)
+        else:
+            self.fig, self.ax = plt.subplots(figsize=figsize or self.figsize)
+        
         return self.fig, self.ax
 
     def fix_colors(self, **kwargs):  # kwargs may provide colors and artificial_darkening overrides.
@@ -137,6 +147,7 @@ class ALL_PLOT:
             for color in colors
         ]
 
+    ############### Plot Styling 
     def style_grid(
         self,
         grid_shape: Literal["both", "xy", "x", "y"],  # Choose which axes receive grid lines.
@@ -155,32 +166,43 @@ class ALL_PLOT:
             grid_shape = 'both'
             grid_opacity = 0 
 
-        
         self.ax.grid(axis=grid_shape, color=grid_color, lw=1.2, alpha=grid_opacity, zorder=1)
-        
-        # Remove all spines but the one in the bottom
-        self.ax.spines["right"].set_visible(False)
-        self.ax.spines["top"].set_visible(False)
-        if switch_off_yaxis:
-            self.ax.spines["left"].set_visible(False)
+        if self.polaroid_coordinates:
+            # Remove X axis / Outer Circle
+            if switch_off_xaxis:
+                self.ax.spines["polar"].set_visible(False) 
+            else:
+                self.ax.spines["polar"].set_linewidth(
+                    kwargs.get("x_axis_width", self.x_axis_width)
+                )
+                self.ax.spines["polar"].set_zorder(50)
+            
+            if grid_shape == 'y':
+                self.ax.grid(axis='x', visible=False)
+            elif grid_shape == 'x':
+                self.ax.grid(axis='y', visible=False)
         else:
-            self.ax.spines["left"].set_linewidth(
-                kwargs.get("y_axis_width", self.y_axis_width)
-            )
-        self.ax.spines["left"].set_zorder(50)
+            # Remove all spines but the one in the bottom
+            self.ax.spines["right"].set_visible(False)
+            self.ax.spines["top"].set_visible(False)
+            if switch_off_yaxis:
+                self.ax.spines["left"].set_visible(False)
+            else:
+                self.ax.spines["left"].set_linewidth(
+                    kwargs.get("y_axis_width", self.y_axis_width)
+                )
+            self.ax.spines["left"].set_zorder(50)
 
-        # Customize bottom spine
-        if switch_off_xaxis:
-            self.ax.spines["bottom"].set_visible(False)
-        else:
-            self.ax.spines["bottom"].set_lw(
-                kwargs.get("x_axis_width", self.x_axis_width)
-            )
-            self.ax.spines["bottom"].set_capstyle("butt")
-        self.ax.spines["bottom"].set_zorder(50)
-        
-        
-
+            # Customize bottom spine
+            if switch_off_xaxis:
+                self.ax.spines["bottom"].set_visible(False)
+            else:
+                self.ax.spines["bottom"].set_lw(
+                    kwargs.get("x_axis_width", self.x_axis_width)
+                )
+                self.ax.spines["bottom"].set_capstyle("butt")
+            self.ax.spines["bottom"].set_zorder(50)
+            
     def style_axis(self,
         Y_range=None, Y_labels=None,  # Set y-axis tick positions and labels.
         X_range=None, X_labels=None,  # Set x-axis tick positions and labels.
@@ -191,7 +213,7 @@ class ALL_PLOT:
         # Apply tick values, labels, fonts, rotations, and optional label offsets.
         if kwargs.get('y_ticks_allowed', self.y_ticks_allowed):
             self.ax.yaxis.set_ticks( Y_range )
-            self.ax.yaxis.set_ticklabels(Y_labels)
+            self.ax.yaxis.set_ticklabels(Y_labels, alpha=kwargs.get("Y_label_opacity", self.Y_label_opacity))
             self.ax.yaxis.set_tick_params(
                 length=6,
                 width=1.2,
@@ -203,7 +225,7 @@ class ALL_PLOT:
 
         if kwargs.get('x_ticks_allowed', self.x_ticks_allowed):
             self.ax.xaxis.set_ticks(X_range)
-            self.ax.xaxis.set_ticklabels(X_labels)
+            self.ax.xaxis.set_ticklabels(X_labels, alpha=kwargs.get("X_label_opacity", self.X_label_opacity))
             self.ax.xaxis.set_tick_params(
                 length=6,
                 width=1.2,
@@ -223,32 +245,42 @@ class ALL_PLOT:
         if x_axis_label_dist_x or x_axis_label_dist_y:
             for i, x_label_obj in enumerate(self.ax.get_xticklabels()):
                 x_label = x_label_obj.get_text()
-                if isinstance(x_axis_label_dist_x, int):
+                if isinstance(x_axis_label_dist_x, int) or isinstance(x_axis_label_dist_x, float):
                     x_label_pos_x = x_axis_label_dist_x
                 elif isinstance(x_axis_label_dist_x, dict):
                     x_label_pos_x = x_axis_label_dist_x[x_label]
 
-                if isinstance(x_axis_label_dist_y, int):
+                if isinstance(x_axis_label_dist_y, int) or isinstance(x_axis_label_dist_y, float):
                     x_label_pos_y = x_axis_label_dist_y
                 elif isinstance(x_axis_label_dist_y, dict):
                     x_label_pos_y = x_axis_label_dist_y[x_label]
 
-                offset = transforms.ScaledTranslation( x_label_pos_x, x_label_pos_y, self.ax.figure.dpi_scale_trans)
+                if self.polaroid_coordinates:
+                    # x_label_pos_x -> angular shift (degrees, along the theta direction)
+                    # x_label_pos_y -> radial shift (inches, positive = away from center)
+                    fig = self.ax.figure
+                    if i == 0:
+                        fig.canvas.draw()  # make sure tick-label padding/positions are final
+                    offset = compute_radial_offset(fig=fig, ax=self.ax, 
+                    label_obj=x_label_obj, label_pos_x=x_label_pos_x, label_pos_y=x_label_pos_y)
+                else:
+                    offset = transforms.ScaledTranslation( x_label_pos_x, x_label_pos_y, self.ax.figure.dpi_scale_trans)
+                
                 x_label_obj.set_transform(x_label_obj.get_transform() + offset)
 
         ###### distatnce of y labels from y axis 
         if y_axis_label_dist_x or y_axis_label_dist_y:
             for i, y_label_obj in enumerate(self.ax.get_yticklabels()):
                 y_label = y_label_obj.get_text()
-                if isinstance(y_axis_label_dist_x, int):
+                if isinstance(y_axis_label_dist_x, int) or isinstance(y_axis_label_dist_x, float):
                     y_label_pos_x = y_axis_label_dist_x
                 elif isinstance(y_axis_label_dist_x, dict):
                     y_label_pos_x = y_axis_label_dist_x[y_label]
 
-                if isinstance(y_axis_label_dist_y, int):
+                if isinstance(y_axis_label_dist_y, int) or isinstance(y_axis_label_dist_y, float):
                     y_label_pos_y = y_axis_label_dist_y
                 elif isinstance(y_axis_label_dist_y, dict):
-                    y_label_pos_y = y_axis_label_dist_y[x_label]
+                    y_label_pos_y = y_axis_label_dist_y[y_label]
 
                 offset = transforms.ScaledTranslation( y_label_pos_x, y_label_pos_y, self.ax.figure.dpi_scale_trans)
                 y_label_obj.set_transform(y_label_obj.get_transform() + offset)
@@ -257,7 +289,7 @@ class ALL_PLOT:
         # for i, (label_pos, label) in enumerate(zip(Y_range, Y_range_label)):
         #     ax.text( x_min - x_padding + x_padding_factor, label_pos + PAD, str(label),  ha="right", va="baseline", fontsize=Y_label_fontsize, )
 
-    ##### Sets the limit of plot and position of axis     
+    # Sets the limit of plot and position of axis     
     def limit_axis(
         self,
         Y_range,  # Tick range used to determine the y-axis bounds.
@@ -274,13 +306,12 @@ class ALL_PLOT:
             y_min - kwargs.get("x_axis_pos_offset", self.x_axis_pos_offset),
             y_max + kwargs.get("y_axis_end_limit_offset", self.y_axis_end_limit_offset), 
         )
-        
-        
-        self.ax.set_xlim(
-            x_min - kwargs.get("y_axis_pos_offset", self.y_axis_pos_offset),
-            x_max + kwargs.get("x_axis_end_limit_offset", self.x_axis_end_limit_offset), 
-        )
-        
+        if not self.polaroid_coordinates:
+            self.ax.set_xlim(
+                x_min - kwargs.get("y_axis_pos_offset", self.y_axis_pos_offset),
+                x_max + kwargs.get("x_axis_end_limit_offset", self.x_axis_end_limit_offset), 
+            )
+            
         return 
         
     def stylize(self,
@@ -325,22 +356,24 @@ class ALL_PLOT:
             ),
             **kwargs
         )
-
+        
         self.style_axis(
             Y_range=Y_range, Y_labels=Y_labels,
             X_range=X_range, X_labels=X_labels,
             **kwargs
         )
 
-        # plt.savefig("test.png", dpi=300)
+        plt.savefig("test.png", dpi=300)
         self.limit_axis(
             Y_range=Y_range, X_range=X_range,
             Y_values=Y_values, X_values=X_values,
             **kwargs
         )
         return 
-        
-        
+    ###############
+
+
+    ############### Plot Congig related     
     def update(self, vals : dict):  # vals maps existing instance attribute names to new values.
         # key = 'switch_off_yaxis'
         # self.__dict__[key]
@@ -369,10 +402,15 @@ class ALL_PLOT:
                 self.kwargs[key] = self.storage.pop(key)
             else:
                 self.kwargs.pop(key, None)
-        
     
+    def update_plot_kwargs(self, Add_parms, plot_kwargs):
+        for k,v in Add_parms.items():
+            # if plot_kwargs.get(k, None) is None:
+            plot_kwargs[k] = v
+        return plot_kwargs
+    ###############
 
-    ##### ALL Plots 
+    ############### ALL Plots 
     def line_plot(self, **kwargs):  # kwargs are forwarded to line_plot from line.py.
         # Forward line-plot options to the line plotting implementation.
         from line import line_plot
@@ -414,14 +452,17 @@ class ALL_PLOT:
             plot_kwargs
         return word_cloud_plt(**plot_kwargs)
 
+    def radar_plot(self, **kwargs):
+        from misc_plot import radar_spider_plot
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        if 'switch_off_yaxis' not in plot_kwargs:
+            plot_kwargs['switch_off_yaxis'] = self.switch_off_yaxis
+        if 'y_axis_width' not in plot_kwargs:
+            plot_kwargs['y_axis_width'] = self.y_axis_width
+        return radar_spider_plot(**plot_kwargs)
+    ###############    
+
         
-    def update_plot_kwargs(self, Add_parms, plot_kwargs):
-        for k,v in Add_parms.items():
-            # if plot_kwargs.get(k, None) is None:
-            plot_kwargs[k] = v
-        return plot_kwargs
-
-
 
     def plot(
         self,
@@ -442,13 +483,12 @@ class ALL_PLOT:
             )
 
         plot_kwargs = self.update_plot_kwargs(Add_parms, plot_kwargs)
-        
+
         self.stylize(Y_values=Y_vals, X_values=X_vals, **plot_kwargs)
         self.add_legends(**plot_kwargs)
         self.save_plot(**plot_kwargs)
 
         self.restore_params()
-
 
     def save_plot(
         self,
@@ -481,16 +521,7 @@ class ALL_PLOT:
     
     
     
-    # def radar_spider_plot(self, *args, **kwargs):
-    #     from misc_plot import radar_spider_plot
-
-    #     return self._invoke_plot(radar_spider_plot, *args, **kwargs)
-
-    # def box_plt(self, *args, **kwargs):
-    #     from misc_plot import box_plt
-
-    #     return self._invoke_plot(box_plt, *args, **kwargs)
-
+    
     # def network_bubble(self, *args, **kwargs):
     #     from misc_plot import network_bubble
 

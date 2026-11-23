@@ -1,7 +1,7 @@
 import matplotlib.colors as mc
 import colorsys
 from matplotlib.colors import LinearSegmentedColormap
-
+import matplotlib.transforms as transforms
 import colorsys
 import matplotlib.pyplot as plt
 import numpy as np 
@@ -77,3 +77,23 @@ def create_color_gradient(colors, n_bins=100):
     colors_template = LinearSegmentedColormap.from_list('custom_gradient', colors, N=n_bins)
     return colors_template
 
+
+def compute_radial_offset(fig, ax, label_obj, label_pos_x, label_pos_y):
+    to_inch = fig.dpi_scale_trans.inverted()
+    # label anchor and polar center, both in inches
+    anchor = to_inch.transform(
+        label_obj.get_transform().transform(label_obj.get_position())
+    )
+    center = to_inch.transform(ax.transAxes.transform((0.5, 0.5)))
+
+    vec = anchor - center
+    radius = np.hypot(*vec)
+    phi = np.arctan2(vec[1], vec[0])  # on-screen angle of the label
+                    
+    new_phi = phi + np.deg2rad(label_pos_x) * ax.get_theta_direction()
+    new_radius = radius + label_pos_y
+    new_anchor = center + new_radius * np.array([np.cos(new_phi), np.sin(new_phi)])
+
+    dx, dy = new_anchor - anchor
+    offset = transforms.ScaledTranslation(dx, dy, fig.dpi_scale_trans)
+    return offset                 

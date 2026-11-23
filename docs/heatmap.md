@@ -1,115 +1,105 @@
 # Heatmaps
 
-These examples follow [`test_heatmap.py`](../test_heatmap.py). The test calls
-[`ALL_PLOT.plot`](../ALL_PLOTS.py) with `plt_type="heatmap"` to draw annotated
-heatmaps from a pandas DataFrame. DataFrame rows become heatmap rows and
-DataFrame columns become heatmap columns.
+`plt_type="heatmap"` draws a colored grid from a pandas DataFrame, with
+optional cell values, a colorbar, and hidden cells. Every example below comes
+from [`test_heatmap.py`](../test_heatmap.py). For options shared by all plots,
+see [basics](basics.md).
 
-## Setup
+Run the examples with:
 
-The test configures shared styling once, then overrides settings for specific
-plots:
+```bash
+python test_heatmap.py
+```
+
+## Data format
+
+Pass a DataFrame as `df`. Its **rows** become heatmap rows, labelled with the
+index, and its **columns** become heatmap columns, labelled with the column
+names. The first row is drawn at the bottom. `NaN` cells are left blank.
+
+The tick positions and labels come from `df`, so `X_range`, `X_labels`,
+`Y_range` and `Y_labels` are ignored. The axis-limit offsets and the normal
+plot grid are also set by the heatmap. Use the heatmap's own grid options below
+instead.
+
+## Setup used by the examples
 
 ```python
 from ALL_PLOTS import ALL_PLOT
-from colors_set import DISTINCT_2_1, DISTINCT_2_7, GRADIENT_GREEN_6
+from colors_set import *
 import numpy as np
 import pandas as pd
 
 PLOT_FN = ALL_PLOT(
     figsize=(6, 4),
-    X_label_fontsize=8,
-    X_label_rotate=45,
-    Y_label_rotate=0,
-    Y_label_fontsize=8,
-    annot=True,
-    annot_decimal_places=2,
-    annot_font_size=9,
-    switch_off_yaxis=True,
-    switch_off_xaxis=True,
-    colors=DISTINCT_2_7,
+    X_label_fontsize=8, X_label_rotate=45,
+    Y_label_fontsize=8, Y_label_rotate=0,
+    annot=True, annot_decimal_places=2, annot_font_size=9,
+    switch_off_yaxis=True, switch_off_xaxis=True,
+    colors=DISTINCT_2_7,          # dark blue -> light blue
     artificial_darkening=1,
-    grid_opacity=1,
-    grid_color="white",
-    grid_widths=0.2,
-    grid_shape="xy",
+    grid_shape="xy", grid_color="white", grid_opacity=1, grid_widths=0.2,
     pad_inches=0.06,
 )
-```
 
-| Setup parameter | What it does |
-| --- | --- |
-| `figsize=(6, 4)` | Sets the figure size in inches. A plot call can override it. |
-| `X_label_fontsize=8`, `Y_label_fontsize=8` | Sets the x- and y-axis tick-label sizes. |
-| `X_label_rotate=45`, `Y_label_rotate=0` | Rotates x-axis labels 45 degrees and leaves y-axis labels horizontal. |
-| `annot=True` | Writes each visible cell's value in the cell. |
-| `annot_decimal_places=2` | Formats cell values to two decimal places. |
-| `annot_font_size=9` | Sets the annotation font size; individual plots can override it. |
-| `switch_off_yaxis=True`, `switch_off_xaxis=True` | Hides the left and bottom axis spines without hiding tick labels. |
-| `colors=DISTINCT_2_7` | Sets the default blue-to-light-blue heatmap palette. |
-| `artificial_darkening=1` | Multiplies palette lightness by 1 (no change); values below 1 darken the palette. |
-| `grid_shape="xy"` | Draws both directions of cell grid lines; `"both"` is equivalent. |
-| `grid_opacity=1`, `grid_color="white"`, `grid_widths=0.2` | Sets fully opaque, white grid lines that are 0.2 points wide. |
-| `pad_inches=0.06` | Sets padding around the tightly cropped saved image in inches. |
-
-## Data
-
-The DataFrame contains six noise conditions and twelve distortion measurements
-per condition. `Noise` becomes the row index, so its values label the y-axis;
-the remaining column names label the x-axis:
-
-```python
 data = [
-    ["OG", 0.28055, 0.31158, 0.29258, 0.26106, 0.24943, 0.28391, 0.30787, 0.29770, 0.24134, 0.24697, 0.18378, 0.18099],
-    ["Pixel Drop", 0.32030, 0.31650, 0.30429, 0.26057, 0.24561, 0.28561, 0.30278, 0.29277, 0.23024, 0.24792, 0.18063, 0.18516],
-    ["ISO", 0.28526, 0.33376, 0.30581, 0.26062, 0.23708, 0.28597, 0.30110, 0.29686, 0.23022, 0.24723, 0.18088, 0.18308],
-    ["Rain", 0.28413, 0.31994, 0.29493, 0.26391, 0.24224, 0.28614, 0.30456, 0.29054, 0.22817, 0.26122, 0.18915, 0.17661],
-    ["Snow", 0.28874, 0.31019, 0.28975, 0.25547, 0.24122, 0.27872, 0.30408, 0.29134, 0.22660, 0.24992, 0.20279, 0.18498],
+    ["OG",          0.28055, 0.31158, 0.29258, 0.26106, 0.24943, 0.28391, 0.30787, 0.29770, 0.24134, 0.24697, 0.18378, 0.18099],
+    ["Pixel Drop",  0.32030, 0.31650, 0.30429, 0.26057, 0.24561, 0.28561, 0.30278, 0.29277, 0.23024, 0.24792, 0.18063, 0.18516],
+    ["ISO",         0.28526, 0.33376, 0.30581, 0.26062, 0.23708, 0.28597, 0.30110, 0.29686, 0.23022, 0.24723, 0.18088, 0.18308],
+    ["Rain",        0.28413, 0.31994, 0.29493, 0.26391, 0.24224, 0.28614, 0.30456, 0.29054, 0.22817, 0.26122, 0.18915, 0.17661],
+    ["Snow",        0.28874, 0.31019, 0.28975, 0.25547, 0.24122, 0.27872, 0.30408, 0.29134, 0.22660, 0.24992, 0.20279, 0.18498],
     ["Atmospheric", 0.28827, 0.31609, 0.29267, 0.26541, 0.25755, 0.30398, 0.30282, 0.29951, 0.24740, 0.24463, 0.18213, 0.20890],
 ]
-
-df = pd.DataFrame(
-    data,
-    columns=[
-        "Noise", "Pixel Drop", "ISO", "Salt", "Low Res", "Focus Blur",
-        "JPG", "Chromatic", "Motion Blur", "Fog", "Rain", "Snow",
-        "Atmospheric",
-    ],
-)
-df.set_index("Noise", inplace=True)
+df = pd.DataFrame(data, columns=[
+    "Noise", "Pixel Drop", "ISO", "Salt", "Low Res", "Focus Blur", "JPG",
+    "Chromatic", "Motion Blur", "Fog", "Rain", "Snow", "Atmospheric",
+])
+df.set_index("Noise", inplace=True)   # "Noise" values label the rows
 ```
+
+## Heatmap options
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `df` | required | DataFrame of numbers. |
+| `colors` | orange, blue, pink | Two or more colors. They are blended into a gradient from the lowest value (first color) to the highest (last color). |
+| `n_bins` | `100` | Number of color steps in the gradient. Small values such as `6` give clearly separated bands. |
+| `vmin`, `vmax` | data min / max | Values mapped to the first and last color. |
+| `center` | `None` | Value mapped to the middle of the gradient. Useful with three colors for data above and below a baseline. |
+| `make_square` | `True` | Make every cell square. `False` lets the figure shape decide. |
+| `mask` | `None` | Boolean array with the same shape as `df`. `True` shows a cell, `False` hides it. |
+| `annot` | `True` | Write each cell's value inside it. |
+| `annot_decimal_places` | `0` | Decimal places in cell values. Also used by colorbar labels. |
+| `annot_font_size` | `5` | Cell-value font size. |
+| `annot_black_threshold` | `0.3` | Cells darker than this (0 = black, 1 = white) get white text; the rest get black text. |
+| `annot_kws` | `None` | Extra Matplotlib text options for cell values, e.g. `{"color": "red", "weight": "bold"}`. A `color` here turns off the automatic black/white choice. |
+| `cbar` | `False` | Show a colorbar on the right. |
+| `cbar_labels` | `None` | Label the colorbar with values. Without it the colorbar has no ticks. |
+| `cbar_count` | `3` | Number of colorbar labels. |
+| `cbar_label_fontsize`, `cbar_label_rotate` | `5`, `0` | Colorbar label size and rotation. |
+| `cbar_kws` | `{"shrink": 0.5, "pad": 0.03}` | Matplotlib colorbar options: `shrink` sets its height relative to the plot, `pad` its distance from the plot. |
+| `grid_shape` | `"both"` | Lines between cells: `"both"`/`"xy"`, `"x"` (between columns), `"y"` (between rows), or `None`. |
+| `grid_color`, `grid_opacity`, `grid_widths` | white, `1`, `2` | Color, opacity and thickness of the lines between cells. |
 
 ## Annotated heatmap
 
-The first call saves `Pictures/Heatmap/test_heatmap.png`. It uses the shared
-palette and settings, keeps the cell aspect ratio flexible, and sets a
-luminance cutoff for annotation text:
-
 ```python
-PLOT_FN.plot(
-    plt_type="heatmap",
-    name="Pictures/Heatmap/test_heatmap",
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap",
     df=df,
     make_square=False,
-    Y_label_rotate=0,
     annot_black_threshold=0.27,
 )
 ```
 
-`make_square=False` lets the figure shape determine cell proportions.
-`annot_black_threshold=0.27` selects white text for cells below this
-luminance and black text otherwise. The default automatic annotation color can
-be overridden with `annot_kws={"color": "..."}`.
-
 <p align="center">
-  <img src="../Pictures/Heatmap/test_heatmap.png" alt="Annotated heatmap with noise conditions and distortion types" width="60%">
+  <img src="../Pictures/Heatmap/test_heatmap.png" alt="Annotated heatmap of noise conditions against distortion types" width="60%">
 </p>
 
-## Change x-axis label positions
+## Move x-axis labels
 
-`x_axis_label_dist_y` moves the x-axis labels independently. Positive values
-move labels higher; the values are offsets in inches. Each label shown on the
-axis must have a matching entry in the dictionary:
+Rotated labels of different lengths can look uneven. `x_axis_label_dist_y`
+moves labels up by the given number of inches. Use one number for all labels,
+or a dict with one entry per column name:
 
 ```python
 x_axis_label_dist_y = {
@@ -121,11 +111,9 @@ x_axis_label_dist_y = {
     "Atmospheric": 0.09,
 }
 
-PLOT_FN.plot(
-    plt_type="heatmap",
-    name="Pictures/Heatmap/test_heatmap_x_axis_pos",
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_x_axis_pos",
     df=df,
-    colors=DISTINCT_2_1,
+    colors=DISTINCT_2_1,              # black -> orange
     make_square=True,
     x_axis_label_dist_y=x_axis_label_dist_y,
     artificial_darkening=0.8,
@@ -133,104 +121,80 @@ PLOT_FN.plot(
 )
 ```
 
-Here, `DISTINCT_2_1` changes the palette to black-to-orange and
-`make_square=True` gives the cells equal width and height. The per-call
-`artificial_darkening=0.8` darkens the palette. The lower annotation cutoff
-means fewer cells use white text than in the first plot.
+`x_axis_label_dist_x`, `y_axis_label_dist_x` and `y_axis_label_dist_y` work the
+same way. See [basics](basics.md#moving-tick-labels).
 
 <p align="center">
-  <img src="../Pictures/Heatmap/test_heatmap_x_axis_pos.png" alt="Heatmap with individually adjusted x-axis label positions" width="60%">
+  <img src="../Pictures/Heatmap/test_heatmap_x_axis_pos.png" alt="Heatmap with x-axis labels moved up individually" width="60%">
 </p>
 
-## Transpose the data and add a colorbar
+## Colorbar
 
-The next example transposes the DataFrame so distortion types become rows and
-noise conditions become columns. `df.iloc[:-3]` drops its final three rows,
-leaving a 9-by-6 table. The call uses a reversed green palette with six color
-levels and adds a labeled colorbar:
+This example transposes the table, so distortions become rows, and keeps the
+first nine rows. A reversed six-step green gradient gives clear color bands:
 
 ```python
 df = df.T
-df = df.iloc[:-3]
+df = df.iloc[:-3]                     # 9 rows x 6 columns
 
-PLOT_FN.plot(
-    plt_type="heatmap",
-    name="Pictures/Heatmap/test_heatmap_color_bar",
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_color_bar",
     df=df,
-    colors=GRADIENT_GREEN_6[::-1],
-    n_bins=6,
+    colors=GRADIENT_GREEN_6[::-1], n_bins=6,
     grid_widths=0.3,
-    annot_font_size=5,
-    artificial_darkening=0.8,
-    cbar=True,
-    cbar_labels=True,
+    annot_font_size=5, artificial_darkening=0.8,
+    cbar=True, cbar_labels=True,
     figsize=(4, 4),
 )
 ```
 
-`cbar=True` displays the colorbar, while `cbar_labels=True` enables its
-automatically generated tick labels. `figsize=(4, 4)` overrides the shared
-figure size, and `annot_font_size=5` makes the annotations smaller to fit the
-denser plot.
-
 <p align="center">
-  <img src="../Pictures/Heatmap/test_heatmap_color_bar.png" alt="Transposed heatmap with a labeled green colorbar" width="55%">
+  <img src="../Pictures/Heatmap/test_heatmap_color_bar.png" alt="Transposed heatmap with a labelled green colorbar" width="50%">
 </p>
 
-## Mask cells
+## Hide cells with a mask
 
-The final example uses a boolean array with the same 9-by-6 shape as `df`.
-In this heatmap API, `True` means show the cell and `False` means hide it:
+`mask` must have the same shape as `df`. `True` shows the cell and `False`
+hides it, including its value. Note that this is the opposite of seaborn's
+`mask`.
 
 ```python
 mask = np.array([
-    [True, True, False, False, True, True],
-    [False, False, True, True, True, True],
-    [False, False, True, False, True, True],
-    [False, False, True, False, True, True],
-    [False, True, True, False, True, True],
-    [True, False, True, True, True, True],
-    [True, False, True, True, True, True],
-    [False, True, False, False, True, True],
-    [False, True, True, True, False, False],
+    [True,  True,  False, False, True,  True ],
+    [False, False, True,  True,  True,  True ],
+    [False, False, True,  False, True,  True ],
+    [False, False, True,  False, True,  True ],
+    [False, True,  True,  False, True,  True ],
+    [True,  False, True,  True,  True,  True ],
+    [True,  False, True,  True,  True,  True ],
+    [False, True,  False, False, True,  True ],
+    [False, True,  True,  True,  False, False],
 ])
 
-PLOT_FN.plot(
-    plt_type="heatmap",
-    name="Pictures/Heatmap/test_heatmap_mask",
-    df=df,
-    mask=mask,
-    colors=GRADIENT_GREEN_6[::-1],
-    n_bins=6,
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/test_heatmap_mask",
+    df=df, mask=mask,
+    colors=GRADIENT_GREEN_6[::-1], n_bins=6,
     grid_widths=0.3,
-    annot_font_size=5,
-    artificial_darkening=0.8,
+    annot_font_size=5, artificial_darkening=0.8,
     figsize=(4, 4),
 )
 ```
 
-The same palette, grid width, annotation size, darkening, and figure size are
-used as in the colorbar example. Cells excluded by the mask are left blank and
-have no annotation.
-
 <p align="center">
-  <img src="../Pictures/Heatmap/test_heatmap_mask.png" alt="Heatmap with selected cells hidden by a boolean mask" width="55%">
+  <img src="../Pictures/Heatmap/test_heatmap_mask.png" alt="Heatmap with selected cells hidden by a mask" width="50%">
 </p>
 
-## Other heatmap options
+## Common changes
 
-| Parameter | Effect |
-| --- | --- |
-| `annot=False` | Hides cell-value annotations. |
-| `annot_decimal_places` | Sets the number of decimal places shown in annotations. |
-| `annot_kws` | Passes Matplotlib text options to annotations; `color` overrides automatic contrast. |
-| `vmin`, `vmax` | Set the lower and upper values mapped to the palette. |
-| `center` | Centers the color normalization on a chosen value. |
-| `cbar_kws` | Passes options such as size and spacing to the colorbar. |
-| `cbar_count`, `cbar_label_fontsize`, `cbar_label_rotate` | Configure the count, font size, and rotation of colorbar tick labels. |
-| `grid_shape` | Uses `"both"`/`"xy"` for both grid directions, `"x"` for vertical, `"y"` for horizontal, or `None` for no grid. |
-| `grid_color`, `grid_opacity`, `grid_widths` | Style the cell grid. |
-| `make_square` | Sets equal cell width and height when `True`. |
+```python
+# Diverging colors centred on a baseline value
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/my_diverging",
+    df=df, colors=[BLUE, "white", RED], center=0.25)
 
-Non-finite values such as `NaN` are omitted automatically. `mask` must match
-the data shape; `True` cells are shown and `False` cells are omitted.
+# Fixed color range, no cell values, no lines between cells
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/my_plain",
+    df=df, vmin=0.15, vmax=0.35, annot=False, grid_shape=None)
+
+# Bold red cell values
+PLOT_FN.plot(plt_type="heatmap", name="Pictures/Heatmap/my_bold",
+    df=df, annot_kws={"color": "red", "weight": "bold"})
+```

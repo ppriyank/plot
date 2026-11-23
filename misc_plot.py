@@ -1,31 +1,17 @@
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import torch  
+from math import pi
+
 from wordcloud import WordCloud
 from colors_set import * 
 
-from plot_utils import range_calc, create_color_gradient
+from plot_utils import create_color_gradient
 
 
-# from colors import LinearSegmentedColormap, sns, ALONE_COLORS, lighten_color, BLUE, ORANGE, generate_color_gradients2
-# from math import pi
-# from plot_utils import range_calc, binning, contrast_ratio
-# import numpy as np 
-
-# import numpy as np
-# from matplotlib.colors import TwoSlopeNorm
-# from numbers import Integral
-# from typing import Literal
-# from plot_add import *
-
-# import matplotlib.pyplot as plt
-
-# from plot_add import * 
-
-
-  
-
-
+##############################################################################
+######################## WORD CLOUD 
 def word_cloud_plt(
     ax,
     word_cloud_shape = (2000, 3500),
@@ -91,96 +77,94 @@ def word_cloud_plt(
     return [0, fig_W * scale_factor], [0, fig_H * scale_factor], {}
 
 
-    
 
+##############################################################################
+######################## RADAR PLOT 
+def overide_params(X_labels, Angles, Y_range, Y_values):
+    if X_labels:
+        X_labels += X_labels[:1]
+    else:
+        X_labels = Angles
 
+    if Y_range:
+        x_axis_pos_offset = min(Y_range)
+    else:
+        x_axis_pos_offset = min(Y_values)
 
+    return {
+        'X_range': Angles, 
+        'X_labels': X_labels,
+        'x_axis_pos_offset': x_axis_pos_offset, 
+        }
 
-def radar_spider_plot(X, curve_points, name=None, curve_names =[], figsize=(6,6), 
-    artificial_darkening=None, ALPHAs=[], COLORS=ALONE_COLORS, decimal_places=1, alpha=0.1, lw=1, 
-    x_axis_allowed=True, X_label_fontsize=10, X_pad=10, outer_circle= True,
-    Y_range=None, Y_range_label=None, y_points=3, y_down_offset= 1, y_up_offset=0, y_axis_angle=0, y_axis_allowed = True, Y_font_color="grey", y_font_size=20, y_font_alpha=0.6,
-    radar_labels=None, radar_label_formatter=lambda x: f"{x:.1f}", radar_labels_font_size=25, radar_label_offset=10,
-    grid_opacity_y=1, grid_opacity_x=1, grid_color_y = "#A8BAC4", grid_color_x = "#A8BAC4",
-    y_padding = 0, grid_above=False):
-    
-    if type(X) != list :
-       X = [list(e) for e in X] 
-    if curve_names == []:
-        curve_names = ["random" for e in X]
+# X - axis is angular distance rotating on fixed radius 
+# Y - axis Radial Distance from center
+def radar_spider_plot(ax,
+    Curves=None, 
+    Alphas=[], 
         
-    plt.clf()
-    fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection': 'polar'})
+    colors = [ORANGE, BLUE, PINK],
+
+    curve_line_width=1,
+    curve_line_opacity=1,
+
+    switch_off_yaxis=False, ## Radar plot has to plot its own y-axis
+    Curves_names = None, ## X axis 
+    X_labels = None, 
+    Y_range = None, 
+    Y_labels = None, 
     
-    if artificial_darkening:
-        COLORS = [lighten_color(e, amount=artificial_darkening)  for e in COLORS]
+    y_axis_angle=10, 
+    y_axis_width=1,
 
-
-    categories = curve_points
-    no_of_categories = len(curve_points)
-    angles = [n / float(no_of_categories) * 2 * pi for n in range(no_of_categories)]
-    angles += angles[:1]
-
-    if ALPHAs == []:
-        ALPHAs = [1 for i in X]
+    **args,
+    ):
     
-    Y_pos =[]
-    for i,x in enumerate(X):
-        Y=x
-        Y_pos += Y
-        Y += Y[:1]
-        print(i, len(angles), len(Y), len(curve_names), len(ALPHAs))
-        # print(i, len(COLORS), len(curve_names), COLORS[i], curve_names[i])
-        ax.plot(angles, Y, color=COLORS[i], linewidth=lw, linestyle='solid', label=curve_names[i], alpha=ALPHAs[i], zorder=14)
-        ax.fill(angles, Y, color= COLORS[i], alpha=alpha, zorder=14)
-        if radar_labels == True:
-            for ang, val in zip(angles[:-1], Y[:-1]):
-                ax.text( ang, val + radar_label_offset, radar_label_formatter(val), ha="center", va="baseline", fontsize=radar_labels_font_size, color=COLORS[i])
-                
-    if x_axis_allowed:
-        ax.xaxis.set_ticks(angles[:-1])
-        ax.xaxis.set_ticklabels(curve_points, fontsize=X_label_fontsize)
-        ax.xaxis.set_tick_params(pad=X_pad)
-        ax.xaxis.set_zorder(12)
+    if isinstance(Curves[0], torch.Tensor):
+        Curves= [e.tolist() for e in Curves]
     
-    if not outer_circle:
-        ax.spines['polar'].set_visible(False)
-
-    if Y_range is None :
-        Y_range, Y_range_label = range_calc(Y_pos, y_points, y_up_off = y_up_offset , y_down_off=y_down_offset, decimal_places=decimal_places)
-        plt.ylim(min(Y_range),  max(Y_range))
-    else:
-        plt.ylim(min(Y_pos) - y_down_offset,  max(Y_pos) + y_up_offset)
-
-    # ax.set_rlabel_position(y_axis_angle)
-    ax.yaxis.set_ticks(Y_range)
-    ax.yaxis.set_zorder(12)
-    # if y_axis_allowed:
-        # ax.yaxis.set_ticklabels(Y_range_label, fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
-    # else:
-    ax.yaxis.set_ticklabels([], fontsize=y_font_size , color=Y_font_color, alpha=y_font_alpha, )
-    
-    if grid_above:
-        grid_z_order = 13
-    else:
-        grid_z_order = 12
-
-    for r, label in zip(Y_range, Y_range_label):
-        ax.text(y_axis_angle * pi / 180 , r + y_padding, label,
-            fontsize=y_font_size, color=Y_font_color, alpha=y_font_alpha, ha='center', va='center', zorder=grid_z_order + 1)
-    
+    N_of_X = len(Curves[0])
+    Angles = [n / float(N_of_X) * 2 * pi for n in range(N_of_X)]
+    Angles += Angles[:1]
     
 
-    ax.grid(axis = "y", color=grid_color_y, lw=1.2, alpha=grid_opacity_y, zorder=grid_z_order )
-    ax.grid(axis = "x", color=grid_color_x, lw=1.2, alpha=grid_opacity_x, zorder=grid_z_order )
+    if isinstance(Alphas, int) or isinstance(Alphas, float):
+        Alphas = [Alphas for i in Curves]
 
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
+    X_values = Angles
+    Y_values = [0, ]
+
+    ####### Plot Curve 
+    for i, curve in enumerate(Curves):
+        Y_values += curve
+        curve += curve[:1]
+        # print(i, len(Angles), len(curve))
+
+        ax.plot(Angles, curve, color=colors[i], linewidth=curve_line_width, linestyle='solid', label=Curves_names[i], alpha=curve_line_opacity, zorder=12)
+        ax.fill(Angles, curve, color=colors[i], alpha=Alphas[i], zorder=14)
     
 
-
-
-
+    ####### Plot Y-Axis
+    ax.set_rlabel_position(y_axis_angle)
+    if not switch_off_yaxis:
+        label_angle_rad = np.deg2rad(y_axis_angle - 5)
+        ax.plot(
+            [label_angle_rad, label_angle_rad],
+            [0, max(Y_range)],
+            color="black",
+            alpha=0.2,
+            linewidth=y_axis_width,
+            zorder=1,
+        )
+     
+    # plt.savefig("test_radar.png", dpi=300)
+    params = overide_params(X_labels.copy() if X_labels else None, Angles, Y_range, Y_values)
+    # print(len(params['X_range']), len(params['X_labels']))
+    return X_values, Y_values, params
+    
+    
+##############################################################################
+######################## Network PLOT 
 # https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
 # column_to_be_colored  should be between 0 to 1 
 def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
@@ -349,6 +333,11 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
 
     
 
+
+
+
+
+
 def _scale_sankey_flow_width(collection, width):
     for path in collection.get_paths():
         vertices = path.vertices.copy()
@@ -467,3 +456,19 @@ def Sankey_web(df, figsize=None,
 
     
              
+
+
+
+# from plot_utils import range_calc, binning, contrast_ratio
+# import numpy as np 
+
+# import numpy as np
+# from matplotlib.colors import TwoSlopeNorm
+# from numbers import Integral
+# from typing import Literal
+# from plot_add import *
+
+# import matplotlib.pyplot as plt
+
+# from plot_add import * 
+
