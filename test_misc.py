@@ -4,14 +4,13 @@ from colors_set import *
 import torch
 import pandas as pd 
 from math import log 
-
+import random 
 
 
 
 ############################################################################################################
 #################################### WORD CLOUD 
 # Nodes, Values (colors), Size
-
 PLOT_FN = ALL_PLOT(
     figsize=(6, 4), 
     artificial_darkening=1,
@@ -62,7 +61,6 @@ PLOT_FN = ALL_PLOT(
 )
 
 torch.manual_seed(100)
-torch.cuda.manual_seed_all(100)
 A = torch.rand(10) * 100 # "Curve A"
 B = torch.rand(10) * 100 # "Curve B"
 C = torch.rand(10) * 100 # "Curve C"
@@ -87,14 +85,17 @@ Radar_label_dist = {
     'Stanford-Cars': 0.1, 
 }
 
+# PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar",
+#     Curves=[A,B,C],  Alphas = [0.5,0.5,.5], 
+#     Curves_names = curve_names, 
+#     Y_range=Y_range, Y_labels= Y_labels, 
+#     X_labels= Radar_label, 
+#     x_axis_label_dist_y = Radar_label_dist,
+# )
 
-PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar",
-    Curves=[A,B,C],  Alphas = [0.5,0.5,.5], 
-    Curves_names = curve_names, 
-    Y_range=Y_range, Y_labels= Y_labels, 
-    X_labels= Radar_label, 
-    x_axis_label_dist_y = Radar_label_dist,
-)
+torch.manual_seed(random.randint(1, 2e3))
+A = torch.rand(10) * 100 # "Curve A"
+B = torch.rand(10) * 100 # "Curve B"
 
 Radar_label_dist = {
     'ImageNet': 0, 
@@ -108,19 +109,103 @@ Radar_label_dist = {
     'SUN397': -0.2, 
     'Stanford-Cars': 0, 
 }
+# PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar_derive_ylabels",
+#     Curves=[A,B],  Alphas = 0.6, 
+#     curve_line_opacity=1,
+#     X_labels= Radar_label, Curves_names = curve_names, x_axis_label_dist_y = Radar_label_dist, 
+#     colors=DISTINCT_2_5,
+#     y_points=3, Y_label_opacity = 0.4,
+#     grid_shape='y', grid_opacity = 0.5, 
+#     decimal_places=1,
+#     figsize=(5, 8), 
+# )
 
-PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar_derive_ylabels",
-    Curves=[A,B,C],  Alphas = 0.4, 
-    X_labels= Radar_label, Curves_names = curve_names, x_axis_label_dist_y = Radar_label_dist, 
-    colors=DISTINCT_3_3,
-    y_points=3, Y_label_opacity=0.4,
-    grid_shape='y', grid_opacity=0.5, 
-    decimal_places=1,
-    curve_line_opacity=0.1,
+
+
+############################################################################################################
+#################################### Network - Web / BUBBLE PLOT 
+PLOT_FN = ALL_PLOT(
+    figsize=(7, 7),  
+    colors=DISTINCT_2_1, 
+    artificial_darkening=0.8,
+    node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
+    node_edge_width=0.2,
+    node_labels=True, 
+    node_labels_font_size=8,
+    node_edge_color="black",
+    connect_edge_width=0.5, 
+    connect_edge_alpha=0.5, 
+    use_bunding=True,
+    edges_with_cluster=True,     
+    
+)
+
+### Nodes
+N_NODES = 30 
+Nodes = torch.arange(start=0, end=N_NODES, step=1, )
+
+### Sizes Size of Node 
+Sizes = torch.rand(N_NODES) * 1000 # nodes 
+
+### COLOR decider (between 0-1)
+Scores = torch.rand(N_NODES)  # nodes 
+
+### Binning used to determin grouping 
+Values = torch.rand(N_NODES)  
+
+
+# PLOT_FN.plot(plt_type="network_bubble", name="Pictures/Misc/test_net_bubble",
+#     Nodes=Nodes, Sizes=Sizes, Scores=Scores,     
+#     Values=Values, 
+#     Labels = None, ## invokes binning of values 
+#     n_cluster = 7,
+#     node_size_range=(3, 6),
+# )
+
+
+############################################################################################################
+#################################### Sankey PLOT 
+PLOT_FN = ALL_PLOT(
+    figsize=(7, 7),  
+    # colors=DISTINCT_2_1, 
+    # artificial_darkening=0.8,
+    # node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
+    # node_edge_width=0.2,
+    # node_labels=True, 
+    # node_labels_font_size=8,
+    # node_edge_color="black",
+    # connect_edge_width=0.5, 
+    # connect_edge_alpha=0.5, 
+    # use_bunding=True,
+    # edges_with_cluster=True,     
+)
+
+url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
+df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
+
+Color_Left = [lighten_color( DISTINCT_2_8[1], amount= 0.5 + 0.3 * i ) for i,k in enumerate(df.true.unique())]
+random.shuffle(Color_Left)
+Color_Right = [lighten_color( DISTINCT_2_8[0], amount= 0.5 + 0.2 * i ) for i,k in enumerate(df.predicted.unique())]
+random.shuffle(Color_Right)
+
+left_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k, color in zip(df.true.unique(), Color_Left)}
+right_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k,color in zip(df.predicted.unique(), Color_Right)}
+
+import pdb
+pdb.set_trace()
+PLOT_FN.plot(plt_type="sankey", name="Pictures/Misc/test_sankey",
+    
 )
 
 
-
+# Sankey_web(df, left_axis='true', right_axis='predicted', gradient=True, 
+# left_axis_colors=left_axis_colors, right_axis_colors=right_axis_colors, edges=True, edge_width=1, edgecolor='white', edge_alpha=0.6, 
+# flow_width=1, 
+# figsize=(5, 5),
+# name=os.path.join('Pictures', "test_sankey"), 
+# )
+    
+    
 
 # cd ~/plot/
 # python test_misc.py
@@ -155,13 +240,6 @@ PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar_derive_ylabels",
 # import os 
 # import random 
 
-# heat_map = False 
-# heat_map2=False 
-# word_cloud = False 
-# radar_plot = False 
-# box_plot = False 
-# bubble_plot = False  
-# sankey_plot=True 
 
 
 
@@ -169,58 +247,5 @@ PLOT_FN.plot(plt_type="radar", name="Pictures/Misc/test_radar_derive_ylabels",
 
 
 
-# ######### BUBBLE PLOT 
-# if bubble_plot:
-#     from math import log 
-#     ### Nodes
-#     class_name = ['lobster', 'jellyfish', 'hand', 'pistol', 'cottontail', 'raccoon', 'motorcycle']
-
-#     ### Sizes (This will be used to bin)
-#     class_sizes = [60, 155, 1515, 346, 46, 64, 330]
-
-#     ### COLOR decider (between 0-1)
-#     class_scores = [0.700000, 0.285235, 0.182759, 0.098592, 0.005739, 0.063559, 0.052960]
-
-#     df = pd.DataFrame({ 'Nodes': class_name, 'Sizes': class_sizes, 'Score': class_scores})
-
-#     # (This will be used to bin or clustered
-#     df['Sizes'] = df['Sizes'].apply(log)
-#     print(df)
-
-
-#     network_bubble(df, column_to_be_binned='Sizes', node_column='Nodes', column_to_be_colored='Score', 
-#         plt_name="bubble_plot", figsize=(20, 20), 
-#         N_CLUSTERS = 3, ## no of clusters
-#         node_size_formula = lambda x: (x ** 1.5) / 2, ## Node size calculator
-#         node_edge_width=0.2, node_labels=True, 
-#         node_labels_font_size=8, ### Node label prop to node size (5 is base size)
-#         N_BINS_COLORS = 100, ### Binning of colors [Score ==0 -> white , Score == 1 --> black]
-#         node_edge_color="black",
-#         edge_width=0.5, edge_alpha=0.5, 
-#     )
-
-
-# if sankey_plot:    
-#     url = "https://raw.githubusercontent.com/anazalea/pySankey/master/pysankey/fruits.txt"
-#     df = pd.read_csv(url, sep=" ", names=["true", "predicted"])
-    
-#     COLORS_LEFT = [lighten_color( DISTINCT_2_8[1], amount= 0.5 + 0.3 * i ) for i,k in enumerate(df.true.unique())]
-#     random.shuffle(COLORS_LEFT)
-#     COLORS_RIGHT = [lighten_color( DISTINCT_2_8[0], amount= 0.5 + 0.2 * i ) for i,k in enumerate(df.predicted.unique())]
-#     random.shuffle(COLORS_RIGHT)
-    
-#     left_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k, color in zip(df.true.unique(), COLORS_LEFT)}
-#     right_axis_colors = {k.split(" ")[-1].replace("(", "").replace(")", ""): color for k,color in zip(df.predicted.unique(), COLORS_RIGHT)}
-
-
-#     Sankey_web(df, left_axis='true', right_axis='predicted', gradient=True, 
-#     left_axis_colors=left_axis_colors, right_axis_colors=right_axis_colors, edges=True, edge_width=1, edgecolor='white', edge_alpha=0.6, 
-#     flow_width=1, 
-#     figsize=(5, 5),
-#     name=os.path.join('Pictures', "test_sankey"), 
-#     )
-    
-    
-
-# # cd ~/plot/
-# # python test_misc.py
+# cd ~/plot/
+# python test_misc.py

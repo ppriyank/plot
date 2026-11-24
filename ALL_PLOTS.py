@@ -21,14 +21,15 @@ class ALL_PLOT:
         # Misc Plots 
         "word_cloud": "word_cloud_plt",
         "radar": "radar_plot",
-        
-        # "network_bubble": "network_bubble",
-        # "sankey": "Sankey_web",
-        # "sankey_web": "Sankey_web",
+        "network_bubble": "network_bubble_plt",
+        "sankey": "Sankey_plt",
     }
-    MISC_PLOTS = set(
-        "word_cloud"
-    )
+    MISC_PLOTS = set([
+        "word_cloud",
+        "radar",
+        "network_bubble",
+        "sankey"
+    ])
 
 
     def __init__(self, figsize=(8, 6),  # Figure width and height in inches.
@@ -363,7 +364,7 @@ class ALL_PLOT:
             **kwargs
         )
 
-        plt.savefig("test.png", dpi=300)
+        # plt.savefig("test.png", dpi=300)
         self.limit_axis(
             Y_range=Y_range, X_range=X_range,
             Y_values=Y_values, X_values=X_values,
@@ -460,6 +461,17 @@ class ALL_PLOT:
         if 'y_axis_width' not in plot_kwargs:
             plot_kwargs['y_axis_width'] = self.y_axis_width
         return radar_spider_plot(**plot_kwargs)
+    
+    def network_bubble_plt(self, **kwargs):
+        from misc_plot import network_bubble_plot
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        return network_bubble_plot(**plot_kwargs)
+    
+    def Sankey_plt(self, **kwargs):
+        from misc_plot import Sankey_plot
+        plot_kwargs = {"ax": self.ax, **kwargs}
+        return Sankey_plot(**plot_kwargs)
+
     ###############    
 
         
@@ -482,7 +494,11 @@ class ALL_PLOT:
                 colors=colors, **plot_kwargs
             )
 
-        plot_kwargs = self.update_plot_kwargs(Add_parms, plot_kwargs)
+        if X_vals == None and Y_vals == None: 
+            plot_kwargs = self.update_plot_kwargs(Add_parms, plot_kwargs)
+            self.restore_params()
+            self.save_plot(**plot_kwargs)
+            return 
 
         self.stylize(Y_values=Y_vals, X_values=X_vals, **plot_kwargs)
         self.add_legends(**plot_kwargs)
@@ -511,23 +527,3 @@ class ALL_PLOT:
         return output_path
 
 
-
-
-
-
-
-
-
-    
-    
-    
-    
-    # def network_bubble(self, *args, **kwargs):
-    #     from misc_plot import network_bubble
-
-    #     return self._invoke_plot(network_bubble, *args, output_name="plt_name", **kwargs)
-
-    # def Sankey_web(self, *args, **kwargs):
-    #     from misc_plot import Sankey_web
-
-    #     return self._invoke_plot(Sankey_web, *args, **kwargs)

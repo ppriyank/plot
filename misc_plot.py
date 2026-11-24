@@ -7,8 +7,13 @@ from math import pi
 from wordcloud import WordCloud
 from colors_set import * 
 
-from plot_utils import create_color_gradient
+from plot_utils import create_color_gradient, contrast_ratio
+import numpy as np
 
+import networkx as nx
+from netgraph import Graph
+import pandas as pd 
+import random 
 
 ##############################################################################
 ######################## WORD CLOUD 
@@ -156,96 +161,149 @@ def radar_spider_plot(ax,
             linewidth=y_axis_width,
             zorder=1,
         )
-     
+    
     # plt.savefig("test_radar.png", dpi=300)
     params = overide_params(X_labels.copy() if X_labels else None, Angles, Y_range, Y_values)
     # print(len(params['X_range']), len(params['X_labels']))
     return X_values, Y_values, params
     
     
+
+    
 ##############################################################################
 ######################## Network PLOT 
 # https://github.com/paulbrodersen/netgraph/blob/master/examples/plot_19_hyperlinks.py
-# column_to_be_colored  should be between 0 to 1 
-def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log', column_to_be_colored=None, different_size_column=None,
-    N_CLUSTERS = 10,  plt_name="test", figsize=(20, 20), COLOR_MAP=None, map_vals_to_colors=True , N_BINS_COLORS = 1000,
-    use_bunding=True, edge_width=0.1,   edge_alpha=0.1, node_edge_width=0.1, node_edge_color='black',
-    node_size_formula=lambda x :x, 
-    node_labels=True, node_labels_font_size=10, node_labels_colors='white', node_alpha=1, 
-    edges_with_cluster = True, color_contrast_ratio_threshold= 4.5, 
-    scale_x = 1, scale_y = 1):
+def bin_histogram(data, n_bins, use_log=None):
+    if not isinstance(data, torch.Tensor):
+        data = torch.tensor(data)
 
-    import networkx as nx
-    from netgraph import Graph
-    import pandas as pd 
+    values = data.detach().cpu().flatten()
+    if not values.is_floating_point():
+        values = values.to(torch.float32)
+    counts, edges = torch.histogram(values, bins=n_bins)
+    cluster_ids = torch.bucketize(data, edges[1:])
+    # for e in cluster_ids.unique():(cluster_ids==e).sum()
+    return cluster_ids
+    
+def network_bubble_plot(ax, 
+    Nodes=None, 
+    Sizes=None, 
+    Scores=None,
+    Values=None,
+    Labels =None, 
+    n_cluster=None, 
+
+    # Alphas=[],     
+    colors = [ORANGE, BLUE, PINK],
+    n_bins=10,
+    
+    node_value_formula=lambda x : x, 
+    node_size_formula=lambda x : x,
+    node_size_range=(1, 6),  # final netgraph node sizes (min, max) after the formula
+
+    use_bunding=True,
+    edges_with_cluster=False, 
+    
+    node_edge_width=0.1,
+    node_edge_color='black',
+    node_alpha=1, 
+    node_labels_font_size=10,
+    node_labels_colors='white',
+    color_contrast_ratio_threshold=4.5,  # WCAG AA; below this labels switch to black
+
+    connect_edge_width=0.1,
+    connect_edge_alpha=0.1, 
+    scale_x = 1, scale_y = 1,
+
+    **args,
+    ):
 
 
-    ##### Range of values 0 --> white and 1 --> black (intermediate blue)
-    if map_vals_to_colors:
-        colors = [(0, "white"), (0.5, "#4169E1"), (1, 'black')]
-        cmap = generate_color_gradients2(N_BINS_COLORS+1, colors=colors)
-        
-        color_bucket_column = column_to_be_colored + "_color_bucket"
-        df[color_bucket_column] = df[column_to_be_colored] * N_BINS_COLORS  // 1
-        df[color_bucket_column] = df[color_bucket_column].astype(int)
-    else:
-        assert False, "custom Color values not yet tasted...."
+    colors = create_color_gradient(colors, n_bins=n_bins)
+    # Convert torch tensors / lists to numpy so dict keys are plain Python
+    # values (0-d torch tensors hash by identity, so they never match the
+    # graph's node ids and netgraph reports node_size as incomplete).
+    def _to_numpy(x):
+        if isinstance(x, torch.Tensor):
+            return x.detach().cpu().numpy()
+        return np.asarray(x)
+
+    Nodes = _to_numpy(Nodes)
+    if isinstance(Sizes, (int, float)):
+        Sizes = [Sizes for i in Nodes]
+    if isinstance(Scores, (int, float)):
+        Scores = [Scores for i in Nodes]
+    Sizes = _to_numpy(Sizes).tolist()
+    Scores = _to_numpy(Scores).tolist()
+    if Values is None:
+        Values = torch.tensor([0 for i in Nodes])
 
 
     ##### Node Size & Colors 
     node_size = {}    
     node_color = {}
-    all_nodes = df[node_column].tolist()
-    for name in all_nodes:
-        if different_size_column:
-            size = df[df[node_column] == name][different_size_column]
-        else:
-            size = df[df[node_column] == name][column_to_be_binned]
-        size = size.item()
-        node_size[name] = node_size_formula(size)
-
-        color_index  = df[df[node_column] == name][color_bucket_column]
-        color_index = color_index.item()
-        node_color[name] = cmap[color_index]
-            
-
+    maxi, mini = max(Scores), min(Scores)
+    N = int( (maxi - mini + 1)  // 1)
+    # netgraph node_size is in 1/100 of axis width (default 3), so rescale the
+    # formula output into node_size_range; otherwise huge raw sizes blow up
+    # both the bubbles and the label font size (raster overflow on draw).
+    raw_sizes = np.array([float(node_size_formula(s)) for s in Sizes])
+    lo, hi = node_size_range
+    span = raw_sizes.max() - raw_sizes.min()
+    if span > 0:
+        scaled_sizes = lo + (raw_sizes - raw_sizes.min()) / span * (hi - lo)
+    else:
+        scaled_sizes = np.full_like(raw_sizes, (lo + hi) / 2)
+    for node, size, score in zip(Nodes.tolist(), scaled_sizes.tolist(), Scores):
+        node_size[node] = size
+        node_color[node] =  mpl.colors.to_hex ( colors ( (score - mini) / N ) )
     
-    ##### Making Clusters of Nodes based on specific column
-    bucket_column = column_to_be_binned + '_bucket'
-    df[ bucket_column ] = df[column_to_be_binned].apply( binning, 
-        **dict(
-            n_bins=N_CLUSTERS,
-            mini= df[column_to_be_binned].min(),
-            maxi=df[column_to_be_binned].max()) 
+    if Labels is None:
+        Labels = bin_histogram(Values, n_cluster, use_log=None)
+    Labels = _to_numpy(Labels)
+
+    ########### beatutification 
+    graph_style = dict(
+        node_color=node_color, 
+        node_edge_width=node_edge_width,     
+        node_edge_color=node_edge_color,
+        node_size = node_size,
+        node_alpha=node_alpha,
+        edge_width=connect_edge_width,        
+        edge_alpha=connect_edge_alpha,        
+        node_labels={n: str(n) for n in Nodes.tolist()},  # netgraph wants bool or dict
+        node_label_fontdict=dict(
+            size=node_labels_font_size, 
+            color=node_labels_colors,
+        ),
+        reduce_edge_crossings=True,   
+        scale=(scale_x, scale_y), 
     )
+    if use_bunding:
+        graph_style['edge_layout'] = 'bundled' # this is where bundling is made possible
     
-    for cluster in range(N_CLUSTERS+1):
-        selected_cluster = df[df[ bucket_column ] == cluster]
-        if len(selected_cluster) > 0:
-            mini = selected_cluster[column_to_be_binned].min()
-            maxi = selected_cluster[column_to_be_binned].max()
-            names = selected_cluster[node_column]
-            print(cluster, mini, maxi, names.tolist()[:10])
-    
-    
+
+
     ##### Connecting points inside the cluster 
     # can also connect points to other clusters
     FROM = []
     TO = []
+    all_nodes = Nodes.tolist()
     node_to_community = dict()
-    all_nodes = df[node_column].tolist()
-    for bucket in range(N_CLUSTERS+1):
-        names = df[df[bucket_column] == bucket][node_column].tolist()
-        print(bucket, names)
+    for bucket in range(n_cluster+1):
+        indices = Labels == bucket
+        names = Nodes[indices].tolist()
+        if names == []:continue 
+        # print(bucket, names)
         if use_bunding:
-            # all_other_buckets = df[df[bucket_column] != bucket][node_column].tolist()
-            buckets= df[bucket_column].unique()
+            all_buckets = [e for e in range(n_cluster) if e != bucket]
             all_other_buckets  = [ ]
-            for e in buckets: 
-                if e != bucket:
-                    # all_other_buckets += df[df[bucket_column] == e].sample(frac=0.25)[node_column].tolist()
-                    all_other_buckets += df[df[bucket_column] == e].sample(n=1)[node_column].tolist()
-             
+            for e in all_buckets: 
+                index = Labels == e
+                nodes = Nodes[index]
+                if len(nodes) == 0: continue  # empty bin -> nothing to sample
+                all_other_buckets += random.sample(nodes.tolist(), k=1)
+        
         for i,name in enumerate(names): 
             node_to_community[name] = bucket 
             if edges_with_cluster:
@@ -259,81 +317,41 @@ def network_bubble(df, column_to_be_binned='Images_log', node_column='Images_log
                 FROM +=  [name] * (len(all_nodes))
                 TO += all_nodes
 
-            
-            
-
     df = pd.DataFrame({ 'from': FROM, 'to':TO})
     G=nx.from_pandas_edgelist(df, 'from', 'to')
 
-    plt.clf()
-    fig, ax = plt.subplots(figsize=figsize)
-    
     # Graph(G)
     # nx.draw(G, with_labels=True)
     # plt.savefig("temp.png", dpi=300)
 
-
-
-    ########### beatutification 
-    graph_style = dict(
-        node_color=node_color, 
-        node_edge_width=node_edge_width,     
-        node_edge_color=node_edge_color,
-        node_size = node_size,
-        node_alpha=node_alpha,
-
-        edge_width=edge_width,        
-        edge_alpha=edge_alpha,
-        
-        node_labels=node_labels,  
-        node_label_fontdict=dict(
-            size=node_labels_font_size, 
-            color=node_labels_colors,
-            # rotation=20,
-        ),
-
-        reduce_edge_crossings=True,   
-        ## size of node (larger number means smaller nodes)
-        scale=(scale_x, scale_y), 
-    )
-
-    if use_bunding:
-        graph_style['edge_layout'] = 'bundled' # this is where bundling is made possible
-    
-    
     graph_plot = Graph(G,
       node_layout='community', node_layout_kwargs=dict(node_to_community=node_to_community),
-      ax=ax,
-      **graph_style
+      ax=ax, **graph_style
     )
 
     ########### Chaning Node fone size and colors
-    for i,e in enumerate(ax._children):
-        if type(e) == mpl.text.Text:
-            node_name = e.get_text()
+    # Use netgraph's node -> Text mapping (label text is a str, dict keys are not)
+    for node_name, text in graph_plot.node_label_artists.items():
+        default_font_size = node_labels_font_size
+        node_size_local = node_size[node_name]
+        text.set_fontsize( node_size_local * default_font_size / 2 )
 
-            default_font_size = node_labels_font_size
-            node_size_local = node_size[node_name]
-            ax._children[i].set_fontsize( node_size_local * default_font_size / 2 )
+        node_color_local = node_color[node_name]
+        default_label_color = node_labels_colors
+        color_contrast_ratio = contrast_ratio(node_color_local, default_label_color)
 
-            node_color_local = node_color[node_name]
-            default_label_color = node_labels_colors
-            color_contrast_ratio = contrast_ratio(node_color_local, default_label_color)
+        if color_contrast_ratio < color_contrast_ratio_threshold :
+            text.set_color('black')
 
-            if color_contrast_ratio < color_contrast_ratio_threshold :
-                ax._children[i].set_color('black')
-            
+    # PLOTS.plot() expects (X_range, Y_range, params) like the other plot fns
+    # return list(ax.get_xlim()), list(ax.get_ylim()), {}
+    return None, None, {}
            
-           
-    
-    plt.tight_layout()
-    plt.savefig(f"{plt_name}.png", dpi=300)
-    plt.clf()
 
 
     
-
-
+##############################################################################
+######################## Sankey PLOT 
 
 
 
@@ -363,7 +381,7 @@ def _scale_sankey_flow_width(collection, width):
     collection.stale = True
 
 
-def Sankey_web(df, figsize=None, 
+def Sankey_plot(df, figsize=None, 
     name="test", 
     left_axis=None, right_axis=None, 
     labels_font_size=15,
