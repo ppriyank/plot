@@ -494,8 +494,9 @@ class ALL_PLOT:
                 colors=colors, **plot_kwargs
             )
 
+        plot_kwargs = self.update_plot_kwargs(Add_parms, plot_kwargs)
+        
         if X_vals == None and Y_vals == None: 
-            plot_kwargs = self.update_plot_kwargs(Add_parms, plot_kwargs)
             self.restore_params()
             self.save_plot(**plot_kwargs)
             return 

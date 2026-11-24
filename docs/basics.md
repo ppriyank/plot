@@ -8,8 +8,9 @@ type. The plot-specific pages list the rest:
 - [Line plots](line.md): `plt_type="line"`
 - [Bar charts and histograms](hist.md): `plt_type="bar"`
 - [Heatmaps](heatmap.md): `plt_type="heatmap"`
-- [Radar plots and word clouds](misc.md): `plt_type="radar"`, `plt_type="word_cloud"`
 - [Scatter plots](scatter.md): `plt_type="scatter"`
+- [Radar, word cloud, network and Sankey plots](misc.md): `plt_type="radar"`,
+  `"word_cloud"`, `"network_bubble"`, `"sankey"`
 
 ## How a plot is made
 
@@ -42,6 +43,9 @@ PLOT_FN.plot(
 4. Builds the axis ticks, grid, and axis lines.
 5. Adds a legend if `legend=True`.
 6. Saves `<name>.png`.
+
+Word clouds, network bubble plots and Sankey plots skip steps 4 and 5: they
+have no axis ticks, grid or legend.
 
 The folder in `name` must already exist.
 

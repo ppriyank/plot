@@ -15,6 +15,7 @@ from netgraph import Graph
 import pandas as pd 
 import random 
 
+
 ##############################################################################
 ######################## WORD CLOUD 
 def word_cloud_plt(
@@ -353,9 +354,6 @@ def network_bubble_plot(ax,
 ##############################################################################
 ######################## Sankey PLOT 
 
-
-
-
 def _scale_sankey_flow_width(collection, width):
     for path in collection.get_paths():
         vertices = path.vertices.copy()
@@ -380,79 +378,139 @@ def _scale_sankey_flow_width(collection, width):
         path.vertices[:] = vertices
     collection.stale = True
 
+def _stack(labels, node_gap, side, weights):
+    gap = node_gap * weights.sum()
+    positions, bottom = {}, 0
+    for label in labels:
+        size = weights[side == label].sum()
+        positions[label] = {'bottom': bottom, 'size': size}
+        bottom += size + gap
+    return positions, bottom - gap
 
-def Sankey_plot(df, figsize=None, 
-    name="test", 
-    left_axis=None, right_axis=None, 
+def _smooth(values):
+    kernel = 0.05 * np.ones(20)
+    return np.convolve(np.convolve(values, kernel, mode='valid'), kernel, mode='valid')
+
+    
+
+def Sankey_plot(ax,
+    Left=None, Right=None,
+    
+    left_weights=None, # Size of Label
+    right_weights=None, # Size of Label
+
+    left_axis_colors=BLUE,
+    right_axis_colors=RED,
+    
+    flow_width=1,
     labels_font_size=15,
-    gradient=False, edges=True, edge_width=0.75, edgecolor='black',  
-    left_axis_colors='black', right_axis_colors='blue', 
-    edge_alpha=0.5, opacity=1, flow_width=0.5,
+    aspect=20,
+    node_gap=0.02,
+
+    gradient=True,
+    opacity=1,
+    edges=True,
+    edge_width=1,
+    edgecolor='white',
+    edge_alpha=0.6,
+
+    **args
     ):
-    """Create a Sankey plot; flow_width scales ribbon thickness (1 keeps the original width)."""
+    """Draw a Sankey diagram (Left -> Right flows) on ``ax``.
+    Layout follows pySankey, but everything is drawn on the supplied axis
+    (pySankey's ``sankey`` always opens a new figure, so it can't be used with ALL_PLOT).
+    flow_width scales ribbon thickness (1 keeps the original width).
+    """
     if not np.isfinite(flow_width) or flow_width < 0:
         raise ValueError("flow_width must be a finite, non-negative number.")
+    if Left is None or Right is None or len(Left) != len(Right):
+        raise ValueError("Left and Right must be given and have the same length.")
 
-    import pandas as pd
-    from pySankey.sankey import sankey
-    # python -m pip install pySankey
+    Left, Right = np.asarray(Left), np.asarray(Right)
+    left_weights = np.ones(len(Left)) if left_weights is None else np.asarray(left_weights, dtype=float)
+    right_weights = left_weights if right_weights is None else np.asarray(right_weights, dtype=float)
 
-    left_labels = pd.unique(df[left_axis])
-    right_labels = pd.unique(df[right_axis])
-    
+    left_labels = np.unique(Left)
+    right_labels = np.unique(Right)
+
     if type(left_axis_colors) is not dict:
-        left_axis_colors = {k:left_axis_colors for k in left_labels}
+        left_axis_colors = {k: left_axis_colors for k in left_labels}
     if type(right_axis_colors) is not dict:
-        right_axis_colors = {k:right_axis_colors for k in right_labels}
-        
-    Dummy_colors = {k:'blue' for k in set(left_labels).union(right_labels)}
+        right_axis_colors = {k: right_axis_colors for k in right_labels}
+
+
+    # Size represents how big bar of the text is .... 
+    # Too many mapping increases the size 
+    #### Node positions (stacked bottom -> top with a gap between nodes)
+    left_pos, left_top = _stack(left_labels, node_gap, Left, left_weights)
+    right_pos, right_top = _stack(right_labels, node_gap, Right, right_weights)
+    x_max = max(left_top, right_top) / aspect
     
-    sankey(df[left_axis], df[right_axis], aspect=20, colorDict=Dummy_colors, fontsize=labels_font_size)
-    plot_ax = plt.gca()
-    if figsize:
-        plot_ax.figure.set_size_inches(figsize, forward=True)
-    node_count = len(left_labels) + len(right_labels)
-    flow_collections = list(plot_ax.collections[node_count:])
 
-    flow_pairs = [
-            (left, right) for left in left_labels for right in right_labels if ((df[left_axis] == left) & (df[right_axis] == right)).any()
-    ]
+    #### Nodes + labels
+    for label, pos in left_pos.items():
+        ax.fill_between([-0.02 * x_max, 0], 2 * [pos['bottom']], 2 * [pos['bottom'] + pos['size']],
+                        color=left_axis_colors[label], alpha=0.99, linewidth=0)
+        ax.text(-0.05 * x_max, pos['bottom'] + 0.5 * pos['size'], label,
+                ha='right', va='center', fontsize=labels_font_size)
+    for label, pos in right_pos.items():
+        ax.fill_between([x_max, 1.02 * x_max], 2 * [pos['bottom']], 2 * [pos['bottom'] + pos['size']],
+                        color=right_axis_colors[label], alpha=0.99, linewidth=0)
+        ax.text(1.05 * x_max, pos['bottom'] + 0.5 * pos['size'], label,
+                ha='left', va='center', fontsize=labels_font_size)
 
-    assert len(flow_collections) == len(flow_pairs), "Unable to apply Sankey gradients: unexpected number of flow artists."
+    # plt.savefig("test_sankey.png", dpi=300)
+    #### Flows (smoothed ribbons)
+    left_cursor = {k: v['bottom'] for k, v in left_pos.items()}
+    right_cursor = {k: v['bottom'] for k, v in right_pos.items()}
+    flow_collections, flow_pairs = [], []
+    for left in left_labels:
+        for right in right_labels:
+            mask = (Left == left) & (Right == right)
+            if not mask.any():
+                continue
+            l_w, r_w = left_weights[mask].sum(), right_weights[mask].sum()
+            ys_d = _smooth(np.array(50 * [left_cursor[left]] + 50 * [right_cursor[right]]))
+            ys_u = _smooth(np.array(50 * [left_cursor[left] + l_w] + 50 * [right_cursor[right] + r_w]))
+            left_cursor[left] += l_w
+            right_cursor[right] += r_w
+
+            collection = ax.fill_between(np.linspace(0, x_max, len(ys_d)), ys_d, ys_u,
+                                         color=left_axis_colors[left], alpha=0.65 * opacity, linewidth=0)
+            flow_collections.append(collection)
+            flow_pairs.append((left, right))
+
+    ax.axis('off')
+    # plt.savefig("test_sankey.png", dpi=300)
     if flow_width != 1:
         for collection in flow_collections:
             _scale_sankey_flow_width(collection, flow_width)
 
+    #### Left -> Right colour gradient clipped to each ribbon
     if gradient:
-        node_collections = plot_ax.collections[:node_count]
-        for collection, label in zip(node_collections[:len(left_labels)], left_labels):
-            collection.set_facecolor(left_axis_colors[label])
-            collection.set_edgecolor(left_axis_colors[label])
-        for collection, label in zip(node_collections[len(left_labels):], right_labels):
-            collection.set_facecolor(right_axis_colors[label])
-            collection.set_edgecolor(right_axis_colors[label])
-
-        x_min, x_max = plot_ax.get_xlim()
-        y_min, y_max = plot_ax.get_ylim()
+        x_min, x_lim_max = ax.get_xlim()
+        y_min, y_max = ax.get_ylim()
         gradient_values = np.linspace(0, 1, 256).reshape(1, -1)
-
         for collection, (left, right) in zip(flow_collections, flow_pairs):
             color_map = mpl.colors.LinearSegmentedColormap.from_list(
                 "sankey_flow", [left_axis_colors[left], right_axis_colors[right]]
             )
-            image = plot_ax.imshow(
+            image = ax.imshow(
                 color_map(gradient_values),
-                extent=(x_min, x_max, y_min, y_max),
+                extent=(x_min, x_lim_max, y_min, y_max),
                 origin="lower",
                 aspect="auto",
                 interpolation="bilinear",
                 alpha=opacity,
                 zorder=collection.get_zorder(),
             )
-            image.set_clip_path(
-                collection.get_paths()[0], collection.get_transform()
-            )
-    
+            image.set_clip_path(collection.get_paths()[0], collection.get_transform())
+            collection.set_visible(False)
+        # imshow resets limits; restore the Sankey extent
+        ax.set_xlim(x_min, x_lim_max)
+        ax.set_ylim(y_min, y_max)
+
+    # plt.savefig("test_sankey.png", dpi=300)
     if edges:
         for collection in flow_collections:
             outline = mpl.patches.PathPatch(
@@ -464,29 +522,10 @@ def Sankey_plot(df, figsize=None,
                 zorder=collection.get_zorder() + 1,
                 alpha=edge_alpha,
             )
-            plot_ax.add_patch(outline)
-            collection.remove()
-            
-    plt.tight_layout()
-    plt.savefig(f"{name}.png", dpi=300)
-    plt.clf()
+            ax.add_patch(outline)
 
+    # PLOTS.plot() expects (X_range, Y_range, params); None, None skips axis stylizing
+    # plt.savefig("test_sankey.png", dpi=300)
+    return None, None, {}
 
-    
-             
-
-
-
-# from plot_utils import range_calc, binning, contrast_ratio
-# import numpy as np 
-
-# import numpy as np
-# from matplotlib.colors import TwoSlopeNorm
-# from numbers import Integral
-# from typing import Literal
-# from plot_add import *
-
-# import matplotlib.pyplot as plt
-
-# from plot_add import * 
 
